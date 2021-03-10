@@ -37,7 +37,7 @@ jobs:
           VERSION=$NUPKG_MAJOR-ci$GITHUB_RUN_ID
           mkdir ./output
           mkdir ./artifacts
-          dotnet build --configuration Release ./Svg2VectorDrawable.Net.sln
+          dotnet build --configuration Release ./MauiDoctor.sln
           dotnet pack --output ./artifacts -p:PackageVersion=$VERSION --configuration Release ./MauiDoctor/MauiDoctor.csproj
       - name: Upload Artifacts
         uses: actions/upload-artifact@v1
