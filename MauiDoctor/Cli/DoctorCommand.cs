@@ -134,29 +134,24 @@ namespace MauiDoctor.Cli
 
 							if (settings.Fix && diagnosis.Prescription.HasRemedy)
 							{
-								ctx.Status("Waiting for user input...");
-
-								if (AnsiConsole.Confirm("  [bold red]Try to fix automatically? [/]"))
+								foreach (var remedy in diagnosis.Prescription.Remedies)
 								{
-									foreach (var remedy in diagnosis.Prescription.Remedies)
+									try
 									{
-										try
+										remedy.OnStatusUpdated += (s, e) =>
 										{
-											remedy.OnStatusUpdated += (s, e) =>
-											{
-												ctx.Status(e.Message);
-											};
+											ctx.Status(e.Message);
+										};
 
-											ctx.Status("Attempting to fix: " + checkup.Title);
+										ctx.Status("Attempting to fix: " + checkup.Title);
 
-											await remedy.Cure(cts.Token);
+										await remedy.Cure(cts.Token);
 
-											AnsiConsole.MarkupLine("  Fix applied.  Run doctor again to verify.");
-										}
-										catch (Exception ex)
-										{
-											AnsiConsole.MarkupLine("  Fix failed - " + ex.Message);
-										}
+										AnsiConsole.MarkupLine("  Fix applied.  Run doctor again to verify.");
+									}
+									catch (Exception ex)
+									{
+										AnsiConsole.MarkupLine("  Fix failed - " + ex.Message);
 									}
 								}
 							}
