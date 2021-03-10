@@ -24,12 +24,18 @@ namespace MauiDoctor.Doctoring
 				if (string.IsNullOrEmpty(url.url))
 					continue;
 
-				this.ReportStatus($"Installing {url.title ?? url.url}", i / Urls.Length);
+				ReportStatus($"Installing {url.title ?? url.url}", i / Urls.Length);
 
-				var boots = new Boots.Core.Bootstrapper();
-				boots.Url = url.url;
+				using (var s = new System.IO.StringWriter())
+				{
+					var boots = new Boots.Core.Bootstrapper
+					{
+						Url = url.url,
+						Logger = s
+					};
 
-				await boots.Install(cancellationToken);
+					await boots.Install(cancellationToken);
+				}
 			}
 		}
 	}
