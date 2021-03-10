@@ -3,13 +3,26 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>maui-doctor</ToolCommandName>
+    <PackageOutputPath>./artifacts</PackageOutputPath>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="iOS\**" />
-    <EmbeddedResource Remove="iOS\**" />
-    <None Remove="iOS\**" />
-  </ItemGroup>
+  <PropertyGroup>
+    <PackageId>Redth.DotNet.Maui.Doctor</PackageId>
+    <Title>.NET MAUI Doctor</Title>
+    <Version>0.1.0</Version>
+    <Authors>Redth</Authors>
+    <Owners>Redth</Owners>
+    <summary>A dotnet tool for helping set up your .NET MAUI environment</summary>
+    <PackageDescription>
+			A dotnet tool for helping set up your .NET MAUI environment
+		</PackageDescription>
+    <Copyright>Copyright © Redth</Copyright>
+    <PackageProjectUrl>https://github.com/redth/Resizetizer</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/redth/ResizetizerNT</RepositoryUrl>
+  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="NuGet.Versioning" Version="5.9.0" />
@@ -20,7 +33,6 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="plist-cil" Version="2.1.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
     <PackageReference Include="Spectre.Console" Version="0.38.0" />
   </ItemGroup>
   <ItemGroup>
