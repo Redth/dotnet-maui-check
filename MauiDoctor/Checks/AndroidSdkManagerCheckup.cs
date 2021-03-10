@@ -37,7 +37,7 @@ namespace MauiDoctor.Checks
 					return Task.FromResult(Diagonosis.Ok(this));
 			} catch { }
 
-			return Task.FromResult(new Diagonosis(Status.Error, this, new Prescription("Install Android SDK Manager",
+			return Task.FromResult(new Diagonosis(Status.Error, this, "Failed to find Android SDK.", new Prescription("Install Android SDK Manager",
 				new ActionRemedy((r, ct) =>
 				{
 					if (SelectedHome != null)
