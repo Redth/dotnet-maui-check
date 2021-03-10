@@ -4,20 +4,20 @@ using System.Threading.Tasks;
 using MauiDoctor.Doctoring;
 using NuGet.Versioning;
 
-namespace MauiDoctor.Checks
+namespace MauiDoctor.Checkups
 {
-	public class VisualStudioWindowsCheckup : Checkup
+	public class VisualStudioMacCheckup : Checkup
 	{
-		public VisualStudioWindowsCheckup(string minimumVersion, string exactVersion = null)
+		public VisualStudioMacCheckup(string minimumVersion, string exactVersion = null)
 		{
 			MinimumVersion = NuGetVersion.Parse(minimumVersion);
 			ExactVersion = exactVersion != null ? NuGetVersion.Parse(exactVersion) : null;
 		}
 
 		public override bool IsPlatformSupported(Platform platform)
-			=> platform == Platform.Windows;
+			=> platform == Platform.OSX;
 
-		public NuGetVersion MinimumVersion { get; private set; } = new NuGetVersion("16.9.0");
+		public NuGetVersion MinimumVersion { get; private set; } = new NuGetVersion("8.9.0");
 		public NuGetVersion ExactVersion { get; private set; }
 
 		public override string Id => "visuastudio";
@@ -28,15 +28,7 @@ namespace MauiDoctor.Checks
 		{
 			var vs = new VisualStudio();
 
-			var vsinfo = await vs.GetWindowsInfo();
-
-			foreach (var vi in vsinfo)
-			{
-				if (vi.Version.IsCompatible(MinimumVersion, ExactVersion))
-					ReportStatus("  :check_mark: [darkgreen]" + vi.Version + " - " + vi.Path + "[/]");
-				else
-					ReportStatus("  - [grey]" + vi.Version + "[/]");
-			}
+			var vsinfo = await vs.GetMacInfo();
 
 			if (vsinfo.Any(vs => vs.Version.IsCompatible(MinimumVersion, ExactVersion)))
 				return Diagonosis.Ok(this);

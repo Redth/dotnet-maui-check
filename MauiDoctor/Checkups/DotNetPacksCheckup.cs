@@ -6,7 +6,7 @@ using MauiDoctor.Doctoring;
 using Microsoft.NET.Sdk.WorkloadManifestReader;
 using NuGet.Versioning;
 
-namespace MauiDoctor.Checks
+namespace MauiDoctor.Checkups
 {
 	public class DotNetPacksCheckup : Checkup
 	{

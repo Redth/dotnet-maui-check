@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using MauiDoctor.Doctoring;
 
-namespace MauiDoctor.Checks
+namespace MauiDoctor.Checkups
 {
 	public class MauiCheckup : Doctoring.Checkup
 	{

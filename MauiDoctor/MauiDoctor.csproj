@@ -37,7 +37,10 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Doctoring\" />
-    <Folder Include="Checks\" />
+    <Folder Include="Checkups\" />
+    <Folder Include="Manifest\" />
+    <Folder Include="AndroidSdk\" />
+    <Folder Include="Process\" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.DotNet.MSBuildSdkResolver">

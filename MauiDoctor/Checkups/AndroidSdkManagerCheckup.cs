@@ -4,7 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using MauiDoctor.Doctoring;
 
-namespace MauiDoctor.Checks
+namespace MauiDoctor.Checkups
 {
 	public class AndroidSdkManagerCheckup : Checkup
 	{

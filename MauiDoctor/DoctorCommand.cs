@@ -1,4 +1,4 @@
-﻿using MauiDoctor.Checks;
+﻿using MauiDoctor.Checkups;
 using MauiDoctor.Doctoring;
 using Spectre.Console;
 using Spectre.Console.Cli;

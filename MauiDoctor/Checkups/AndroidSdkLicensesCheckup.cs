@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MauiDoctor.Doctoring;
 
-namespace MauiDoctor.Checks
+namespace MauiDoctor.Checkups
 {
 	public class AndroidSdkLicensesCheckup : Checkup
 	{

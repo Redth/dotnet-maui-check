@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MauiDoctor.Checks;
+using MauiDoctor.Checkups;
 using MauiDoctor.Cli;
 using MauiDoctor.Doctoring;
 using NuGet.Versioning;

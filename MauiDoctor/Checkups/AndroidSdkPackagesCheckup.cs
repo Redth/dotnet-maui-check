@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using MauiDoctor.Doctoring;
 using NuGet.Versioning;
 
-namespace MauiDoctor.Checks
+namespace MauiDoctor.Checkups
 {
 	public class AndroidSdkPackagesCheckup : Checkup
 	{
