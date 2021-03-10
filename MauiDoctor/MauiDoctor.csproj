@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NuGet.Versioning" Version="5.9.0" />
+    <PackageReference Include="Microsoft.Build.Framework" Version="16.9.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="vswhere" Version="2.8.4">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="plist-cil" Version="2.1.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
+    <PackageReference Include="Spectre.Console" Version="0.38.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="iOS\" />
+    <Folder Include="Doctoring\" />
+    <Folder Include="Checks\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.DotNet.MSBuildSdkResolver">
+      <HintPath>..\libs\Microsoft.DotNet.MSBuildSdkResolver.dll</HintPath>
+    </Reference>
+    <Reference Include="Boots.Core">
+      <HintPath>..\libs\Boots.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Polly">
+      <HintPath>..\libs\Polly.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>
