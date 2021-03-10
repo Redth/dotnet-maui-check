@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageId>Redth.DotNet.Maui.Doctor</PackageId>
+    <PackageId>Redth.Microsoft.DotNet.Maui.Doctor</PackageId>
     <Title>.NET MAUI Doctor</Title>
     <Version>0.1.0</Version>
     <Authors>Redth</Authors>
@@ -19,9 +19,9 @@
 			A dotnet tool for helping set up your .NET MAUI environment
 		</PackageDescription>
     <Copyright>Copyright © Redth</Copyright>
-    <PackageProjectUrl>https://github.com/redth/Resizetizer</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/redth/dotnet-maui-doctor</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/redth/ResizetizerNT</RepositoryUrl>
+    <RepositoryUrl>https://github.com/redth/dotnet-maui-doctor</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
