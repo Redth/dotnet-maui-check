@@ -1,0 +1,72 @@
+name: Build
+
+on: 
+  push:
+  release:
+    types: [published]
+  pull_request:
+    branches:
+    - master
+    
+jobs:
+    build:
+      name: Build
+      env:
+        NUPKG_MAJOR: 0.4
+      runs-on: macos-latest
+      steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1.100
+      - name: Build and Pack - Release
+        if: github.event_name == 'release'
+        run: |
+          arrTag=(${GITHUB_REF//\// })
+          VERSION="${arrTag[2]}"
+          VERSION="${VERSION//v}"
+          mkdir ./output
+          mkdir ./artifacts
+          dotnet build --configuration Release ./MauiDoctor.sln
+          dotnet pack --output ./artifacts -p:PackageVersion=$VERSION --configuration Release ./MauiDoctor/MauiDoctor.csproj
+      - name: Build and Pack - CI
+        if: github.event_name != 'release'
+        run: |
+          VERSION=$NUPKG_MAJOR-ci$GITHUB_RUN_ID
+          mkdir ./output
+          mkdir ./artifacts
+          dotnet build --configuration Release ./MauiDoctor.sln
+          dotnet pack --output ./artifacts -p:PackageVersion=$VERSION --configuration Release ./MauiDoctor/MauiDoctor.csproj
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: NuGet
+          path: ./artifacts
+
+    publish:
+      name: Publish
+      needs: build
+      runs-on: windows-latest
+      if: github.event_name == 'release'
+      steps:
+        - name: Download Artifacts
+          uses: actions/download-artifact@v1
+          with:
+            name: NuGet
+        - name: Setup .NET Core
+          uses: actions/setup-dotnet@v1
+          with:
+            dotnet-version: 3.1.100
+        - name: Setup NuGet
+          uses: nuget/setup-nuget@v1
+          with:
+            nuget-api-key: ${{ secrets.NUGET_API_KEY }}
+            nuget-version: 'latest'
+        - name: Push NuGet
+          run: |
+            nuget sources add -Name "GPR" -Source "https://nuget.pkg.github.com/Redth/index.json" -UserName Redth -Password ${{ secrets.GITHUB_TOKEN }}
+            nuget setApiKey ${{ secrets.NUGET_API_KEY }} -Source "GPR"
+            nuget push NuGet\*.nupkg -Source "GPR" -SkipDuplicate
+            nuget push NuGet\*.nupkg -Source https://api.nuget.org/v3/index.json -ApiKey ${{ secrets.NUGET_ORG_API_KEY }} -SkipDuplicate
