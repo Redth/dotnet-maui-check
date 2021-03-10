@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MauiDoctor.AndroidSdk;
@@ -15,6 +17,9 @@ namespace MauiDoctor
 			sdkManager = new AndroidSdkManager();
 
 		}
+
+		public DirectoryInfo[] GetHomes()
+			=> AndroidSdkManager.FindHome().Distinct().ToArray();
 
 		public Task<bool> AcceptLicenses()
 			=> Task.FromResult(sdkManager.SdkManager.AcceptLicenses());

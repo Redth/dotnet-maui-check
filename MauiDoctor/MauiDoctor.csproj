@@ -6,6 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="iOS\**" />
+    <EmbeddedResource Remove="iOS\**" />
+    <None Remove="iOS\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="NuGet.Versioning" Version="5.9.0" />
     <PackageReference Include="Microsoft.Build.Framework" Version="16.9.0" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
@@ -18,7 +24,6 @@
     <PackageReference Include="Spectre.Console" Version="0.38.0" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="iOS\" />
     <Folder Include="Doctoring\" />
     <Folder Include="Checks\" />
   </ItemGroup>

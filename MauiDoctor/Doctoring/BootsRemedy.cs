@@ -21,7 +21,10 @@ namespace MauiDoctor.Doctoring
 			{
 				i++;
 
-				this.ReportStatus($"Installing {url.title}", i / Urls.Length);
+				if (string.IsNullOrEmpty(url.url))
+					continue;
+
+				this.ReportStatus($"Installing {url.title ?? url.url}", i / Urls.Length);
 
 				var boots = new Boots.Core.Bootstrapper();
 				boots.Url = url.url;

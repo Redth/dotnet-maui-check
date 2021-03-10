@@ -46,13 +46,21 @@ namespace MauiDoctor.Checks
 				}
 			}
 
+			foreach (var sdk in sdks)
+			{
+				if (RequiredSdks.Any(rs => sdk.Version == NuGetVersion.Parse(rs.Version)))
+					ReportStatus("  :check_mark: [darkgreen]" + sdk.Version + " - " + sdk.Directory + "[/]");
+				else
+					ReportStatus("  - [grey]" + sdk.Version + " - " + sdk.Directory + "[/]");
+			}
+
 			if (missingSdks.Any())
 			{
 				var str = SdkListToString();
 
 				return new Diagonosis(Status.Error, this, $".NET SDK {str} not found.",
 						new Prescription($"Download .NET SDK {str}",
-						new BootsRemedy(missingSdks.Select(ms => (ms.Urls.For(Util.Platform).ToString(), ".NET SDK " + ms.Version)).ToArray())));
+						new BootsRemedy(missingSdks.Select(ms => (ms.Urls.For(Util.Platform)?.ToString(), ".NET SDK " + ms.Version)).ToArray())));
 			}
 
 			return new Diagonosis(Status.Ok, this);

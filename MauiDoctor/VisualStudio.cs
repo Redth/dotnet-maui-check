@@ -72,7 +72,7 @@ namespace MauiDoctor
 				return default;
 
 			var r = ShellProcessRunner.Run(path,
-				"-all -requires Microsoft.Component.MSBuild -format -json");
+				"-all -requires Microsoft.Component.MSBuild -format json");
 
 			var str = r.GetOutput();
 
@@ -80,7 +80,7 @@ namespace MauiDoctor
 
 			foreach (var vsjson in json.RootElement.EnumerateArray())
 			{
-				if (!vsjson.TryGetProperty("catalyst", out var vsCat) || !vsCat.TryGetProperty("productSemanticVersion", out var vsSemVer))
+				if (!vsjson.TryGetProperty("catalog", out var vsCat) || !vsCat.TryGetProperty("productSemanticVersion", out var vsSemVer))
 					continue;
 
 				if (!NuGetVersion.TryParse(vsSemVer.GetString(), out var semVer))

@@ -13,7 +13,7 @@ namespace MauiDoctor.Checks
 		public DotNetPacksCheckup(string sdkVersion, params Manifest.DotNetPack[] requiredPacks) : base()
 		{
 			SdkVersion = sdkVersion;
-			RequiredPacks = requiredPacks;
+			RequiredPacks = requiredPacks?.Where(p => p.SupportedFor(Util.Platform))?.ToArray();
 		}
 
 		public override string[] Dependencies => new string[] { "dotnet" };
@@ -57,7 +57,7 @@ namespace MauiDoctor.Checks
 				Status.Error,
 				this,
 				new Prescription("Install Missing SDK Packs",
-					new BootsRemedy(missingPacks.Select(mp => (mp.Urls.For(Util.Platform).ToString(), $"{mp.Id} ({mp.Version})")).ToArray())));
+					new BootsRemedy(missingPacks.Select(mp => (mp.Urls.For(Util.Platform)?.ToString(), $"{mp.Id} ({mp.Version})")).ToArray())));
 		}
 	}
 }

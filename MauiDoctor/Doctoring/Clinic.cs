@@ -16,7 +16,7 @@ namespace MauiDoctor.Doctoring
 		public void OfferService(Checkup checkup)
 			=> checkups.Add(checkup);
 
-		public IEnumerable<Checkup> ScheduleAppointments()
+		public IEnumerable<Checkup> ScheduleCheckups()
 		{
 			var filtered = checkups.Where(c => c.IsPlatformSupported(Util.Platform));
 

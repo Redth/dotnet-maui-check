@@ -13,6 +13,8 @@ namespace MauiDoctor.Checks
 
 		public override string Id => "androidsdklicenses";
 
+		public override string[] Dependencies => new[] { "androidsdk" };
+
 		public override string Title => "Android SDK - Accepted Licenses";
 
 		public override async Task<Diagonosis> Examine()

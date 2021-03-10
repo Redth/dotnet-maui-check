@@ -30,6 +30,14 @@ namespace MauiDoctor.Checks
 
 			var vsinfo = await vs.GetWindowsInfo();
 
+			foreach (var vi in vsinfo)
+			{
+				if (vi.Version.IsCompatible(MinimumVersion, ExactVersion))
+					ReportStatus("  :check_mark: [darkgreen]" + vi.Version + " - " + vi.Path + "[/]");
+				else
+					ReportStatus("  - [grey]" + vi.Version + "[/]");
+			}
+
 			if (vsinfo.Any(vs => vs.Version.IsCompatible(MinimumVersion, ExactVersion)))
 				return Diagonosis.Ok(this);
 

@@ -40,7 +40,7 @@ namespace MauiDoctor.AndroidSdk
 				candidates.AddRange(additionalPossibleDirectories);
 			candidates.AddRange(KnownLikelyPaths);
 
-			foreach (var c in candidates)
+			foreach (var c in candidates.Distinct())
 			{
 				if (!string.IsNullOrWhiteSpace(c) && Directory.Exists(c))
 					yield return new DirectoryInfo(c);
