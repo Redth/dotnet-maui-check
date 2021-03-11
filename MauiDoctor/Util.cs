@@ -34,6 +34,40 @@ namespace MauiDoctor
 		public static bool IsMac
 			=> Platform == Platform.OSX;
 
+
+		[DllImport("libc")]
+#pragma warning disable IDE1006 // Naming Styles
+		static extern uint getuid();
+#pragma warning restore IDE1006 // Naming Styles
+
+
+		public static bool IsAdmin()
+		{
+			try
+			{
+				if (IsWindows)
+				{
+					using (var identity = System.Security.Principal.WindowsIdentity.GetCurrent())
+					{
+						var principal = new System.Security.Principal.WindowsPrincipal(identity);
+						if (!principal.IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator))
+						{
+							return false;
+						}
+					}
+				}
+				else if (getuid() != 0)
+				{
+					return false;
+				}
+			}
+			catch
+			{
+				return false;
+			}
+
+			return true;
+		}
 	}
 
 	public enum Platform
