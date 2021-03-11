@@ -12,7 +12,7 @@ jobs:
     build:
       name: Build
       env:
-        NUPKG_MAJOR: 0.4
+        NUPKG_MAJOR: 0.1
       runs-on: macos-latest
       steps:
       - name: Checkout
@@ -26,7 +26,6 @@ jobs:
         run: |
           arrTag=(${GITHUB_REF//\// })
           VERSION="${arrTag[2]}"
-          VERSION="${VERSION//v}"
           mkdir ./output
           mkdir ./artifacts
           dotnet build --configuration Release ./MauiDoctor.sln
