@@ -17,8 +17,8 @@ namespace MauiDoctor.Doctoring
 		public virtual bool IsPlatformSupported(Platform platform)
 			=> true;
 
-		protected void ReportStatus(string message, int progress = -1)
-			=> OnStatusUpdated?.Invoke(this, new CheckupStatusEventArgs(this, message, progress));
+		protected void ReportStatus(string message, Status? status, int progress = -1)
+			=> OnStatusUpdated?.Invoke(this, new CheckupStatusEventArgs(this, message, status, progress));
 
 		public event EventHandler<CheckupStatusEventArgs> OnStatusUpdated;
 	}

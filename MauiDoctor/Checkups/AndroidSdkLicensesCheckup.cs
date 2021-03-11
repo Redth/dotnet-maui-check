@@ -13,31 +13,35 @@ namespace MauiDoctor.Checkups
 
 		public override string Id => "androidsdklicenses";
 
-		public override string[] Dependencies => new[] { "androidsdkpackages" };
+		public override string[] Dependencies => new[] { "androidsdk" };
 
-		public override string Title => "Android SDK - Accept Licenses";
+		public override string Title => "Android SDK - Licenses Acceptance";
 
-		public override async Task<Diagonosis> Examine()
+		public override Task<Diagonosis> Examine()
 		{
-			var android = new Android();
+			var android = new AndroidSdk.AndroidSdkManager();
 
 			try
 			{
-				var v = await android.RequiresLicenseAcceptance();
+				var v = android.SdkManager.RequiresLicenseAcceptance();
 
 				if (!v)
 				{
-					ReportStatus($":check_mark: [bold darkgreen]All licenses accepted.[/]");
-					return Diagonosis.Ok(this);
+					ReportStatus($"All licenses accepted.", Status.Ok);
+					return Task.FromResult(Diagonosis.Ok(this));
 				}
 			}
 			catch { }
 
-			return new Diagonosis(Status.Error, this, new Prescription("Accept Licenses in Android SDK Manager",
-				new ActionRemedy(async (r, ct) =>
+			var ext = Util.IsWindows ? ".bat" : string.Empty;
+
+			return Task.FromResult(new Diagonosis(Status.Error, this, new Prescription("Android SDK has licenses which need to be accepted.",
+				$"To read and accept Android SDK licenses, run the following command in a terminal:  sdkmanager{ext} --licenses",
+				new ActionRemedy((r, ct) =>
 				{
-					await android.AcceptLicenses();
-				})));
+					android.SdkManager.AcceptLicenses();
+					return Task.CompletedTask;
+				}))));
 		}
 	}
 }

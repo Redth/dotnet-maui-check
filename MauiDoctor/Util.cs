@@ -32,8 +32,7 @@ namespace MauiDoctor
 			=> Platform == Platform.Windows;
 
 		public static bool IsMac
-			=> Platform == Platform.OSX;
-
+			=> Platform == Platform.OSX;		
 
 		[DllImport("libc")]
 #pragma warning disable IDE1006 // Naming Styles

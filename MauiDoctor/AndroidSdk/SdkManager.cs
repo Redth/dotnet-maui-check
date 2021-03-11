@@ -187,7 +187,21 @@ namespace MauiDoctor.AndroidSdk
 				}
 			}
 
-			ZipFile.ExtractToDirectory(sdkZipFile.FullName, sdkDir.FullName);
+
+			var zip = Xamarin.Tools.Zip.ZipArchive.Open(sdkZipFile.FullName, FileMode.Open, sdkDir.FullName, false);
+
+			zip.ExtractAll(sdkDir.FullName);
+
+			// Extracts to $HOME/cmdline-tools, move to $HOME/latest
+			Directory.Move(Path.Combine(sdkDir.FullName, "cmdline-tools"), Path.Combine(sdkDir.FullName, "latest"));
+
+			// Create the cmdline-tools again so we have a new blank dir
+			Directory.CreateDirectory(Path.Combine(sdkDir.FullName, "cmdline-tools"));
+
+			// Move into it so we end up with $HOME/cmdline-tools/latest
+			Directory.Move(Path.Combine(sdkDir.FullName, "latest"), Path.Combine(sdkDir.FullName, "cmdline-tools", "latest"));
+
+			//ZipFile.ExtractToDirectory(sdkZipFile.FullName, sdkDir.FullName);
 		}
 
 		public bool IsUpToDate()
@@ -209,6 +223,8 @@ namespace MauiDoctor.AndroidSdk
 		{
 			var builder = new ProcessArgumentBuilder();
 			builder.Append("--version");
+
+			BuildStandardOptions(builder);
 
 			var p = Run(builder);
 
@@ -355,9 +371,32 @@ namespace MauiDoctor.AndroidSdk
 
 			BuildStandardOptions(builder);
 
-			RunWithAccept(builder);
+			var output = RunWithAccept2(builder, TimeSpan.Zero);
 
 			return true;
+		}
+
+		public bool RequiresLicenseAcceptance()
+		{
+			var sdkManager = FindToolPath(AndroidSdkHome);
+
+			if (!(sdkManager?.Exists ?? false))
+				throw new FileNotFoundException("Could not locate sdkmanager", sdkManager?.FullName);
+
+			var requiresAcceptance = false;
+
+			var cts = new CancellationTokenSource();
+			var spr = new ShellProcessRunner(sdkManager.FullName, "--licenses", cts.Token, rx =>
+			{
+				if (rx.ToLowerInvariant().Contains("licenses not accepted"))
+				{
+					requiresAcceptance = true;
+					cts.Cancel();
+				}
+			});
+
+			spr.WaitForExit();
+			return requiresAcceptance;
 		}
 
 		public bool AcceptLicenses()
@@ -460,6 +499,35 @@ namespace MauiDoctor.AndroidSdk
 				Directory.Delete(sdkToolsTempDir, true);
 
 			return r.StandardOutput;
+		}
+
+		List<string> RunWithAccept2(ProcessArgumentBuilder builder, TimeSpan timeout, bool moveToolsToTemp = false)
+		{
+			var sdkManager = FindToolPath(AndroidSdkHome);
+
+			if (!(sdkManager?.Exists ?? false))
+				throw new FileNotFoundException("Could not locate sdkmanager", sdkManager?.FullName);
+
+			var ct = new CancellationTokenSource();
+			if (timeout != TimeSpan.Zero)
+				ct.CancelAfter(timeout);
+
+			var p = new ShellProcessRunner(sdkManager.FullName, builder.ToString(), ct.Token, null, true);
+
+			while (!p.HasExited)
+			{
+				Thread.Sleep(250);
+
+				try
+				{
+					p.Write("y");
+				}
+				catch { }
+			}
+
+			var r = p.WaitForExit();
+
+			return r.StandardOutput.Concat(r.StandardError).ToList();
 		}
 
 		List<string> Run(ProcessArgumentBuilder builder)

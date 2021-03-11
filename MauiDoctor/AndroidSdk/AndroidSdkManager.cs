@@ -34,9 +34,11 @@ namespace MauiDoctor.AndroidSdk
 		public static IEnumerable<DirectoryInfo> FindHome(string mostLikelyHome = null, params string[] additionalPossibleDirectories)
 		{
 			var candidates = new List<string>();
+			
 			candidates.Add(mostLikelyHome);
-			candidates.Add(Environment.GetEnvironmentVariable("ANDROID_HOME"));
 			candidates.Add(Environment.GetEnvironmentVariable("ANDROID_SDK_ROOT"));
+			candidates.Add(Environment.GetEnvironmentVariable("ANDROID_HOME"));
+			
 			if (additionalPossibleDirectories != null)
 				candidates.AddRange(additionalPossibleDirectories);
 			candidates.AddRange(KnownLikelyPaths);

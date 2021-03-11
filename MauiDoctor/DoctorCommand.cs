@@ -93,16 +93,28 @@ namespace MauiDoctor.Cli
 				if (skipCheckup)
 				{
 					checkupStatus.Add(checkup.Id, Doctoring.Status.Error);
-					AnsiConsole.MarkupLine("X [bold red]Skipped: " + checkup.Title + "[/]");
+					AnsiConsole.WriteLine();
+					AnsiConsole.MarkupLine($"[bold red]{Icon.Error} Skipped: " + checkup.Title + "[/]");
 					continue;
 				}
 
 				checkup.OnStatusUpdated += (s, e) =>
 				{
-					AnsiConsole.MarkupLine("  " + e.Message);
+					var msg = "";
+					if (e.Status == Doctoring.Status.Error)
+						msg = $"[red]{Icon.Error} {e.Message}[/]";
+					else if (e.Status == Doctoring.Status.Warning)
+						msg = $"[red]{Icon.Error} {e.Message}[/]";
+					else if (e.Status == Doctoring.Status.Ok)
+						msg = $"[green]{Icon.Success} {e.Message}[/]";
+					else
+						msg = $"{Icon.ListItem} {e.Message}";
+
+					AnsiConsole.MarkupLine("  " + msg);
 				};
 
-				AnsiConsole.MarkupLine(":magnifying_glass_tilted_right: [bold]" + checkup.Title + "[/]...");
+				AnsiConsole.WriteLine();
+				AnsiConsole.MarkupLine($"[bold]{Icon.Checking} " + checkup.Title + " Checkup[/]...");
 				Console.Title = checkup.Title;
 
 				Diagonosis diagnosis = null;
@@ -122,16 +134,16 @@ namespace MauiDoctor.Cli
 				if (diagnosis.Status == Doctoring.Status.Ok)
 					continue;
 
-				var statusEmoji = diagnosis.Status == Doctoring.Status.Error ? ":cross_mark:" : ":warning:";
+				var statusEmoji = diagnosis.Status == Doctoring.Status.Error ? Icon.Error : Icon.Warning;
 				var statusColor = diagnosis.Status == Doctoring.Status.Error ? "red" : "orange3";
 
 				var msg = !string.IsNullOrEmpty(diagnosis.Message) ? " - " + diagnosis.Message : string.Empty;
 
-				AnsiConsole.MarkupLine(statusEmoji + $" [{statusColor}]" + checkup.Title + $"{msg}[/]");
+				//AnsiConsole.MarkupLine($"[{statusColor}]{statusEmoji} {checkup.Title}{msg}[/]");
 
 				if (diagnosis.HasPrescription)
 				{
-					AnsiConsole.MarkupLine("  :syringe: [bold blue]Recommendation:[/] " + diagnosis.Prescription.Name);
+					AnsiConsole.MarkupLine($"  [bold blue]{Icon.Recommend} Recommendation:[/] {diagnosis.Prescription.Name}");
 
 					if (!string.IsNullOrEmpty(diagnosis.Prescription.Description))
 						AnsiConsole.MarkupLine(diagnosis.Prescription.Description);

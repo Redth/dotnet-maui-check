@@ -20,37 +20,38 @@ namespace MauiDoctor.Checkups
 
 		public override Task<Diagonosis> Examine()
 		{
-			var android = new Android();
-
 			try
 			{
-				var homes = android.GetHomes();
-
+				var homes = AndroidSdk.AndroidSdkManager.FindHome();
+			
 				foreach (var home in homes)
 				{
 					try
 					{
-						var v = android.GetSdkManagerVersion();
+						var sdk = new AndroidSdk.SdkManager(home);
+
+						var v = sdk.GetVersion();
+
 						if (v != default)
 						{
 							if (SelectedHome == default)
 							{
 								SelectedHome = home;
-								ReportStatus($":check_mark: [bold darkgreen]{home.FullName} ({v}) found.[/]");
+								ReportStatus($"{home.FullName} ({v}) found.", Status.Ok);
 							}
 							else
 							{
-								ReportStatus($":check_mark: {home.FullName} ({v}) also found.");
+								ReportStatus($"{home.FullName} ({v}) also found.", Status.Ok);
 							}
 						}
 						else
 						{
-							ReportStatus($":warning: {home.FullName} invalid.");
+							ReportStatus($"{home.FullName} invalid.", Status.Warning);
 						}
 					}
 					catch
 					{
-						ReportStatus($":warning: {home.FullName} invalid.");
+						ReportStatus($"{home.FullName} invalid.", Status.Warning);
 					}
 				}
 
@@ -58,40 +59,45 @@ namespace MauiDoctor.Checkups
 					return Task.FromResult(Diagonosis.Ok(this));
 			} catch { }
 
-			return Task.FromResult(new Diagonosis(Status.Error, this, "Failed to find Android SDK.", new Prescription("Install Android SDK Manager",
-				new ActionRemedy((r, ct) =>
-				{
-					if (SelectedHome != null)
-					{
-						if (SelectedHome.Exists)
-						{
-							try { SelectedHome.Delete(true); }
-							catch (UnauthorizedAccessException)
-							{
-								throw new Exception("Fix requires running with adminstrator privileges.  Try opening a terminal as administrator and running maui-doctor again.");
-							}
-							catch (Exception ex)
-							{
-								throw new Exception("Failed to delete existing Android SDK: " + ex.Message);
-							}
+			return Task.FromResult(
+				new Diagonosis(
+					Status.Error,
+					this,
+					"Failed to find Android SDK.",
+					new Prescription("Please Install the Android SDK Manager.  For more information see: https://aka.ms/dotnet-androidsdk-help"))); //,
+				//new ActionRemedy((r, ct) =>
+				//{
+				//	if (SelectedHome != null)
+				//	{
+				//		if (SelectedHome.Exists)
+				//		{
+				//			try { SelectedHome.Delete(true); }
+				//			catch (UnauthorizedAccessException)
+				//			{
+				//				throw new Exception("Fix requires running with adminstrator privileges.  Try opening a terminal as administrator and running maui-doctor again.");
+				//			}
+				//			catch (Exception ex)
+				//			{
+				//				throw new Exception("Failed to delete existing Android SDK: " + ex.Message);
+				//			}
 
-							try { SelectedHome.Create(); }
-							catch { }
-						}
-					}
-					else
-					{
-						SelectedHome = new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Android", "android-sdk"));
-						try { SelectedHome.Create(); }
-						catch { }
-					}
+				//			try { SelectedHome.Create(); }
+				//			catch { }
+				//		}
+				//	}
+				//	else
+				//	{
+				//		SelectedHome = new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Android", "android-sdk"));
+				//		try { SelectedHome.Create(); }
+				//		catch { }
+				//	}
 
-					var sdk = new AndroidSdk.AndroidSdkManager(SelectedHome);
+				//	var sdk = new AndroidSdk.AndroidSdkManager(SelectedHome);
 
-					sdk.Acquire();
+				//	sdk.Acquire();
 
-					return Task.CompletedTask;
-				}))));
+				//	return Task.CompletedTask;
+				//}))));
 		}
 	}
 }

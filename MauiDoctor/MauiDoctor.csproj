@@ -29,12 +29,14 @@
     <PackageReference Include="NuGet.Versioning" Version="5.9.0" />
     <PackageReference Include="Microsoft.Build.Framework" Version="16.9.0" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="SharpZipLib" Version="1.3.1" />
     <PackageReference Include="vswhere" Version="2.8.4">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="plist-cil" Version="2.1.0" />
     <PackageReference Include="Spectre.Console" Version="0.38.0" />
+    <PackageReference Include="Xamarin.LibZipSharp" Version="1.0.24" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Checkups\" />

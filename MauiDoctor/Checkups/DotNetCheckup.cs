@@ -19,7 +19,7 @@ namespace MauiDoctor.Checkups
 
 		public override string Id => "dotnet";
 
-		public override string Title => $".NET Core SDK " + SdkListToString();
+		public override string Title => $".NET Core SDK";
 
 		string SdkListToString()
 			=> (RequiredSdks?.Any() ?? false) ? "(" + string.Join(", ", RequiredSdks.Select(s => s.Version)) + ")" : string.Empty;
@@ -49,9 +49,9 @@ namespace MauiDoctor.Checkups
 			foreach (var sdk in sdks)
 			{
 				if (RequiredSdks.Any(rs => sdk.Version == NuGetVersion.Parse(rs.Version)))
-					ReportStatus(":check_mark: [darkgreen]" + sdk.Version + " - " + sdk.Directory + "[/]");
+					ReportStatus($"{sdk.Version}  - {sdk.Directory}", Status.Ok);
 				else
-					ReportStatus("- [grey]" + sdk.Version + " - " + sdk.Directory + "[/]");
+					ReportStatus($"{sdk.Version} - {sdk.Directory}", null);
 			}
 
 			if (missingSdks.Any())

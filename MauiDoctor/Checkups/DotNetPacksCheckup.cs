@@ -25,7 +25,7 @@ namespace MauiDoctor.Checkups
 
 		public override string Id => "dotnetpacks";
 
-		public override string Title => $".NET Core SDK Packs ({SdkVersion})";
+		public override string Title => $".NET Core SDK - Workloads / Packs ({SdkVersion})";
 
 		public override async Task<Diagonosis> Examine()
 		{
@@ -41,12 +41,12 @@ namespace MauiDoctor.Checkups
 			{
 				if (!sdkPacks.Any(sp => sp.Id == rp.Id && sp.Version == rp.Version))
 				{
-					ReportStatus($":warning: {rp.Id} ({rp.Version}) not found.");
+					ReportStatus($"{rp.Id} ({rp.Version}) not found.", Status.Warning);
 					missingPacks.Add(rp);
 				}
 				else
 				{
-					ReportStatus($":check_mark: [darkgreen]{rp.Id} ({rp.Version}) found.[/]");
+					ReportStatus($"{rp.Id} ({rp.Version}) found", Status.Ok);
 				}
 			}
 

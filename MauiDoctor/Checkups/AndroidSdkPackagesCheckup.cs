@@ -15,20 +15,19 @@ namespace MauiDoctor.Checkups
 			RequiredPackages = requiredPackages;
 		}
 
-		public override string[] Dependencies => new string[] { "androidsdk" };
+		public override string[] Dependencies => new string[] { "androidsdklicenses" };
 
 		public Manifest.AndroidPackage[] RequiredPackages { get; private set; }
 
 		public override string Id => "androidsdkpackages";
 
-		public override string Title => "Android SDK - Install Packages";
+		public override string Title => "Android SDK - Installed Packages";
 
 		public override Task<Diagonosis> Examine()
 		{
-			var android = new Android();
+			var android = new AndroidSdk.AndroidSdkManager();
 
-			
-			var packages = android.GetPackages();
+			var packages = android.SdkManager.List().InstalledPackages;
 
 			var missingPackages = new List<Manifest.AndroidPackage>();
 
@@ -37,42 +36,45 @@ namespace MauiDoctor.Checkups
 				if (!packages.Any(p => p.Path.Equals(rp.Path, StringComparison.OrdinalIgnoreCase)
 					&& NuGetVersion.Parse(p.Version) >= NuGetVersion.Parse(rp.Version)))
 				{
-					ReportStatus($":warning: {rp.Path} ({rp.Version}) not found.");
+					ReportStatus($"{Icon.Warning} {rp.Path} ({rp.Version}) missing.", Status.Error);
 					missingPackages.Add(rp);
 				}
 				else
 				{
-					ReportStatus($":check_mark: [darkgreen]{rp.Path} ({rp.Version}) found.[/]");
+					ReportStatus($"{Icon.Success} {rp.Path} ({rp.Version})", Status.Ok);
 				}
 			}
 
 			if (!missingPackages.Any())
 				return Task.FromResult(Diagonosis.Ok(this));
 
+			var remedies = Util.IsMac ? new AndroidPackagesRemedy[] { new AndroidPackagesRemedy(android, missingPackages.ToArray()) } : null;
+
 			return Task.FromResult(new Diagonosis(
 				Status.Error,
 				this,
-				new Prescription("Install Missing SDK Packs",
-					new AndroidPackagesRemedy(android, missingPackages.ToArray()))));
+				new Prescription("Install missing Android SDK items",
+					"Your Android SDK is missing some required packages.  You can use the Android SDK Manager to install them. For more information see: https://aka.ms/dotnet-androidsdk-help",
+					remedies)));
 		}
 	}
 
 	public class AndroidPackagesRemedy : Remedy
 	{
-		public AndroidPackagesRemedy(Android android, Manifest.AndroidPackage[] packages)
+		public AndroidPackagesRemedy(AndroidSdk.AndroidSdkManager android, Manifest.AndroidPackage[] packages)
 		{
 			Android = android;
 			Packages = packages;
 		}
 
-		public Android Android { get; private set; }
+		public AndroidSdk.AndroidSdkManager Android { get; private set; }
 		public Manifest.AndroidPackage[] Packages { get; private set; }
 
 		public override async Task Cure(CancellationToken cancellationToken)
 		{
 			await base.Cure(cancellationToken);
 
-			Android.InstallPackages(Packages.Select(p => p.Path).ToArray());
+			Android.SdkManager.Install(Packages.Select(p => p.Path).ToArray());
 		}
 	}
 

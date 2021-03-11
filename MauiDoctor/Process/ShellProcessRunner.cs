@@ -23,7 +23,7 @@ namespace MauiDoctor
 
 		public Action<string> OutputHandler { get; private set; }
 
-		public ShellProcessRunner(string executable, string args, System.Threading.CancellationToken cancellationToken, Action<string> outputHandler = null)
+		public ShellProcessRunner(string executable, string args, System.Threading.CancellationToken cancellationToken, Action<string> outputHandler = null, bool redirectStdInput = false)
 		{
 			OutputHandler = outputHandler;
 
@@ -38,6 +38,9 @@ namespace MauiDoctor
 			process.StartInfo.UseShellExecute = false;
 			process.StartInfo.RedirectStandardOutput = true;
 			process.StartInfo.RedirectStandardError = true;
+
+			if (redirectStdInput)
+				process.StartInfo.RedirectStandardInput = true;
 
 			process.OutputDataReceived += (s, e) =>
 			{
@@ -68,6 +71,9 @@ namespace MauiDoctor
 				});
 			}
 		}
+
+		public void Write(string txt)
+			=> process.StandardInput.Write(txt);
 
 		public int ExitCode
 			=> process.HasExited ? process.ExitCode : -1;
