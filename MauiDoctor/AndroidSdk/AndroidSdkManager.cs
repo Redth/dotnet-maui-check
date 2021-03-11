@@ -36,6 +36,7 @@ namespace MauiDoctor.AndroidSdk
 			var candidates = new List<string>();
 			candidates.Add(mostLikelyHome);
 			candidates.Add(Environment.GetEnvironmentVariable("ANDROID_HOME"));
+			candidates.Add(Environment.GetEnvironmentVariable("ANDROID_SDK_ROOT"));
 			if (additionalPossibleDirectories != null)
 				candidates.AddRange(additionalPossibleDirectories);
 			candidates.AddRange(KnownLikelyPaths);

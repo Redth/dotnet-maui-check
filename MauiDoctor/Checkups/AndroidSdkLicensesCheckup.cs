@@ -26,7 +26,10 @@ namespace MauiDoctor.Checkups
 				var v = await android.RequiresLicenseAcceptance();
 
 				if (!v)
+				{
+					ReportStatus($":check_mark: [bold darkgreen]All licenses accepted.[/]");
 					return Diagonosis.Ok(this);
+				}
 			}
 			catch { }
 

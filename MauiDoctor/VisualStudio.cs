@@ -72,7 +72,7 @@ namespace MauiDoctor
 				return default;
 
 			var r = ShellProcessRunner.Run(path,
-				"-all -requires Microsoft.Component.MSBuild -format json");
+				"-all -requires Microsoft.Component.MSBuild -format json -prerelease");
 
 			var str = r.GetOutput();
 

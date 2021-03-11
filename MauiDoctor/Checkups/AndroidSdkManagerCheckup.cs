@@ -27,13 +27,34 @@ namespace MauiDoctor.Checkups
 				var homes = android.GetHomes();
 
 				foreach (var home in homes)
-					ReportStatus("- " + home.FullName);
+				{
+					try
+					{
+						var v = android.GetSdkManagerVersion();
+						if (v != default)
+						{
+							if (SelectedHome == default)
+							{
+								SelectedHome = home;
+								ReportStatus($":check_mark: [bold darkgreen]{home.FullName} ({v}) found.[/]");
+							}
+							else
+							{
+								ReportStatus($":check_mark: {home.FullName} ({v}) also found.");
+							}
+						}
+						else
+						{
+							ReportStatus($":warning: {home.FullName} invalid.");
+						}
+					}
+					catch
+					{
+						ReportStatus($":warning: {home.FullName} invalid.");
+					}
+				}
 
-				SelectedHome = homes[0];
-
-				var v = android.GetSdkManagerVersion();
-
-				if (v != default)
+				if (SelectedHome != default)
 					return Task.FromResult(Diagonosis.Ok(this));
 			} catch { }
 
