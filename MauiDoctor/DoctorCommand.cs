@@ -15,6 +15,8 @@ namespace MauiDoctor.Cli
 	{
 		public override async Task<int> ExecuteAsync(CommandContext context, DoctorSettings settings)
 		{
+			Console.Title = ".NET MAUI Doctor";
+
 			AnsiConsole.MarkupLine("[underline bold green].NET MAUI Doctor[/] Press any key to begin!");
 
 			AnsiConsole.Render(new Rule());
@@ -101,6 +103,7 @@ namespace MauiDoctor.Cli
 				};
 
 				AnsiConsole.MarkupLine(":magnifying_glass_tilted_right: [bold]" + checkup.Title + "[/]...");
+				Console.Title = checkup.Title;
 
 				Diagonosis diagnosis = null;
 
@@ -164,6 +167,8 @@ namespace MauiDoctor.Cli
 					}
 				}
 			}
+
+			Console.Title = ".NET MAUI Doctor";
 
 			return 0;
 		}
