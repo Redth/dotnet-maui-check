@@ -12,7 +12,7 @@ namespace MauiDoctor
 	{
 		AndroidSdkManager sdkManager;
 
-		public Android(DirectoryInfo home)
+		public Android(DirectoryInfo home = null)
 		{
 			sdkManager = new AndroidSdkManager(home);
 		}
