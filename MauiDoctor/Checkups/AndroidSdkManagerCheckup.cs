@@ -8,8 +8,9 @@ namespace MauiDoctor.Checkups
 {
 	public class AndroidSdkManagerCheckup : Checkup
 	{
-		public AndroidSdkManagerCheckup()
+		public AndroidSdkManagerCheckup(string overrideSdkRoot = null)
 		{
+			OverrideSdkRoot = overrideSdkRoot;
 		}
 
 		public override string Id => "androidsdk";
@@ -18,18 +19,21 @@ namespace MauiDoctor.Checkups
 
 		public DirectoryInfo SelectedHome { get; private set; }
 
+		public string OverrideSdkRoot { get; }
+
 		public override Task<Diagonosis> Examine()
 		{
-			var android = new Android();
-
 			try
 			{
-				var homes = android.GetHomes();
+				var homes = string.IsNullOrEmpty(OverrideSdkRoot)
+					? Android.GetHomes()
+					: new[] { new DirectoryInfo(OverrideSdkRoot) };
 
 				foreach (var home in homes)
 				{
 					try
 					{
+						var android = new Android(home);
 						var v = android.GetSdkManagerVersion();
 						if (v != default)
 						{

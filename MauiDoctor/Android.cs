@@ -12,14 +12,13 @@ namespace MauiDoctor
 	{
 		AndroidSdkManager sdkManager;
 
-		public Android()
+		public Android(DirectoryInfo home)
 		{
-			sdkManager = new AndroidSdkManager();
-
+			sdkManager = new AndroidSdkManager(home);
 		}
 
-		public DirectoryInfo[] GetHomes()
-			=> AndroidSdkManager.FindHome().Distinct().ToArray();
+		public static DirectoryInfo[] GetHomes()
+			=> AndroidSdkManager.FindHome().ToArray();
 
 		public Task<bool> AcceptLicenses()
 			=> Task.FromResult(sdkManager.SdkManager.AcceptLicenses());

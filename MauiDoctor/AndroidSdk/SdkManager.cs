@@ -50,6 +50,7 @@ namespace MauiDoctor.AndroidSdk
 		internal override string SdkPackageId => "tools";
 
 		// ANDROID_HOME/cmdline-tools/1.0/bin
+		// ANDROID_HOME/tools/bin
 		public override FileInfo FindToolPath(DirectoryInfo androidSdkHome)
 		{
 			var tool = FindTool(androidSdkHome, toolName: "sdkmanager", windowsExtension: ".bat", "cmdline-tools", "1.0", "bin");

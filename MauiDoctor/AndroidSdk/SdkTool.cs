@@ -30,7 +30,7 @@ namespace MauiDoctor.AndroidSdk
 			var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
 			var ext = isWindows ? windowsExtension : string.Empty;
-			var home = AndroidSdkManager.FindHome(androidHome)?.FirstOrDefault();
+			var home = androidHome ?? AndroidSdkManager.FindHome()?.FirstOrDefault();
 
 			if (home?.Exists ?? false)
 			{

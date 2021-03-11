@@ -19,6 +19,7 @@ namespace MauiDoctor.AndroidSdk
 				{
 					Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Library", "Developer", "android-sdk-macosx"),
 					Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Library", "Developer", "Xamarin", "android-sdk-macosx"),
+					Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Library", "Android", "sdk"),
 					Path.Combine("Developer", "Android", "android-sdk-macosx"),
 				};
 

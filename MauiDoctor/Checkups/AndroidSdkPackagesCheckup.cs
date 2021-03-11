@@ -10,8 +10,11 @@ namespace MauiDoctor.Checkups
 {
 	public class AndroidSdkPackagesCheckup : Checkup
 	{
-		public AndroidSdkPackagesCheckup(Manifest.AndroidPackage[] requiredPackages = null)
+		private readonly AndroidSdkManagerCheckup sdkManagerCheckup;
+
+		public AndroidSdkPackagesCheckup(AndroidSdkManagerCheckup sdkManagerCheckup, Manifest.AndroidPackage[] requiredPackages = null)
 		{
+			this.sdkManagerCheckup = sdkManagerCheckup;
 			RequiredPackages = requiredPackages;
 		}
 
@@ -25,7 +28,7 @@ namespace MauiDoctor.Checkups
 
 		public override Task<Diagonosis> Examine()
 		{
-			var android = new Android();
+			var android = new Android(sdkManagerCheckup.SelectedHome);
 
 			
 			var packages = android.GetPackages();

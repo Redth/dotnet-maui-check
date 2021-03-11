@@ -43,9 +43,10 @@ namespace MauiDoctor.Cli
 
 			if (chart.Doctor.Android != null)
 			{
-				clinic.OfferService(new AndroidSdkManagerCheckup());
-				clinic.OfferService(new AndroidSdkPackagesCheckup(chart.Doctor.Android.Packages.ToArray()));
-				clinic.OfferService(new AndroidSdkLicensesCheckup());
+				var sdkManagerCheckup = new AndroidSdkManagerCheckup(settings.AndroidSdkRoot);
+				clinic.OfferService(sdkManagerCheckup);
+				clinic.OfferService(new AndroidSdkPackagesCheckup(sdkManagerCheckup, chart.Doctor.Android.Packages.ToArray()));
+				clinic.OfferService(new AndroidSdkLicensesCheckup(sdkManagerCheckup));
 			}
 
 			if (chart.Doctor.DotNet != null)
@@ -181,5 +182,8 @@ namespace MauiDoctor.Cli
 
 		[CommandOption("-f|--fix")]
 		public bool Fix { get; set; }
+
+		[CommandOption("--android-sdk")]
+		public string AndroidSdkRoot { get; set; }
 	}
 }

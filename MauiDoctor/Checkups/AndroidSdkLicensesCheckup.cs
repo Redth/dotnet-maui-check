@@ -7,8 +7,11 @@ namespace MauiDoctor.Checkups
 {
 	public class AndroidSdkLicensesCheckup : Checkup
 	{
-		public AndroidSdkLicensesCheckup()
+		private readonly AndroidSdkManagerCheckup sdkManagerCheckup;
+
+		public AndroidSdkLicensesCheckup(AndroidSdkManagerCheckup sdkManagerCheckup)
 		{
+			this.sdkManagerCheckup = sdkManagerCheckup;
 		}
 
 		public override string Id => "androidsdklicenses";
@@ -19,7 +22,7 @@ namespace MauiDoctor.Checkups
 
 		public override async Task<Diagonosis> Examine()
 		{
-			var android = new Android();
+			var android = new Android(sdkManagerCheckup.SelectedHome);
 
 			try
 			{
