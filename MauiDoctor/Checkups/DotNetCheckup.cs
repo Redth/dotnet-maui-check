@@ -60,7 +60,10 @@ namespace MauiDoctor.Checkups
 
 				return new Diagonosis(Status.Error, this, $".NET SDK {str} not found.",
 						new Prescription($"Download .NET SDK {str}",
-						new BootsRemedy(missingSdks.Select(ms => (ms.Urls.For(Util.Platform)?.ToString(), ".NET SDK " + ms.Version)).ToArray())));
+						new BootsRemedy(missingSdks.Select(ms => (ms.Urls.For(Util.Platform)?.ToString(), ".NET SDK " + ms.Version)).ToArray())
+						{
+							AdminRequirements = new [] { (Platform.Windows, true) }
+						}));
 			}
 
 			return new Diagonosis(Status.Ok, this);

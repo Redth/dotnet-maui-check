@@ -45,6 +45,10 @@ namespace MauiDoctor.Checkups
 						if (SelectedHome.Exists)
 						{
 							try { SelectedHome.Delete(true); }
+							catch (UnauthorizedAccessException ex)
+							{
+								throw new Exception("Fix requires running with adminstrator privileges.  Try opening a terminal as administrator and running maui-doctor again.");
+							}
 							catch (Exception ex)
 							{
 								throw new Exception("Failed to delete existing Android SDK: " + ex.Message);

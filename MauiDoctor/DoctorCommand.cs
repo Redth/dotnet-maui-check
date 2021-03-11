@@ -142,9 +142,15 @@ namespace MauiDoctor.Cli
 
 						if (confirm)
 						{
+							var isAdmin = Util.IsAdmin();
 
 							foreach (var remedy in diagnosis.Prescription.Remedies)
 							{
+								if (!remedy.HasPrivilegesToRun(isAdmin, Util.Platform))
+								{
+									AnsiConsole.Markup("Fix requires running with adminstrator privileges.  Try opening a terminal as administrator and running maui-doctor again.");
+									continue;
+								}
 								try
 								{
 									remedy.OnStatusUpdated += (s, e) =>

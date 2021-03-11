@@ -6,6 +6,7 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>maui-doctor</ToolCommandName>
     <PackageOutputPath>./artifacts</PackageOutputPath>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -36,7 +37,6 @@
     <PackageReference Include="Spectre.Console" Version="0.38.0" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Doctoring\" />
     <Folder Include="Checkups\" />
     <Folder Include="Manifest\" />
     <Folder Include="AndroidSdk\" />
