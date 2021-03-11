@@ -26,15 +26,25 @@ namespace MauiDoctor.Doctoring
 
 				ReportStatus($"Installing {url.title ?? url.url}", i / Urls.Length);
 
-				using (var s = new System.IO.StringWriter())
+				var boots = new Boots.Core.Bootstrapper
 				{
-					var boots = new Boots.Core.Bootstrapper
-					{
-						Url = url.url,
-						Logger = s
-					};
+					Url = url.url,
+					Logger = System.IO.TextWriter.Null
+				};
 
+				try
+				{
 					await boots.Install(cancellationToken);
+				}
+				catch
+				{
+					if (string.IsNullOrEmpty(url.title))
+						ReportStatus($":warning: Installation failed for an item:", i / Urls.Length);
+					else
+						ReportStatus($":warning: Installation failed for {url.title}", i / Urls.Length);
+					ReportStatus($"  {url.url}", i / Urls.Length);
+
+					throw;
 				}
 			}
 		}

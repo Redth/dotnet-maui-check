@@ -85,17 +85,11 @@ namespace MauiDoctor
 			return new ShellProcessResult(standardOutput, standardError, process.ExitCode);
 		}
 
-		public Task<ShellProcessResult> WaitForExitAsync()
+		public async Task<ShellProcessResult> WaitForExitAsync()
 		{
-			var tcs = new TaskCompletionSource<ShellProcessResult>();
+			await process.WaitForExitAsync();
 
-			Task.Run(() =>
-			{
-				var r = WaitForExit();
-				tcs.TrySetResult(r);
-			});
-
-			return tcs.Task;
+			return new ShellProcessResult(standardOutput, standardError, process.ExitCode);
 		}
 
 		public class ShellProcessResult
