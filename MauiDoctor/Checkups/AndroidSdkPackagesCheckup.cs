@@ -37,12 +37,12 @@ namespace MauiDoctor.Checkups
 				if (!packages.Any(p => p.Path.Equals(rp.Path, StringComparison.OrdinalIgnoreCase)
 					&& NuGetVersion.Parse(p.Version) >= NuGetVersion.Parse(rp.Version)))
 				{
-					ReportStatus($"  :warning: {rp.Path} ({rp.Version}) not found.");
+					ReportStatus($":warning: {rp.Path} ({rp.Version}) not found.");
 					missingPackages.Add(rp);
 				}
 				else
 				{
-					ReportStatus($"  :check_mark: [darkgreen]{rp.Path} ({rp.Version}) found.[/]");
+					ReportStatus($":check_mark: [darkgreen]{rp.Path} ({rp.Version}) found.[/]");
 				}
 			}
 

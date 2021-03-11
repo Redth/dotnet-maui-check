@@ -27,7 +27,7 @@ namespace MauiDoctor.Checkups
 				var homes = android.GetHomes();
 
 				foreach (var home in homes)
-					ReportStatus("   - Found: " + home.FullName);
+					ReportStatus("- " + home.FullName);
 
 				SelectedHome = homes[0];
 

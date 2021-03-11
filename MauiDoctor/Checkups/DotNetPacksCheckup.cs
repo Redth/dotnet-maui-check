@@ -41,12 +41,12 @@ namespace MauiDoctor.Checkups
 			{
 				if (!sdkPacks.Any(sp => sp.Id == rp.Id && sp.Version == rp.Version))
 				{
-					ReportStatus($"  :warning: {rp.Id} ({rp.Version}) not found.");
+					ReportStatus($":warning: {rp.Id} ({rp.Version}) not found.");
 					missingPacks.Add(rp);
 				}
 				else
 				{
-					ReportStatus($"  :check_mark: [darkgreen]{rp.Id} ({rp.Version}) found.[/]");
+					ReportStatus($":check_mark: [darkgreen]{rp.Id} ({rp.Version}) found.[/]");
 				}
 			}
 

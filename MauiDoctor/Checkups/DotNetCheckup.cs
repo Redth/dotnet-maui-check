@@ -49,9 +49,9 @@ namespace MauiDoctor.Checkups
 			foreach (var sdk in sdks)
 			{
 				if (RequiredSdks.Any(rs => sdk.Version == NuGetVersion.Parse(rs.Version)))
-					ReportStatus("  :check_mark: [darkgreen]" + sdk.Version + " - " + sdk.Directory + "[/]");
+					ReportStatus(":check_mark: [darkgreen]" + sdk.Version + " - " + sdk.Directory + "[/]");
 				else
-					ReportStatus("  - [grey]" + sdk.Version + " - " + sdk.Directory + "[/]");
+					ReportStatus("- [grey]" + sdk.Version + " - " + sdk.Directory + "[/]");
 			}
 
 			if (missingSdks.Any())
