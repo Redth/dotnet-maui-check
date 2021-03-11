@@ -27,137 +27,143 @@ namespace MauiDoctor.Cli
 
 			var checkupStatus = new Dictionary<string, Doctoring.Status>();
 
-			await AnsiConsole.Status().StartAsync("[bold blue]Synchronizing configuration...[/]",
-				async ctx =>
+
+
+			var consoleStatus = AnsiConsole.Status();
+
+			AnsiConsole.Markup("[bold blue]Synchronizing configuration...[/]");
+
+			var chart = await Manifest.Chart.FromFileOrUrl(settings.Manifest);
+
+			AnsiConsole.MarkupLine(" ok");
+
+			AnsiConsole.Markup("[bold blue]Scheduling appointments...[/]");
+
+			if (chart.Doctor.Android != null)
+			{
+				clinic.OfferService(new AndroidSdkManagerCheckup());
+				clinic.OfferService(new AndroidSdkPackagesCheckup(chart.Doctor.Android.Packages.ToArray()));
+				clinic.OfferService(new AndroidSdkLicensesCheckup());
+			}
+
+			if (chart.Doctor.DotNet != null)
+				clinic.OfferService(new XCodeCheckup(chart.Doctor.XCode.MinimumVersion, chart.Doctor.XCode.ExactVersion));
+
+			if (chart.Doctor.VSMac != null && !string.IsNullOrEmpty(chart.Doctor.VSMac.MinimumVersion))
+				clinic.OfferService(new VisualStudioMacCheckup(chart.Doctor.VSMac.MinimumVersion, chart.Doctor.VSMac.ExactVersion));
+
+			if (chart.Doctor.VSWin != null && !string.IsNullOrEmpty(chart.Doctor.VSWin.MinimumVersion))
+				clinic.OfferService(new VisualStudioWindowsCheckup(chart.Doctor.VSWin.MinimumVersion, chart.Doctor.VSWin.ExactVersion));
+
+
+			if (chart.Doctor.DotNet?.Sdks?.Any() ?? false)
+			{
+				clinic.OfferService(new DotNetCheckup(chart.Doctor.DotNet.Sdks.ToArray()));
+
+				foreach (var sdk in chart.Doctor.DotNet.Sdks)
 				{
-					ctx.Spinner(Spinner.Known.Ascii);
-					ctx.SpinnerStyle = new Style(Color.DodgerBlue1, decoration: Decoration.Bold);
+					clinic.OfferService(new DotNetPacksCheckup(sdk.Version, sdk.Packs.ToArray()));
+				}
+			}
 
-					var chart = await Manifest.Chart.FromFileOrUrl(settings.Manifest);
 
-					ctx.Status("[bold blue]Scheduling appointments...[/]");
+			var checkups = clinic.ScheduleCheckups();
 
-					if (chart.Doctor.Android != null)
+			AnsiConsole.MarkupLine(" ok");
+
+			foreach (var checkup in checkups)
+			{
+				var skipCheckup = false;
+
+				// Make sure our dependencies succeeded first
+				if (checkup.Dependencies?.Any() ?? false)
+				{
+					foreach (var dep in checkup.Dependencies)
 					{
-						clinic.OfferService(new AndroidSdkManagerCheckup());
-						clinic.OfferService(new AndroidSdkPackagesCheckup(chart.Doctor.Android.Packages.ToArray()));
-						clinic.OfferService(new AndroidSdkLicensesCheckup());
-					}
-
-					if (chart.Doctor.DotNet != null)
-						clinic.OfferService(new XCodeCheckup(chart.Doctor.XCode.MinimumVersion, chart.Doctor.XCode.ExactVersion));
-
-					if (chart.Doctor.VSMac != null && !string.IsNullOrEmpty(chart.Doctor.VSMac.MinimumVersion))
-						clinic.OfferService(new VisualStudioMacCheckup(chart.Doctor.VSMac.MinimumVersion, chart.Doctor.VSMac.ExactVersion));
-
-					if (chart.Doctor.VSWin != null && !string.IsNullOrEmpty(chart.Doctor.VSWin.MinimumVersion))
-						clinic.OfferService(new VisualStudioWindowsCheckup(chart.Doctor.VSWin.MinimumVersion, chart.Doctor.VSWin.ExactVersion));
-
-
-					if (chart.Doctor.DotNet?.Sdks?.Any() ?? false)
-					{
-						clinic.OfferService(new DotNetCheckup(chart.Doctor.DotNet.Sdks.ToArray()));
-
-						foreach (var sdk in chart.Doctor.DotNet.Sdks)
+						if (!checkupStatus.TryGetValue(dep, out var depStatus) || depStatus != Doctoring.Status.Ok)
 						{
-							clinic.OfferService(new DotNetPacksCheckup(sdk.Version, sdk.Packs.ToArray()));
+							skipCheckup = true;
+							break;
 						}
 					}
+				}
 
+				if (skipCheckup)
+				{
+					checkupStatus.Add(checkup.Id, Doctoring.Status.Error);
+					AnsiConsole.MarkupLine("X [bold red]Skipped: " + checkup.Title + "[/]");
+					continue;
+				}
 
-					var checkups = clinic.ScheduleCheckups();
+				checkup.OnStatusUpdated += (s, e) =>
+				{
+					AnsiConsole.MarkupLine("  " + e.Message);
+				};
 
+				AnsiConsole.MarkupLine(":magnifying_glass_tilted_right: [bold]" + checkup.Title + "[/]...");
 
-					foreach (var checkup in checkups)
+				Diagonosis diagnosis = null;
+
+				try
+				{
+					diagnosis = await checkup.Examine();
+				}
+				catch (Exception ex)
+				{
+					diagnosis = new Diagonosis(Doctoring.Status.Error, checkup, ex.Message);
+				}
+
+				// Cache the status for dependencies
+				checkupStatus.Add(checkup.Id, diagnosis.Status);
+
+				if (diagnosis.Status == Doctoring.Status.Ok)
+					continue;
+
+				var statusEmoji = diagnosis.Status == Doctoring.Status.Error ? ":cross_mark:" : ":warning:";
+				var statusColor = diagnosis.Status == Doctoring.Status.Error ? "red" : "orange3";
+
+				var msg = !string.IsNullOrEmpty(diagnosis.Message) ? " - " + diagnosis.Message : string.Empty;
+
+				AnsiConsole.MarkupLine(statusEmoji + $" [{statusColor}]" + checkup.Title + $"{msg}[/]");
+
+				if (diagnosis.HasPrescription)
+				{
+					AnsiConsole.MarkupLine("  :syringe: [bold blue]Recommendation:[/] " + diagnosis.Prescription.Name);
+
+					if (!string.IsNullOrEmpty(diagnosis.Prescription.Description))
+						AnsiConsole.MarkupLine(diagnosis.Prescription.Description);
+
+					if (diagnosis.Prescription.HasRemedy)
 					{
-						var skipCheckup = false;
+						var confirm = AnsiConsole.Confirm("    [bold]Attempt to fix?[/]");
 
-						// Make sure our dependencies succeeded first
-						if (checkup.Dependencies?.Any() ?? false)
+						if (confirm)
 						{
-							foreach (var dep in checkup.Dependencies)
+
+							foreach (var remedy in diagnosis.Prescription.Remedies)
 							{
-								if (!checkupStatus.TryGetValue(dep, out var depStatus) || depStatus != Doctoring.Status.Ok)
+								try
 								{
-									skipCheckup = true;
-									break;
+									remedy.OnStatusUpdated += (s, e) =>
+									{
+										AnsiConsole.MarkupLine("  " + e.Message);
+									};
+
+									AnsiConsole.MarkupLine("Attempting to fix: " + checkup.Title);
+									
+									await remedy.Cure(cts.Token);
+
+									AnsiConsole.MarkupLine("  Fix applied.  Run doctor again to verify.");
 								}
-							}
-						}
-
-						if (skipCheckup)
-						{
-							checkupStatus.Add(checkup.Id, Doctoring.Status.Error);
-							AnsiConsole.MarkupLine("X [bold red]Skipped: " + checkup.Title + "[/]");
-							continue;
-						}
-
-						checkup.OnStatusUpdated += (s, e) =>
-						{
-							AnsiConsole.MarkupLine(e.Message);
-						};
-
-						AnsiConsole.MarkupLine(":magnifying_glass_tilted_right: [bold]" + checkup.Title + "[/]");
-
-						ctx.Status("[bold blue]Checking:[/] " + checkup.Title);
-
-						Diagonosis diagnosis = null;
-
-						try
-						{
-							diagnosis = await checkup.Examine();
-						}
-						catch (Exception ex)
-						{
-							diagnosis = new Diagonosis(Doctoring.Status.Error, checkup, ex.Message);
-						}
-
-						// Cache the status for dependencies
-						checkupStatus.Add(checkup.Id, diagnosis.Status);
-
-						if (diagnosis.Status == Doctoring.Status.Ok)
-							continue;
-
-						var statusEmoji = diagnosis.Status == Doctoring.Status.Error ? ":cross_mark:" : ":warning:";
-						var statusColor = diagnosis.Status == Doctoring.Status.Error ? "red" : "orange3";
-
-						var msg = !string.IsNullOrEmpty(diagnosis.Message) ? " - " + diagnosis.Message : string.Empty;
-
-						AnsiConsole.MarkupLine(statusEmoji + $" [{statusColor}]" + checkup.Title + $"{msg}[/]");
-
-						if (diagnosis.HasPrescription)
-						{
-							AnsiConsole.MarkupLine("  :syringe: [bold blue]Recommendation:[/] " + diagnosis.Prescription.Name);
-
-							if (!string.IsNullOrEmpty(diagnosis.Prescription.Description))
-								AnsiConsole.MarkupLine(diagnosis.Prescription.Description);
-
-							if (settings.Fix && diagnosis.Prescription.HasRemedy)
-							{
-								foreach (var remedy in diagnosis.Prescription.Remedies)
+								catch (Exception ex)
 								{
-									try
-									{
-										remedy.OnStatusUpdated += (s, e) =>
-										{
-											ctx.Status(e.Message);
-										};
-
-										ctx.Status("Attempting to fix: " + checkup.Title);
-
-										await remedy.Cure(cts.Token);
-
-										AnsiConsole.MarkupLine("  Fix applied.  Run doctor again to verify.");
-									}
-									catch (Exception ex)
-									{
-										AnsiConsole.MarkupLine("  Fix failed - " + ex.Message);
-									}
+									AnsiConsole.MarkupLine("  Fix failed - " + ex.Message);
 								}
 							}
 						}
 					}
-				});
+				}
+			}
 
 			return 0;
 		}
