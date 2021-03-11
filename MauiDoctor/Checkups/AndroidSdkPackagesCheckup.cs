@@ -36,12 +36,12 @@ namespace MauiDoctor.Checkups
 				if (!packages.Any(p => p.Path.Equals(rp.Path, StringComparison.OrdinalIgnoreCase)
 					&& NuGetVersion.Parse(p.Version) >= NuGetVersion.Parse(rp.Version)))
 				{
-					ReportStatus($"{Icon.Warning} {rp.Path} ({rp.Version}) missing.", Status.Error);
+					ReportStatus($"{rp.Path} ({rp.Version}) missing.", Status.Error);
 					missingPackages.Add(rp);
 				}
 				else
 				{
-					ReportStatus($"{Icon.Success} {rp.Path} ({rp.Version})", Status.Ok);
+					ReportStatus($"{rp.Path} ({rp.Version})", Status.Ok);
 				}
 			}
 
