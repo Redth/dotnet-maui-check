@@ -13,7 +13,7 @@ namespace MauiDoctor
 {
 	class Program
 	{
-		static async Task<int> Main(string[] args)
+		static Task<int> Main(string[] args)
 		{
 			var app = new CommandApp();
 
@@ -22,7 +22,7 @@ namespace MauiDoctor
 				config.AddCommand<DoctorCommand>("doctor");
 			});
 
-			return app.Run(new[] { "doctor" }.Concat(args));
+			return app.RunAsync(new[] { "doctor" }.Concat(args));
 		}
 	}
 }

@@ -1,9 +1,12 @@
 
+using System.Diagnostics;
+
 namespace MauiDoctor.AndroidSdk
 {
 	/// <summary>
 	/// Android SDK Package Information.
 	/// </summary>
+	[DebuggerDisplay("{Path,nq};{Version,nq}")]
 	public class SdkPackage
 	{
 		/// <summary>

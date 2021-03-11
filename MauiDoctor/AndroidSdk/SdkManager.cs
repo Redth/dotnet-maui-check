@@ -51,7 +51,17 @@ namespace MauiDoctor.AndroidSdk
 
 		// ANDROID_HOME/cmdline-tools/1.0/bin
 		public override FileInfo FindToolPath(DirectoryInfo androidSdkHome)
-			=> FindTool(androidSdkHome, toolName: "sdkmanager", windowsExtension: ".bat", "cmdline-tools", "1.0", "bin");
+		{
+			var tool = FindTool(androidSdkHome, toolName: "sdkmanager", windowsExtension: ".bat", "cmdline-tools", "1.0", "bin");
+			if (tool != null)
+				return tool;
+
+			tool = FindTool(androidSdkHome, toolName: "sdkmanager", windowsExtension: ".bat", "tools", "bin");
+			if (tool != null)
+				return tool;
+
+			return null;
+		}
 
 		/// <summary>
 		/// Downloads the Android SDK
