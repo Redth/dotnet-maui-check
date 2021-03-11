@@ -52,13 +52,33 @@ namespace MauiDoctor.AndroidSdk
 		// ANDROID_HOME/cmdline-tools/1.0/bin
 		public override FileInfo FindToolPath(DirectoryInfo androidSdkHome)
 		{
-			var tool = FindTool(androidSdkHome, toolName: "sdkmanager", windowsExtension: ".bat", "cmdline-tools", "1.0", "bin");
-			if (tool != null)
-				return tool;
+			var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+			var ext = isWindows ? ".bat" : string.Empty;
 
-			tool = FindTool(androidSdkHome, toolName: "sdkmanager", windowsExtension: ".bat", "tools", "bin");
-			if (tool != null)
-				return tool;
+			var likelyPathSegments = new List<string[]>
+			{
+				new [] { "tools", "bin" },
+				new [] { "cmdline-tools", "bin" }
+			};
+
+			var cmdlineToolsPath = new DirectoryInfo(Path.Combine(androidSdkHome.FullName, "cmdline-tools"));
+
+			if (cmdlineToolsPath.Exists)
+			{
+				foreach (var dir in cmdlineToolsPath.GetDirectories())
+				{
+					var toolPath = new FileInfo(Path.Combine(dir.FullName, "bin", "sdkmanager" + ext));
+					if (toolPath.Exists)
+						likelyPathSegments.Insert(0, new[] { "cmdline-tools", dir.Name, "bin" });
+				}
+			}
+
+			foreach (var pathSeg in likelyPathSegments)
+			{
+				var tool = FindTool(androidSdkHome, toolName: "sdkmanager", windowsExtension: ".bat", pathSeg);
+				if (tool != null)
+					return tool;
+			}
 
 			return null;
 		}

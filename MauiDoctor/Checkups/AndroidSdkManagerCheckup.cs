@@ -66,7 +66,7 @@ namespace MauiDoctor.Checkups
 						if (SelectedHome.Exists)
 						{
 							try { SelectedHome.Delete(true); }
-							catch (UnauthorizedAccessException ex)
+							catch (UnauthorizedAccessException)
 							{
 								throw new Exception("Fix requires running with adminstrator privileges.  Try opening a terminal as administrator and running maui-doctor again.");
 							}
