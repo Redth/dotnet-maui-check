@@ -146,7 +146,7 @@ namespace MauiDoctor.Cli
 					AnsiConsole.MarkupLine($"  [bold blue]{Icon.Recommend} Recommendation:[/] {diagnosis.Prescription.Name}");
 
 					if (!string.IsNullOrEmpty(diagnosis.Prescription.Description))
-						AnsiConsole.MarkupLine(diagnosis.Prescription.Description);
+						AnsiConsole.MarkupLine("  " + diagnosis.Prescription.Description);
 
 					if (diagnosis.Prescription.HasRemedy)
 					{
