@@ -16,12 +16,16 @@
                     "version" : "30.4.5"
                 },
                 {
-                    "path" : "build-tools;29.0.2",
-                    "version" : "29.0.2"
+                    "path" : "build-tools;30.0.2",
+                    "version" : "30.0.2"
                 },
                 {
                     "path" : "platforms;android-30",
                     "version" : "3"
+                },
+                {
+                    "path" : "platform-tools",
+                    "version" : "31.0.0"
                 }
             ]
         },
@@ -45,19 +49,19 @@
                         },
                         {
                             "id" : "Microsoft.iOS.Sdk",
-                            "version" : "14.4.100-ci.main.1180",
+                            "version" : "14.4.100-ci.main.1192",
                             "workload" : "Microsoft.NET.Workload.iOS",
                             "urls" : {
-                                "win" : "https://bosstoragemirror.azureedge.net/wrench/main/cc1918e6740610447042acd5867284eb3e27aff5/4538289/package/Microsoft.NET.Workload.iOS.14.4.100-ci.main.1185.msi",
-                                "osx" : "https://bosstoragemirror.azureedge.net/wrench/main/cc1918e6740610447042acd5867284eb3e27aff5/4538289/package/notarized/Microsoft.iOS.Bundle.14.4.100-ci.main.1185.pkg"
+                                "win" : "https://bosstoragemirror.azureedge.net/wrench/main/98c8649d0c7d1e3c4c8d8d09e022befa853fb1e7/4541181/package/Microsoft.NET.Workload.iOS.14.4.100-ci.main.1192.msi",
+                                "osx" : "https://bosstoragemirror.azureedge.net/wrench/main/98c8649d0c7d1e3c4c8d8d09e022befa853fb1e7/4541181/package/notarized/Microsoft.iOS.Bundle.14.4.100-ci.main.1192.pkg"
                             }
                         },
                         {
                             "id" : "Microsoft.MacCatalyst.Sdk",
-                            "version" : "14.3.100-ci.main.325",
+                            "version" : "14.3.100-ci.main.337",
                             "workload" : "Microsoft.NET.Workload.MacCatalyst",
                             "urls" : {
-                                "osx" : "https://bosstoragemirror.azureedge.net/wrench/main/cc1918e6740610447042acd5867284eb3e27aff5/4538289/package/notarized/Microsoft.MacCatalyst.Bundle.14.3.100-ci.main.330.pkg"
+                                "osx" : "https://bosstoragemirror.azureedge.net/wrench/main/98c8649d0c7d1e3c4c8d8d09e022befa853fb1e7/4541181/package/notarized/Microsoft.MacCatalyst.Bundle.14.3.100-ci.main.337.pkg"
                             }
                         }
         
