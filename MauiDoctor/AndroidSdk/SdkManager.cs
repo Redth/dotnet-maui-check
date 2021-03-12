@@ -55,11 +55,7 @@ namespace MauiDoctor.AndroidSdk
 			var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 			var ext = isWindows ? ".bat" : string.Empty;
 
-			var likelyPathSegments = new List<string[]>
-			{
-				new [] { "tools", "bin" },
-				new [] { "cmdline-tools", "bin" }
-			};
+			var likelyPathSegments = new List<string[]>();
 
 			var cmdlineToolsPath = new DirectoryInfo(Path.Combine(androidSdkHome.FullName, "cmdline-tools"));
 
@@ -72,6 +68,8 @@ namespace MauiDoctor.AndroidSdk
 						likelyPathSegments.Insert(0, new[] { "cmdline-tools", dir.Name, "bin" });
 				}
 			}
+
+			likelyPathSegments.Insert(0, new [] { "tools", "bin" });
 
 			foreach (var pathSeg in likelyPathSegments)
 			{
