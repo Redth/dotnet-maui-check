@@ -17,29 +17,45 @@ namespace MauiDoctor.Cli
 		{
 			Console.Title = ".NET MAUI Doctor";
 
-			AnsiConsole.MarkupLine("[underline bold green].NET MAUI Doctor[/] Press any key to begin!");
+			AnsiConsole.MarkupLine($"[underline bold green]{Icon.Ambulance} .NET MAUI Doctor {Icon.Recommend}[/]");
 
 			AnsiConsole.Render(new Rule());
 
-			Console.ReadKey();
+			AnsiConsole.MarkupLine("This tool will attempt to evaluate your .NET MAUI development environment.");
+			AnsiConsole.MarkupLine("If problems are detected, this tool may offer the option to try and fix them for you, or suggest a way to fix them yourself.");
+			AnsiConsole.WriteLine();
+			AnsiConsole.MarkupLine("Thanks for choosing .NET MAUI!");
+
+			AnsiConsole.WriteLine();
+
+			if (!settings.NonInteractive)
+			{
+				AnsiConsole.Markup("Press any key to start...");
+				Console.ReadKey();
+				AnsiConsole.WriteLine();
+			}
+
+			AnsiConsole.Render(new Rule());
+
+			
 
 			var clinic = new Clinic();
 
 			var cts = new System.Threading.CancellationTokenSource();
 
 			var checkupStatus = new Dictionary<string, Doctoring.Status>();
-
+			var diagnoses = new List<Diagonosis>();
 
 
 			var consoleStatus = AnsiConsole.Status();
 
-			AnsiConsole.Markup("[bold blue]Synchronizing configuration...[/]");
+			AnsiConsole.Markup($"[bold blue]{Icon.Thinking} Synchronizing configuration...[/]");
 
 			var chart = await Manifest.Chart.FromFileOrUrl(settings.Manifest);
 
 			AnsiConsole.MarkupLine(" ok");
 
-			AnsiConsole.Markup("[bold blue]Scheduling appointments...[/]");
+			AnsiConsole.Markup($"[bold blue]{Icon.Thinking} Scheduling appointments...[/]");
 
 			if (chart.Doctor.Android != null)
 			{
@@ -128,6 +144,8 @@ namespace MauiDoctor.Cli
 					diagnosis = new Diagonosis(Doctoring.Status.Error, checkup, ex.Message);
 				}
 
+				diagnoses.Add(diagnosis);
+
 				// Cache the status for dependencies
 				checkupStatus.Add(checkup.Id, diagnosis.Status);
 
@@ -148,42 +166,61 @@ namespace MauiDoctor.Cli
 					if (!string.IsNullOrEmpty(diagnosis.Prescription.Description))
 						AnsiConsole.MarkupLine("  " + diagnosis.Prescription.Description);
 
-					if (diagnosis.Prescription.HasRemedy)
+					// See if we should fix
+					// needs to have a remedy available to even bother asking/trying
+					var doFix = diagnosis.Prescription.HasRemedy
+						&& (
+							// --fix + --non-interactive == auto fix, no prompt
+							(settings.NonInteractive && settings.Fix)
+							// interactive (default) + prompt/confirm they want to fix
+							|| (!settings.NonInteractive && AnsiConsole.Confirm($"    [bold]{Icon.Bell} Attempt to fix?[/]"))
+						);
+
+					if (doFix)
 					{
-						var confirm = AnsiConsole.Confirm("    [bold]Attempt to fix?[/]");
+						var isAdmin = Util.IsAdmin();
 
-						if (confirm)
+						foreach (var remedy in diagnosis.Prescription.Remedies)
 						{
-							var isAdmin = Util.IsAdmin();
-
-							foreach (var remedy in diagnosis.Prescription.Remedies)
+							if (!remedy.HasPrivilegesToRun(isAdmin, Util.Platform))
 							{
-								if (!remedy.HasPrivilegesToRun(isAdmin, Util.Platform))
+								AnsiConsole.Markup("Fix requires running with adminstrator privileges.  Try opening a terminal as administrator and running maui-doctor again.");
+								continue;
+							}
+							try
+							{
+								remedy.OnStatusUpdated += (s, e) =>
 								{
-									AnsiConsole.Markup("Fix requires running with adminstrator privileges.  Try opening a terminal as administrator and running maui-doctor again.");
-									continue;
-								}
-								try
-								{
-									remedy.OnStatusUpdated += (s, e) =>
-									{
-										AnsiConsole.MarkupLine("  " + e.Message);
-									};
+									AnsiConsole.MarkupLine("  " + e.Message);
+								};
 
-									AnsiConsole.MarkupLine("Attempting to fix: " + checkup.Title);
+								AnsiConsole.MarkupLine($"{Icon.Thinking} Attempting to fix: " + checkup.Title);
 									
-									await remedy.Cure(cts.Token);
+								await remedy.Cure(cts.Token);
 
-									AnsiConsole.MarkupLine("  Fix applied.  Run doctor again to verify.");
-								}
-								catch (Exception ex)
-								{
-									AnsiConsole.MarkupLine("  Fix failed - " + ex.Message);
-								}
+								AnsiConsole.MarkupLine("  Fix applied.  Run doctor again to verify.");
+							}
+							catch (Exception ex)
+							{
+								AnsiConsole.MarkupLine("  Fix failed - " + ex.Message);
 							}
 						}
 					}
 				}
+			}
+
+			AnsiConsole.Render(new Rule());
+			AnsiConsole.WriteLine();
+
+
+			if (diagnoses.Any(d => d.Status == Doctoring.Status.Error))
+			{
+				AnsiConsole.MarkupLine($"[bold red]{Icon.Bell} There were one or more problems detected.[/]");
+				AnsiConsole.MarkupLine($"[bold red]Please review the errors and correct them and run maui-doctor again.[/]");
+			}
+			else
+			{
+				AnsiConsole.MarkupLine($"[bold blue]{Icon.Success} Congratulations, everything looks great![/]");
 			}
 
 			Console.Title = ".NET MAUI Doctor";
@@ -199,5 +236,8 @@ namespace MauiDoctor.Cli
 
 		[CommandOption("-f|--fix")]
 		public bool Fix { get; set; }
+
+		[CommandOption("-n|--non-interactive")]
+		public bool NonInteractive { get; set; }
 	}
 }

@@ -31,17 +31,51 @@ namespace MauiDoctor.Checkups
 
 		public override async Task<Diagonosis> Examine()
 		{
-			var xcode = new XCode();
-
-			var info = await xcode.GetInfo();
+			var info = await GetInfo();
 
 			if (NuGetVersion.TryParse(info.Version?.ToString(), out var semVer))
 			{
 				if (semVer.IsCompatible(MinimumVersion, ExactVersion))
+				{
+					ReportStatus($"XCode.app ({info.Version} {info.Build})", Status.Ok);
 					return Diagonosis.Ok(this);
+				}
 			}
+
+			ReportStatus($"XCode.app ({info.Version}) not found.", Status.Error);
 
 			return new Diagonosis(Status.Error, this, new Prescription($"Download XCode {MinimumVersion.ThisOrExact(ExactVersion)}"));
 		}
+
+		Task<XCodeInfo> GetInfo()
+		{
+			//Xcode 12.4
+			//Build version 12D4e
+			var r = ShellProcessRunner.Run("xcodebuild", "-version");
+
+			var info = new XCodeInfo();
+
+			foreach (var line in r.StandardOutput)
+			{
+				if (line.StartsWith("Xcode"))
+				{
+					var vstr = line.Substring(5).Trim();
+					if (Version.TryParse(vstr, out var v))
+						info.Version = v;
+				}
+				else if (line.StartsWith("Build version"))
+				{
+					info.Build = line.Substring(13)?.Trim();
+				}
+			}
+
+			return Task.FromResult(info);
+		}
+	}
+
+	public struct XCodeInfo
+	{
+		public Version Version;
+		public string Build;
 	}
 }

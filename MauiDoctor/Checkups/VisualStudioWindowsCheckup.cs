@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using MauiDoctor.Doctoring;
 using NuGet.Versioning;
@@ -27,9 +29,7 @@ namespace MauiDoctor.Checkups
 
 		public override async Task<Diagonosis> Examine()
 		{
-			var vs = new VisualStudio();
-
-			var vsinfo = await vs.GetWindowsInfo();
+			var vsinfo = await GetWindowsInfo();
 
 			foreach (var vi in vsinfo)
 			{
@@ -58,5 +58,55 @@ namespace MauiDoctor.Checkups
 
 			return new Diagonosis(Status.Error, this);
 		}
+
+		Task<IEnumerable<VisualStudioInfo>> GetWindowsInfo()
+		{
+			var items = new List<VisualStudioInfo>();
+
+			var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
+				"Microsoft Visual Studio", "Installer", "vswhere.exe");
+
+
+			if (!File.Exists(path))
+				Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+				"Microsoft Visual Studio", "Installer", "vswhere.exe");
+
+			if (!File.Exists(path))
+				return default;
+
+			var r = ShellProcessRunner.Run(path,
+				"-all -requires Microsoft.Component.MSBuild -format json -prerelease");
+
+			var str = r.GetOutput();
+
+			var json = JsonDocument.Parse(str);
+
+			foreach (var vsjson in json.RootElement.EnumerateArray())
+			{
+				if (!vsjson.TryGetProperty("catalog", out var vsCat) || !vsCat.TryGetProperty("productSemanticVersion", out var vsSemVer))
+					continue;
+
+				if (!NuGetVersion.TryParse(vsSemVer.GetString(), out var semVer))
+					continue;
+
+				if (!vsjson.TryGetProperty("installationPath", out var installPath))
+					continue;
+
+				items.Add(new VisualStudioInfo
+				{
+					Version = semVer,
+					Path = installPath.GetString()
+				});
+			}
+
+			return Task.FromResult<IEnumerable<VisualStudioInfo>>(items);
+		}
+	}
+
+	public struct VisualStudioInfo
+	{
+		public string Path { get; set; }
+
+		public NuGetVersion Version { get; set; }
 	}
 }

@@ -33,6 +33,8 @@ namespace MauiDoctor.Checkups
 			}
 			catch { }
 
+			ReportStatus("One or more Licenses are not accepted.", Status.Error);
+
 			var ext = Util.IsWindows ? ".bat" : string.Empty;
 
 			return Task.FromResult(new Diagonosis(Status.Error, this, new Prescription("Android SDK has licenses which need to be accepted.",

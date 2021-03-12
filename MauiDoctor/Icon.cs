@@ -20,6 +20,15 @@
 
 		public static string Success
 			=> PrettyBoring(":check_mark:", "–");
+
+		public static string Ambulance
+			=> PrettyBoring(":ambulance:", "¤");
+
+		public static string Bell
+			=> PrettyBoring("\a:bell:", "\a!");
+
+		public static string Thinking
+			=> PrettyBoring(":hourglass_not_done:", "»");
 	}
 
 
