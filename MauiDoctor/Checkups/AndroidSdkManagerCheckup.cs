@@ -16,7 +16,11 @@ namespace MauiDoctor.Checkups
 
 		public override string Title => "Android SDK";
 
+		public override string[] Dependencies => new [] { "openjdk" };
+
 		public DirectoryInfo SelectedHome { get; private set; }
+
+		public FileInfo SdkManagerPath { get; private set; }
 
 		public override Task<Diagonosis> Examine()
 		{
@@ -37,6 +41,14 @@ namespace MauiDoctor.Checkups
 							if (SelectedHome == default)
 							{
 								SelectedHome = home;
+								SdkManagerPath = sdk.FindToolPath(SelectedHome);
+
+								if (SdkManagerPath != null)
+								{
+									Util.SetDoctorEnvironmentVariable("ANDROID_SDK_ROOT", SdkManagerPath.FullName);
+									Util.SetDoctorEnvironmentVariable("ANDROID_HOME", SdkManagerPath.FullName);
+								}
+
 								ReportStatus($"{home.FullName} ({v}) found.", Status.Ok);
 							}
 							else

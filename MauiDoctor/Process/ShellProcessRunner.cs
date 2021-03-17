@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -39,6 +40,11 @@ namespace MauiDoctor
 			process.StartInfo.RedirectStandardOutput = true;
 			process.StartInfo.RedirectStandardError = true;
 
+			// Process any env variables to be set that might have been set by other checkups
+			// ie: JavaJdkCheckup sets MAUI_DOCTOR_JAVA_HOME
+			foreach (var ev in Util.GetDoctorEnvironmentVariables())
+				process.StartInfo.Environment[ev.Key] = ev.Value?.ToString();
+
 			if (redirectStdInput)
 				process.StartInfo.RedirectStandardInput = true;
 
@@ -68,6 +74,9 @@ namespace MauiDoctor
 				{
 					try { process.Kill(); }
 					catch { }
+
+					try { process?.Dispose(); }
+					catch { }
 				});
 			}
 		}
@@ -86,7 +95,10 @@ namespace MauiDoctor
 
 		public ShellProcessResult WaitForExit()
 		{
-			process.WaitForExit();
+			try
+			{
+				process.WaitForExit();
+			} catch { }
 
 			return new ShellProcessResult(standardOutput, standardError, process.ExitCode);
 		}

@@ -50,9 +50,14 @@ namespace MauiDoctor.AndroidSdk
 			}
 		}
 
-		public AndroidSdkManager(DirectoryInfo home = null)
+		public AndroidSdkManager(string home = null)
 		{
-			Home = home ?? FindHome()?.FirstOrDefault();
+			DirectoryInfo homeDir = null;
+
+			if (!string.IsNullOrEmpty(home) && Directory.Exists(home))
+				homeDir = new DirectoryInfo(home);
+
+			Home = homeDir ?? FindHome()?.FirstOrDefault();
 
 			SdkManager = new SdkManager(Home);
 			//AvdManager = new AvdManager(Home);

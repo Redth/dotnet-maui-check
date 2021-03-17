@@ -46,13 +46,24 @@ namespace MauiDoctor.Checkups
 				}
 			}
 
+			DotNetSdkInfo bestSdk = null;
+
 			foreach (var sdk in sdks)
 			{
 				if (RequiredSdks.Any(rs => sdk.Version == NuGetVersion.Parse(rs.Version)))
+				{
+					if (bestSdk == null || sdk.Version > bestSdk.Version)
+						bestSdk = sdk;
+
 					ReportStatus($"{sdk.Version}  - {sdk.Directory}", Status.Ok);
+				}
 				else
 					ReportStatus($"{sdk.Version} - {sdk.Directory}", null);
 			}
+
+			// Find newest compatible sdk
+			if (bestSdk != null)
+				Util.SetDoctorEnvironmentVariable("DOTNET_SDK", bestSdk.Directory.FullName);
 
 			if (missingSdks.Any())
 			{

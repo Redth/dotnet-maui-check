@@ -369,7 +369,7 @@ namespace MauiDoctor.AndroidSdk
 
 			BuildStandardOptions(builder);
 
-			var output = RunWithAccept2(builder, TimeSpan.Zero);
+			var output = RunWithAccept(builder);
 
 			return true;
 		}
@@ -391,7 +391,7 @@ namespace MauiDoctor.AndroidSdk
 					requiresAcceptance = true;
 					cts.Cancel();
 				}
-			});
+			}, true);
 
 			spr.WaitForExit();
 			return requiresAcceptance;
@@ -442,64 +442,67 @@ namespace MauiDoctor.AndroidSdk
 			return Run(new ProcessArgumentBuilder());
 		}
 
+		//List<string> RunWithAccept(ProcessArgumentBuilder builder, bool moveToolsToTemp = false)
+		//	=> RunWithAccept(builder, TimeSpan.Zero, moveToolsToTemp);
+
+		//List<string> RunWithAccept(ProcessArgumentBuilder builder, TimeSpan timeout, bool moveToolsToTemp = false)
+		//{
+		//	var sdkManager = FindToolPath(AndroidSdkHome);
+
+		//	if (!(sdkManager?.Exists ?? false))
+		//		throw new FileNotFoundException("Could not locate sdkmanager", sdkManager?.FullName);
+
+		//	var ct = new CancellationTokenSource();
+		//	if (timeout != TimeSpan.Zero)
+		//		ct.CancelAfter(timeout);
+
+		//	// UGLY HACK AND DRAGONS 🐲🔥
+		//	// Basically, on windows sdkmanager.bat is in tools, but updating itself
+		//	// tries to delete tools and move the new one in place after it downloads
+		//	// which causes issues because sdkmanager.bat is running from that folder
+		//	string sdkToolsTempDir = null;
+		//	var didMoveToolsToTemp = false;
+
+		//	if (moveToolsToTemp && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+		//	{
+		//		// Get the actual tools dir
+		//		var sdkToolsDir = Path.Combine(sdkManager.Directory.FullName, "..");
+		//		sdkToolsTempDir = Path.Combine(sdkToolsDir, "..", "tools-temp");
+
+		//		// Perform the copy
+		//		CopyFilesRecursively(new DirectoryInfo(sdkToolsDir), new DirectoryInfo(sdkToolsTempDir));
+
+		//		// Set the sdkmanager.bat path to the new temp location
+		//		sdkManager = new FileInfo(Path.Combine(sdkToolsTempDir, "bin", "sdkmanager.bat"));
+		//		didMoveToolsToTemp = true;
+		//	}
+
+		//	var p = new ProcessRunner(sdkManager, builder, ct.Token, true);
+
+		//	while (!p.HasExited)
+		//	{
+		//		Thread.Sleep(250);
+
+		//		try
+		//		{
+		//			p.StandardInputWriteLine("y");
+		//		}
+		//		catch { }
+		//	}
+
+		//	var r = p.WaitForExit();
+
+		//	// If we used the ugly hack above, let's cleanup the temp copy
+		//	if (didMoveToolsToTemp)
+		//		Directory.Delete(sdkToolsTempDir, true);
+
+		//	return r.StandardOutput;
+		//}
+
 		List<string> RunWithAccept(ProcessArgumentBuilder builder, bool moveToolsToTemp = false)
-			=> RunWithAccept(builder, TimeSpan.Zero, moveToolsToTemp);
+			=> RunWithAccept(builder, TimeSpan.Zero);
 
 		List<string> RunWithAccept(ProcessArgumentBuilder builder, TimeSpan timeout, bool moveToolsToTemp = false)
-		{
-			var sdkManager = FindToolPath(AndroidSdkHome);
-
-			if (!(sdkManager?.Exists ?? false))
-				throw new FileNotFoundException("Could not locate sdkmanager", sdkManager?.FullName);
-
-			var ct = new CancellationTokenSource();
-			if (timeout != TimeSpan.Zero)
-				ct.CancelAfter(timeout);
-
-			// UGLY HACK AND DRAGONS 🐲🔥
-			// Basically, on windows sdkmanager.bat is in tools, but updating itself
-			// tries to delete tools and move the new one in place after it downloads
-			// which causes issues because sdkmanager.bat is running from that folder
-			string sdkToolsTempDir = null;
-			var didMoveToolsToTemp = false;
-
-			if (moveToolsToTemp && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-			{
-				// Get the actual tools dir
-				var sdkToolsDir = Path.Combine(sdkManager.Directory.FullName, "..");
-				sdkToolsTempDir = Path.Combine(sdkToolsDir, "..", "tools-temp");
-
-				// Perform the copy
-				CopyFilesRecursively(new DirectoryInfo(sdkToolsDir), new DirectoryInfo(sdkToolsTempDir));
-				
-				// Set the sdkmanager.bat path to the new temp location
-				sdkManager = new FileInfo(Path.Combine(sdkToolsTempDir, "bin", "sdkmanager.bat"));
-				didMoveToolsToTemp = true;
-			}
-
-			var p = new ProcessRunner(sdkManager, builder, ct.Token, true);
-
-			while (!p.HasExited)
-			{
-				Thread.Sleep(250);
-
-				try
-				{
-					p.StandardInputWriteLine("y");
-				}
-				catch { }
-			}
-
-			var r = p.WaitForExit();
-
-			// If we used the ugly hack above, let's cleanup the temp copy
-			if (didMoveToolsToTemp)
-				Directory.Delete(sdkToolsTempDir, true);
-
-			return r.StandardOutput;
-		}
-
-		List<string> RunWithAccept2(ProcessArgumentBuilder builder, TimeSpan timeout, bool moveToolsToTemp = false)
 		{
 			var sdkManager = FindToolPath(AndroidSdkHome);
 

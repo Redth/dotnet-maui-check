@@ -38,7 +38,6 @@
     <PackageReference Include="Xamarin.LibZipSharp" Version="1.0.24" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Checkups\" />
     <Folder Include="Manifest\" />
     <Folder Include="AndroidSdk\" />
     <Folder Include="Process\" />

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace MauiDoctor
@@ -7,6 +9,43 @@ namespace MauiDoctor
 	{
 		public Util()
 		{
+		}
+
+		public const string DoctorEnvironmentVariableNamePrefix = "MAUI_DOCTOR_";
+
+		public static void SetDoctorEnvironmentVariable(string name, string value)
+		{
+			Environment.SetEnvironmentVariable(name, value);
+		}
+		public static string GetDoctorEnvironmentVariable(string name)
+		{
+			foreach (DictionaryEntry ev in Environment.GetEnvironmentVariables())
+			{
+				if (ev.Key.ToString().StartsWith(DoctorEnvironmentVariableNamePrefix, StringComparison.OrdinalIgnoreCase))
+				{
+					var evName = ev.Key.ToString().Substring(DoctorEnvironmentVariableNamePrefix.Length);
+
+					if (evName.Equals(name, StringComparison.OrdinalIgnoreCase))
+						return ev.Value?.ToString();
+				}
+			}
+
+			return null;
+		}
+
+		public static IEnumerable<KeyValuePair<string, string>> GetDoctorEnvironmentVariables()
+		{
+			foreach (DictionaryEntry ev in Environment.GetEnvironmentVariables())
+			{
+				var key = ev.Key.ToString();
+
+				if (key?.StartsWith(DoctorEnvironmentVariableNamePrefix, StringComparison.OrdinalIgnoreCase) ?? false)
+				{
+					var v = ev.Value?.ToString();
+					if (!string.IsNullOrEmpty(v))
+						yield return new KeyValuePair<string, string>(key, v);
+				}
+			}
 		}
 
 		public static Platform Platform

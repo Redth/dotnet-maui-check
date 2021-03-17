@@ -15,7 +15,7 @@ namespace MauiDoctor.Checkups
 			RequiredPackages = requiredPackages;
 		}
 
-		public override string[] Dependencies => new string[] { "androidsdklicenses" };
+		public override string[] Dependencies => new string[] { "androidsdk" };
 
 		public Manifest.AndroidPackage[] RequiredPackages { get; private set; }
 
@@ -25,7 +25,8 @@ namespace MauiDoctor.Checkups
 
 		public override Task<Diagonosis> Examine()
 		{
-			var android = new AndroidSdk.AndroidSdkManager();
+			var android = new AndroidSdk.AndroidSdkManager(
+				Util.GetDoctorEnvironmentVariable("ANDROID_SDK_ROOT") ?? Util.GetDoctorEnvironmentVariable("ANDROID_HOME"));
 
 			var packages = android.SdkManager.List().InstalledPackages;
 

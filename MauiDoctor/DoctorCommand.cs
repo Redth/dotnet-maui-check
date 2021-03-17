@@ -57,6 +57,11 @@ namespace MauiDoctor.Cli
 
 			AnsiConsole.Markup($"[bold blue]{Icon.Thinking} Scheduling appointments...[/]");
 
+			if (chart.Doctor.OpenJdk != null)
+			{
+				clinic.OfferService(new OpenJdkCheckup(chart.Doctor.OpenJdk.MinimumVersion, chart.Doctor.OpenJdk.ExactVersion));
+			}
+
 			if (chart.Doctor.Android != null)
 			{
 				clinic.OfferService(new AndroidSdkManagerCheckup());

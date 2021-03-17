@@ -4,6 +4,9 @@ namespace MauiDoctor.Manifest
 {
 	public partial class Doctor
 	{
+		[JsonProperty("openjdk")]
+		public MinExactVersion OpenJdk { get; set; }
+
 		[JsonProperty("xcode")]
 		public MinExactVersion XCode { get; set; }
 
