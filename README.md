@@ -1,7 +1,8 @@
+
 # dotnet-maui-doctor
 .NET MAUI Doctor tool
 
-![.NET MAUI Doctor](https://user-images.githubusercontent.com/271950/110705286-305e6d80-81c4-11eb-993f-0d2d772b2260.gif)
+![.NET MAUI Doctor](https://user-images.githubusercontent.com/271950/111553662-3c65a480-875b-11eb-9e67-3738d3f7e0ad.gif)
 
 
 To run:
