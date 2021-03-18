@@ -44,6 +44,8 @@ namespace MauiDoctor.Cli
 			var cts = new System.Threading.CancellationTokenSource();
 
 			var checkupStatus = new Dictionary<string, Doctoring.Status>();
+			var patientHistory = new PatientHistory();
+
 			var diagnoses = new List<Diagonosis>();
 
 
@@ -69,7 +71,7 @@ namespace MauiDoctor.Cli
 				clinic.OfferService(new AndroidSdkLicensesCheckup());
 			}
 
-			if (chart.Doctor.DotNet != null)
+			if (chart.Doctor.XCode != null)
 				clinic.OfferService(new XCodeCheckup(chart.Doctor.XCode.MinimumVersion, chart.Doctor.XCode.ExactVersion));
 
 			if (chart.Doctor.VSMac != null && !string.IsNullOrEmpty(chart.Doctor.VSMac.MinimumVersion))
@@ -85,7 +87,10 @@ namespace MauiDoctor.Cli
 
 				foreach (var sdk in chart.Doctor.DotNet.Sdks)
 				{
-					clinic.OfferService(new DotNetPacksCheckup(sdk.Version, sdk.Packs.ToArray()));
+					clinic.OfferService(new DotNetWorkloadsCheckup(sdk.Version, sdk.Workloads.ToArray(), sdk.PackageSources.ToArray()));
+
+					// Always run the packs checkup even if manifest is empty, since the workloads may resolve some required packs dynamically that aren't from the manifest
+					clinic.OfferService(new DotNetPacksCheckup(sdk.Version, sdk.Packs?.ToArray() ?? Array.Empty<Manifest.NuGetPackage>(), sdk.PackageSources.ToArray()));
 				}
 			}
 
@@ -142,7 +147,7 @@ namespace MauiDoctor.Cli
 
 				try
 				{
-					diagnosis = await checkup.Examine();
+					diagnosis = await checkup.Examine(patientHistory);
 				}
 				catch (Exception ex)
 				{

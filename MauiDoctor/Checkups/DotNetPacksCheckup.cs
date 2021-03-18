@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MauiDoctor.Doctoring;
+using MauiDoctor.Manifest;
 using Microsoft.NET.Sdk.WorkloadManifestReader;
 using NuGet.Versioning;
 
@@ -10,43 +11,57 @@ namespace MauiDoctor.Checkups
 {
 	public class DotNetPacksCheckup : Checkup
 	{
-		public DotNetPacksCheckup(string sdkVersion, params Manifest.DotNetPack[] requiredPacks) : base()
+		public DotNetPacksCheckup(string sdkVersion, Manifest.NuGetPackage[] requiredPacks, params string[] nugetPackageSources) : base()
 		{
 			SdkVersion = sdkVersion;
-			RequiredPacks = requiredPacks?.Where(p => p.SupportedFor(Util.Platform))?.ToArray();
+			RequiredPacks = requiredPacks;
+			NuGetPackageSources = nugetPackageSources;
+
+			dotnet = new DotNet();
+			SdkRoot = dotnet.DotNetSdkLocation.FullName;
+			workloadManager = new DotNetWorkloadManager(SdkRoot, SdkVersion, NuGetPackageSources);
 		}
 
-		public override string[] Dependencies => new string[] { "dotnet" };
+		readonly DotNet dotnet;
+		readonly DotNetWorkloadManager workloadManager;
 
-		
-		public Manifest.DotNetPack[] RequiredPacks { get; }
-		public string SdkVersion { get; }
+		public readonly string SdkRoot;
+		public readonly string SdkVersion;
+		public readonly string[] NuGetPackageSources;
+		public readonly Manifest.NuGetPackage[] RequiredPacks;
 
+		public override string[] Dependencies => new string[] { "dotnetworkloads" };
 
 		public override string Id => "dotnetpacks";
 
-		public override string Title => $".NET Core SDK - Workloads / Packs ({SdkVersion})";
+		public override string Title => $".NET Core SDK - Packs ({SdkVersion})";
 
-		public override async Task<Diagonosis> Examine()
+		public override async Task<Diagonosis> Examine(PatientHistory history)
 		{
-			var dn = new DotNet();
-			var sdk = (await dn.GetSdks())?.FirstOrDefault(s => s.Version.Equals(SdkVersion));
+			var sdkPacks = workloadManager.GetAllInstalledWorkloadPacks();
 
-			var sdkPacks = await dn.GetWorkloadPacks(SdkVersion, WorkloadPackKind.Sdk);
+			var missingPacks = new List<NuGetPackage>();
 
+			var requiredPacks = new List<NuGetPackage>();
+			requiredPacks.AddRange(RequiredPacks);
 
-			var missingPacks = new List<Manifest.DotNetPack>();
+			if (history.TryGetNotes<WorkloadResolver.PackInfo[]>("dotnetworkloads", "required_packs", out var p) && p.Any())
+				requiredPacks.AddRange(p.Select(pi => new NuGetPackage { Id = pi.Id, Version = pi.Version }));
 
-			foreach (var rp in RequiredPacks)
+			var uniqueRequiredPacks = requiredPacks
+				.GroupBy(p => p.Id + p.Version.ToString())
+				.Select(g => g.First());
+
+			foreach (var rp in uniqueRequiredPacks)
 			{
 				if (!sdkPacks.Any(sp => sp.Id == rp.Id && sp.Version == rp.Version))
 				{
-					ReportStatus($"{rp.Id} ({rp.Version}) not found.", Status.Warning);
+					ReportStatus($"{rp.Id} ({rp.Version}) not installed.", Status.Warning);
 					missingPacks.Add(rp);
 				}
 				else
 				{
-					ReportStatus($"{rp.Id} ({rp.Version}) found", Status.Ok);
+					ReportStatus($"{rp.Id} ({rp.Version}) installed.", Status.Ok);
 				}
 			}
 
@@ -57,7 +72,7 @@ namespace MauiDoctor.Checkups
 				Status.Error,
 				this,
 				new Prescription("Install Missing SDK Packs",
-					new BootsRemedy(missingPacks.Select(mp => (mp.Urls.For(Util.Platform)?.ToString(), $"{mp.Id} ({mp.Version})")).ToArray())));
+				new DotNetPackInstallRemedy(SdkRoot, SdkVersion, missingPacks.ToArray(), NuGetPackageSources))); ;
 		}
 	}
 }

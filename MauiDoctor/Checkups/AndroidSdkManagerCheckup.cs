@@ -22,7 +22,7 @@ namespace MauiDoctor.Checkups
 
 		public FileInfo SdkManagerPath { get; private set; }
 
-		public override Task<Diagonosis> Examine()
+		public override Task<Diagonosis> Examine(PatientHistory history)
 		{
 			try
 			{
@@ -49,11 +49,11 @@ namespace MauiDoctor.Checkups
 									Util.SetDoctorEnvironmentVariable("ANDROID_HOME", SdkManagerPath.FullName);
 								}
 
-								ReportStatus($"{home.FullName} ({v}) found.", Status.Ok);
+								ReportStatus($"{home.FullName} ({v}) installed.", Status.Ok);
 							}
 							else
 							{
-								ReportStatus($"{home.FullName} ({v}) also found.", Status.Ok);
+								ReportStatus($"{home.FullName} ({v}) also installed.", Status.Ok);
 							}
 						}
 						else

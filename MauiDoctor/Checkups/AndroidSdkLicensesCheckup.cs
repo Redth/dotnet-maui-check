@@ -20,7 +20,7 @@ namespace MauiDoctor.Checkups
 
 		public FileInfo SdkManagerPath { get; private set; }
 
-		public override Task<Diagonosis> Examine()
+		public override Task<Diagonosis> Examine(PatientHistory history)
 		{
 			var android = new AndroidSdk.AndroidSdkManager(
 				Util.GetDoctorEnvironmentVariable("ANDROID_SDK_ROOT") ?? Util.GetDoctorEnvironmentVariable("ANDROID_HOME"));

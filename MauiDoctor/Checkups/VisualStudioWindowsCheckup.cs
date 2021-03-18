@@ -27,7 +27,7 @@ namespace MauiDoctor.Checkups
 
 		public override string Title => $"Visual Studio {MinimumVersion.ThisOrExact(ExactVersion)}";
 
-		public override async Task<Diagonosis> Examine()
+		public override async Task<Diagonosis> Examine(PatientHistory history)
 		{
 			var vsinfo = await GetWindowsInfo();
 

@@ -24,11 +24,11 @@ namespace MauiDoctor.Checkups
 		string SdkListToString()
 			=> (RequiredSdks?.Any() ?? false) ? "(" + string.Join(", ", RequiredSdks.Select(s => s.Version)) + ")" : string.Empty;
 
-		public override async Task<Diagonosis> Examine()
+		public override async Task<Diagonosis> Examine(PatientHistory history)
 		{
 			var dn = new DotNet();
 
-			var missingDiagnosis = new Diagonosis(Status.Error, this, new Prescription(".NET SDK not found"));
+			var missingDiagnosis = new Diagonosis(Status.Error, this, new Prescription(".NET SDK not installed"));
 
 			if (!dn.Exists)
 				return missingDiagnosis;
@@ -69,7 +69,7 @@ namespace MauiDoctor.Checkups
 			{
 				var str = SdkListToString();
 
-				return new Diagonosis(Status.Error, this, $".NET SDK {str} not found.",
+				return new Diagonosis(Status.Error, this, $".NET SDK {str} not installed.",
 						new Prescription($"Download .NET SDK {str}",
 						new BootsRemedy(missingSdks.Select(ms => (ms.Urls.For(Util.Platform)?.ToString(), ".NET SDK " + ms.Version)).ToArray())
 						{

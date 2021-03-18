@@ -43,7 +43,7 @@ namespace MauiDoctor.Checkups
 
 		static string PlatformJavaCExtension => Util.IsWindows ? ".exe" : string.Empty;
 
-		public override Task<Diagonosis> Examine()
+		public override Task<Diagonosis> Examine(PatientHistory history)
 		{
 			var jdks = FindJdks();
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace MauiDoctor.Doctoring
@@ -12,7 +13,7 @@ namespace MauiDoctor.Doctoring
 		public abstract string Title { get; }
 		public virtual string Description { get; } = string.Empty;
 
-		public abstract Task<Diagonosis> Examine();
+		public abstract Task<Diagonosis> Examine(PatientHistory history);
 
 		public virtual bool IsPlatformSupported(Platform platform)
 			=> true;

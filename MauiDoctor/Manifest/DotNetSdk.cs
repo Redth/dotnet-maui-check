@@ -12,6 +12,12 @@ namespace MauiDoctor.Manifest
 		public string Version { get; set; }
 
 		[JsonProperty("packs")]
-		public List<DotNetPack> Packs { get; set; }
+		public List<NuGetPackage> Packs { get; set; }
+
+		[JsonProperty("workloads")]
+		public List<DotNetWorkload> Workloads { get; set; }
+
+		[JsonProperty("packageSources")]
+		public List<string> PackageSources { get; set; }
 	}
 }

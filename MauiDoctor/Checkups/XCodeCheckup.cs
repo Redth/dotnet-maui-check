@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using MauiDoctor.Doctoring;
 using NuGet.Versioning;
@@ -29,7 +30,7 @@ namespace MauiDoctor.Checkups
 
 		public override string Title => $"XCode {MinimumVersion.ThisOrExact(ExactVersion)}";
 
-		public override async Task<Diagonosis> Examine()
+		public override async Task<Diagonosis> Examine(PatientHistory history)
 		{
 			var info = await GetInfo();
 
@@ -42,7 +43,7 @@ namespace MauiDoctor.Checkups
 				}
 			}
 
-			ReportStatus($"XCode.app ({info.Version}) not found.", Status.Error);
+			ReportStatus($"XCode.app ({info.Version}) not installed.", Status.Error);
 
 			return new Diagonosis(Status.Error, this, new Prescription($"Download XCode {MinimumVersion.ThisOrExact(ExactVersion)}"));
 		}

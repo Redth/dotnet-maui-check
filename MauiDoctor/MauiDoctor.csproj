@@ -26,6 +26,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="NuGet.Packaging" Version="5.9.0" />
+    <PackageReference Include="NuGet.Protocol" Version="5.9.0" />
     <PackageReference Include="NuGet.Versioning" Version="5.9.0" />
     <PackageReference Include="Microsoft.Build.Framework" Version="16.9.0" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
@@ -38,7 +40,6 @@
     <PackageReference Include="Xamarin.LibZipSharp" Version="1.0.24" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Manifest\" />
     <Folder Include="AndroidSdk\" />
     <Folder Include="Process\" />
   </ItemGroup>

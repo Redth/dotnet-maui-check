@@ -1,10 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.NET.Sdk.WorkloadManifestReader;
+using NuGet.Common;
+using NuGet.Packaging.Core;
+using NuGet.Protocol;
+using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
 
 namespace MauiDoctor
@@ -39,7 +45,7 @@ namespace MauiDoctor
 				{
 					// /home/user/share/dotnet/dotnet
 					Path.Combine(
-						Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile),
+						Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
 						"share",
 						"dotnet",
 						"dotnet")
@@ -47,7 +53,7 @@ namespace MauiDoctor
 				_ => new string[] { }
 			};
 
-
+			// First try and use the actual resolver logic
 			var r = new Microsoft.DotNet.DotNetSdkResolver.NETCoreSdkResolver();
 			DotNetSdkLocation = new DirectoryInfo(r.GetDotnetExeDirectory());
 
@@ -111,43 +117,14 @@ namespace MauiDoctor
 							}
 						}
 					}
-				} catch
+				}
+				catch
 				{
 					// Bad line, ignore
 				}
 			}
 
 			return Task.FromResult<IEnumerable<DotNetSdkInfo>>(sdks);
-		}
-
-		public Task<ISet<WorkloadResolver.WorkloadInfo>> GetWorkloadSuggestions(string sdkVersion, params string[] missingPackIds)
-		{
-			var r = new Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver();
-
-			string dotNetRoot = DotNetSdkLocation.FullName;
-			string sdkDirectory = Path.Combine(dotNetRoot, sdkVersion);
-			string fileName = Path.GetFileName(sdkDirectory);
-			
-			var workloadManifestProvider = new SdkDirectoryWorkloadManifestProvider(dotNetRoot, fileName);
-			var workloadResolver = WorkloadResolver.Create(workloadManifestProvider, dotNetRoot, fileName);
-
-			return Task.FromResult(workloadResolver.GetWorkloadSuggestionForMissingPacks(missingPackIds));
-		}
-
-		public Task<IEnumerable<WorkloadResolver.PackInfo>> GetWorkloadPacks(string sdkVersion, WorkloadPackKind kind)
-		{
-			var r = new Microsoft.DotNet.MSBuildSdkResolver.DotNetMSBuildSdkResolver();
-
-			string dotNetRoot = DotNetSdkLocation.FullName;
-			string sdkDirectory = Path.Combine(dotNetRoot, sdkVersion);
-			string fileName = Path.GetFileName(sdkDirectory);
-
-			var workloadManifestProvider = new SdkDirectoryWorkloadManifestProvider(dotNetRoot, fileName);
-			var workloadResolver = WorkloadResolver.Create(workloadManifestProvider, dotNetRoot, fileName);
-
-			var workloadSdks = workloadResolver.GetInstalledWorkloadPacksOfKind(kind);
-
-			return Task.FromResult(workloadSdks);
 		}
 	}
 
