@@ -41,6 +41,8 @@ namespace MauiDoctor.Checkups
 
 		public override string Title => $"OpenJDK {MinimumVersion.ThisOrExact(ExactVersion)}";
 
+		static string PlatformJavaCExtension => Util.IsWindows ? ".exe" : string.Empty;
+
 		public override Task<Diagonosis> Examine()
 		{
 			var jdks = FindJdks();
@@ -75,7 +77,8 @@ namespace MauiDoctor.Checkups
 				SearchDirectoryForJdks(paths, "C:\\Program Files\\Android\\Jdk\\", true);
 			} else if (Util.IsMac)
 			{
-				SearchDirectoryForJdks(paths, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Library", "Developer", "Xamarin", "jdk"), true);
+				var msDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Library", "Developer", "Xamarin", "jdk");
+				SearchDirectoryForJdks(paths, msDir, true);
 			}
 
 			SearchDirectoryForJdks(paths, Environment.GetEnvironmentVariable("JAVA_HOME") ?? string.Empty, true);
@@ -103,7 +106,7 @@ namespace MauiDoctor.Checkups
 
 			if (dir.Exists)
 			{
-				var files = dir.EnumerateFileSystemInfos("javac.exe", recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+				var files = dir.EnumerateFileSystemInfos($"javac{PlatformJavaCExtension}", recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
 				foreach (var file in files)
 				{
