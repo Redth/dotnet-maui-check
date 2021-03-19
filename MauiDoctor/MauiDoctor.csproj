@@ -23,6 +23,7 @@
     <PackageProjectUrl>https://github.com/redth/dotnet-maui-doctor</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/redth/dotnet-maui-doctor</RepositoryUrl>
+    <AssemblyFileVersion>$(Version)</AssemblyFileVersion>
   </PropertyGroup>
 
   <ItemGroup>

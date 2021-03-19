@@ -4,6 +4,9 @@ namespace MauiDoctor.Manifest
 {
 	public partial class Doctor
 	{
+		[JsonProperty("toolVersion")]
+		public string ToolVersion { get; set; }
+
 		[JsonProperty("openjdk")]
 		public MinExactVersion OpenJdk { get; set; }
 

@@ -1,9 +1,11 @@
 ﻿using MauiDoctor.Checkups;
 using MauiDoctor.Doctoring;
+using NuGet.Versioning;
 using Spectre.Console;
 using Spectre.Console.Cli;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
@@ -13,12 +15,14 @@ namespace MauiDoctor.Cli
 {
 	public class DoctorCommand : AsyncCommand<DoctorSettings>
 	{
+		const string ToolName = ".NET MAUI Doctor";
+		const string ToolPackageId = "Redth.Net.Maui.Doctor";
+
 		public override async Task<int> ExecuteAsync(CommandContext context, DoctorSettings settings)
 		{
-			Console.Title = ".NET MAUI Doctor";
+			Console.Title = ToolName;
 
-			AnsiConsole.MarkupLine($"[underline bold green]{Icon.Ambulance} .NET MAUI Doctor {Icon.Recommend}[/]");
-
+			AnsiConsole.MarkupLine($"[underline bold green]{Icon.Ambulance} {ToolName} {Icon.Recommend}[/]");
 			AnsiConsole.Render(new Rule());
 
 			AnsiConsole.MarkupLine("This tool will attempt to evaluate your .NET MAUI development environment.");
@@ -37,26 +41,35 @@ namespace MauiDoctor.Cli
 
 			AnsiConsole.Render(new Rule());
 
-			
-
 			var clinic = new Clinic();
-
 			var cts = new System.Threading.CancellationTokenSource();
 
 			var checkupStatus = new Dictionary<string, Doctoring.Status>();
 			var patientHistory = new PatientHistory();
 
 			var diagnoses = new List<Diagonosis>();
-
-
 			var consoleStatus = AnsiConsole.Status();
 
 			AnsiConsole.Markup($"[bold blue]{Icon.Thinking} Synchronizing configuration...[/]");
 
 			var chart = await Manifest.Chart.FromFileOrUrl(settings.Manifest);
+			var toolVersion = chart?.Doctor?.ToolVersion;
+
+			var fileVersion = NuGetVersion.Parse(FileVersionInfo.GetVersionInfo(this.GetType().Assembly.Location).FileVersion);
+
+			if (string.IsNullOrEmpty(toolVersion) || !NuGetVersion.TryParse(toolVersion, out var toolVer) || fileVersion < toolVer)
+			{
+				Console.WriteLine();
+				AnsiConsole.MarkupLine($"[bold red]{Icon.Error} Updating to version {toolVersion} or newer is required:[/]");
+				AnsiConsole.MarkupLine($"[red]Update with the following:[/]");
+
+				var installCmdVer = string.IsNullOrEmpty(toolVersion) ? "" : $" --version {toolVersion}";
+				AnsiConsole.Markup($"  dotnet tool install --global {ToolPackageId}{installCmdVer}");
+
+				return -1;
+			}
 
 			AnsiConsole.MarkupLine(" ok");
-
 			AnsiConsole.Markup($"[bold blue]{Icon.Thinking} Scheduling appointments...[/]");
 
 			if (chart.Doctor.OpenJdk != null)
@@ -233,7 +246,7 @@ namespace MauiDoctor.Cli
 				AnsiConsole.MarkupLine($"[bold blue]{Icon.Success} Congratulations, everything looks great![/]");
 			}
 
-			Console.Title = ".NET MAUI Doctor";
+			Console.Title = ToolName;
 
 			return 0;
 		}
