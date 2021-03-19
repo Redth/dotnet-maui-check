@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using MauiDoctor.Doctoring;
@@ -36,6 +37,7 @@ namespace MauiDoctor.Checkups
 			var sdks = await dn.GetSdks();
 
 			var missingSdks = new List<Manifest.DotNetSdk>();
+			var sentinelFiles = new List<string>();
 
 			if (RequiredSdks?.Any() ?? false)
 			{
@@ -50,12 +52,20 @@ namespace MauiDoctor.Checkups
 
 			foreach (var sdk in sdks)
 			{
-				if (RequiredSdks.Any(rs => sdk.Version == NuGetVersion.Parse(rs.Version)))
+				var requiredSdk = RequiredSdks.FirstOrDefault(rs => sdk.Version == NuGetVersion.Parse(rs.Version));
+
+				if (requiredSdk != null)
 				{
 					if (bestSdk == null || sdk.Version > bestSdk.Version)
 						bestSdk = sdk;
 
-					ReportStatus($"{sdk.Version}  - {sdk.Directory}", Status.Ok);
+					if (requiredSdk.EnableWorkloadResolver)
+					{
+						var sentinelPath = Path.Combine(sdk.Directory.FullName, "EnableWorkloadResolver.sentinel");
+						sentinelFiles.Add(sentinelPath);
+					}
+
+					ReportStatus($"{sdk.Version} - {sdk.Directory}", Status.Ok);
 				}
 				else
 					ReportStatus($"{sdk.Version} - {sdk.Directory}", null);
@@ -64,6 +74,10 @@ namespace MauiDoctor.Checkups
 			// Find newest compatible sdk
 			if (bestSdk != null)
 				Util.SetDoctorEnvironmentVariable("DOTNET_SDK", bestSdk.Directory.FullName);
+
+			// Add sentinel files that should be considered
+			if (sentinelFiles.Any())
+				history.AddNotes(this, "sentinel_files", sentinelFiles.ToArray());
 
 			if (missingSdks.Any())
 			{

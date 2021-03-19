@@ -31,27 +31,23 @@ namespace MauiDoctor.Checkups
 		{
 			var vsinfo = await GetWindowsInfo();
 
+			var sentinelFiles = new List<string>();
+
 			foreach (var vi in vsinfo)
 			{
 				if (vi.Version.IsCompatible(MinimumVersion, ExactVersion))
 				{
 					ReportStatus($"{vi.Version} - {vi.Path}", Status.Ok);
 
-					var workloadResolverSentinel = Path.Combine(vi.Path, "MSBuild\\Current\\Bin\\SdkResolvers\\Microsoft.DotNet.MSBuildSdkResolver\\EnableWorkloadResolver.sentinel");
-
-					if (Directory.Exists(workloadResolverSentinel) && !File.Exists(workloadResolverSentinel))
-					{
-						try
-						{
-							File.Create(workloadResolverSentinel);
-							ReportStatus("Created EnableWorkloadResolver.sentinel for IDE support", Status.Ok);
-						}
-						catch { }
-					}
+					var sentinel = Path.Combine(vi.Path, "MSBuild\\Current\\Bin\\SdkResolvers\\Microsoft.DotNet.MSBuildSdkResolver\\EnableWorkloadResolver.sentinel");
+					sentinelFiles.Add(sentinel);
 				}
 				else
 					ReportStatus($"{vi.Version}", null);
 			}
+
+			if (sentinelFiles.Any())
+				history.AddNotes(this, "sentinel_files", sentinelFiles.ToArray());
 
 			if (vsinfo.Any(vs => vs.Version.IsCompatible(MinimumVersion, ExactVersion)))
 				return Diagonosis.Ok(this);

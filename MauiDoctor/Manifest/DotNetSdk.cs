@@ -19,5 +19,8 @@ namespace MauiDoctor.Manifest
 
 		[JsonProperty("packageSources")]
 		public List<string> PackageSources { get; set; }
+
+		[JsonProperty("enableWorkloadResolver")]
+		public bool EnableWorkloadResolver { get; set; }
 	}
 }
