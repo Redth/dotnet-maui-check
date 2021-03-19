@@ -2,7 +2,7 @@
   "profiles": {
     "MauiDoctor": {
       "commandName": "Project",
-      "commandLineArgs": "-m https://gist.githubusercontent.com/Redth/9bcd8eb7615eb4db3aefa9298e226c49/raw/ff4997ca4069648813b5d4075ae549eca015e6c3/maui-dr-manifest.json"
+      "commandLineArgs": "-m https://gist.githubusercontent.com/Redth/9bcd8eb7615eb4db3aefa9298e226c49/raw/40a3691a3838bc979c3e156bdbe01daf45f45ed0/maui-dr-manifest.json"
     }
   }
 }

@@ -15,7 +15,8 @@ namespace MauiDoctor.Checkups
 			RequiredPackages = requiredPackages;
 		}
 
-		public override string[] Dependencies => new string[] { "androidsdk" };
+		public override IEnumerable<CheckupDependency> Dependencies
+			=> new List<CheckupDependency> { new CheckupDependency("androidsdk") };
 
 		public Manifest.AndroidPackage[] RequiredPackages { get; private set; }
 

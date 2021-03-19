@@ -108,9 +108,9 @@ namespace MauiDoctor.Cli
 				{
 					foreach (var dep in checkup.Dependencies)
 					{
-						if (!checkupStatus.TryGetValue(dep, out var depStatus) || depStatus != Doctoring.Status.Ok)
+						if (!checkupStatus.TryGetValue(dep.CheckupId, out var depStatus) || depStatus != Doctoring.Status.Ok)
 						{
-							skipCheckup = true;
+							skipCheckup = dep.IsRequired;
 							break;
 						}
 					}

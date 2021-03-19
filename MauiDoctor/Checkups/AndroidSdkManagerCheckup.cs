@@ -16,7 +16,8 @@ namespace MauiDoctor.Checkups
 
 		public override string Title => "Android SDK";
 
-		public override string[] Dependencies => new [] { "openjdk" };
+		public override IEnumerable<CheckupDependency> Dependencies
+			=> new List<CheckupDependency> { new CheckupDependency("openjdk") };
 
 		public DirectoryInfo SelectedHome { get; private set; }
 

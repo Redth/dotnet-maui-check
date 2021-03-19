@@ -14,7 +14,8 @@ namespace MauiDoctor.Checkups
 
 		public override string Id => "androidsdklicenses";
 
-		public override string[] Dependencies => new[] { "androidsdk" };
+		public override IEnumerable<CheckupDependency> Dependencies
+			=> new List<CheckupDependency> { new CheckupDependency("androidsdk") };
 
 		public override string Title => "Android SDK - Licenses Acceptance";
 

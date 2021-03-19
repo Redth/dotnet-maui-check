@@ -21,7 +21,7 @@ namespace MauiDoctor.Doctoring
 			var filtered = checkups.Where(c => c.IsPlatformSupported(Util.Platform));
 
 			var sorted = TopologicalSort<Checkup>(filtered, c =>
-				checkups.Where(dc => c.Dependencies.Contains(dc.Id)));
+				checkups.Where(dc => c.Dependencies.Any(d => d.CheckupId == dc.Id)));
 
 			return sorted;
 		}

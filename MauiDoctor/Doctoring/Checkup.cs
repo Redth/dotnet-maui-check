@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace MauiDoctor.Doctoring
@@ -8,7 +9,7 @@ namespace MauiDoctor.Doctoring
 	{
 		public abstract string Id { get; }
 
-		public virtual string[] Dependencies { get; }  = Array.Empty<string>();
+		public virtual IEnumerable<CheckupDependency> Dependencies { get; } = Enumerable.Empty<CheckupDependency>();
 
 		public abstract string Title { get; }
 		public virtual string Description { get; } = string.Empty;

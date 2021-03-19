@@ -29,7 +29,8 @@ namespace MauiDoctor.Checkups
 		public readonly string[] NuGetPackageSources;
 		public readonly Manifest.DotNetWorkload[] RequiredWorkloads;
 
-		public override string[] Dependencies => new string[] { "dotnet" };
+		public override IEnumerable<CheckupDependency> Dependencies
+			=> new List<CheckupDependency> { new CheckupDependency("dotnet") };
 
 		public override string Id => "dotnetworkloads";
 

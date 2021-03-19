@@ -30,7 +30,8 @@ namespace MauiDoctor.Checkups
 		public readonly string[] NuGetPackageSources;
 		public readonly Manifest.NuGetPackage[] RequiredPacks;
 
-		public override string[] Dependencies => new string[] { "dotnetworkloads" };
+		public override IEnumerable<CheckupDependency> Dependencies
+			=> new List<CheckupDependency> { new CheckupDependency("dotnetworkloads") };
 
 		public override string Id => "dotnetpacks";
 
