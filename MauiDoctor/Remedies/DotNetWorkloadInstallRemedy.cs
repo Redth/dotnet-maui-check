@@ -11,14 +11,14 @@ namespace MauiDoctor.Doctoring
 {
 	public class DotNetWorkloadInstallRemedy : Remedy
 	{
-		public DotNetWorkloadInstallRemedy(string sdkRoot, string sdkVersion, DotNetWorkload[] packages, params string[] nugetPackageSources)
+		public DotNetWorkloadInstallRemedy(string sdkRoot, string sdkVersion, DotNetWorkload workload, params string[] nugetPackageSources)
 		{
-			Packages = packages;
+			Workload = workload;
 			WorkloadManager = new DotNetWorkloadManager(sdkRoot, sdkVersion, nugetPackageSources);
 		}
 
 		public readonly DotNetWorkloadManager WorkloadManager;
-		public DotNetWorkload[] Packages { get; private set; }
+		public DotNetWorkload Workload { get; private set; }
 
 		public override bool RequiresAdmin(Platform platform)
 		{
@@ -32,18 +32,15 @@ namespace MauiDoctor.Doctoring
 		{
 			await base.Cure(cancellationToken);
 
-			foreach (var pack in Packages)
-			{
-				ReportStatus($"Installing Workload: {pack.Id}...");
+			ReportStatus($"Installing Workload: {Workload.Id}...");
 
-				if (NuGetVersion.TryParse(pack.Version, out var version)
-					&& await WorkloadManager.InstallWorkloadManifest(pack.PackageId, version, cancellationToken))
-				{
-					ReportStatus($"Installed Workload: {pack.Id}.");
-				}
-				else
-					ReportStatus($"Failed to install workload: {pack.Id}.");
+			if (NuGetVersion.TryParse(Workload.Version, out var version)
+				&& await WorkloadManager.InstallWorkloadManifest(Workload.PackageId, version, cancellationToken))
+			{
+				ReportStatus($"Installed Workload: {Workload.Id}.");
 			}
+			else
+				ReportStatus($"Failed to install workload: {Workload.Id}.");
 		}
 	}
 }

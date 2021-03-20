@@ -74,11 +74,14 @@ namespace MauiDoctor.Checkups
 			if (!missingWorkloads.Any())
 				return Diagonosis.Ok(this);
 
+			var remedies = missingWorkloads
+				.Select(mw => new DotNetWorkloadInstallRemedy(SdkRoot, SdkVersion, mw, NuGetPackageSources));
+
 			return new Diagonosis(
 				Status.Error,
 				this,
 				new Prescription("Install Missing SDK Workloads",
-				new DotNetWorkloadInstallRemedy(SdkRoot, SdkVersion, missingWorkloads.ToArray(), NuGetPackageSources)));
+				remedies.ToArray()));
 		}
 	}
 }

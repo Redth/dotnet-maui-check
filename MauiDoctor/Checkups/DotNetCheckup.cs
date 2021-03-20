@@ -83,12 +83,15 @@ namespace MauiDoctor.Checkups
 			{
 				var str = SdkListToString();
 
+				var remedies = missingSdks.Select(ms =>
+					new BootsRemedy(ms.Urls.For(Util.Platform).ToString(), ".NET SDK " + ms.Version)
+					{
+						AdminRequirements = new[] { (Platform.Windows, true) }
+					});
+
 				return new Diagonosis(Status.Error, this, $".NET SDK {str} not installed.",
 						new Prescription($"Download .NET SDK {str}",
-						new BootsRemedy(missingSdks.Select(ms => (ms.Urls.For(Util.Platform)?.ToString(), ".NET SDK " + ms.Version)).ToArray())
-						{
-							AdminRequirements = new [] { (Platform.Windows, true) }
-						}));
+						remedies.ToArray()));
 			}
 
 			return new Diagonosis(Status.Ok, this);

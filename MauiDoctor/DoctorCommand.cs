@@ -53,7 +53,7 @@ namespace MauiDoctor.Cli
 			AnsiConsole.Markup($"[bold blue]{Icon.Thinking} Synchronizing configuration...[/]");
 
 			var chart = await Manifest.Chart.FromFileOrUrl(settings.Manifest);
-			var toolVersion = chart?.Doctor?.ToolVersion;
+			var toolVersion = chart?.Doctor?.ToolVersion ?? "0.3.0";
 
 			var fileVersion = NuGetVersion.Parse(FileVersionInfo.GetVersionInfo(this.GetType().Assembly.Location).FileVersion);
 
@@ -100,7 +100,8 @@ namespace MauiDoctor.Cli
 
 				foreach (var sdk in chart.Doctor.DotNet.Sdks)
 				{
-					clinic.OfferService(new DotNetWorkloadsCheckup(sdk.Version, sdk.Workloads.ToArray(), sdk.PackageSources.ToArray()));
+					if (sdk.Workloads?.Any() ?? false)
+						clinic.OfferService(new DotNetWorkloadsCheckup(sdk.Version, sdk.Workloads.ToArray(), sdk.PackageSources.ToArray()));
 
 					// Always run the packs checkup even if manifest is empty, since the workloads may resolve some required packs dynamically that aren't from the manifest
 					clinic.OfferService(new DotNetPacksCheckup(sdk.Version, sdk.Packs?.ToArray() ?? Array.Empty<Manifest.NuGetPackage>(), sdk.PackageSources.ToArray()));
@@ -203,11 +204,15 @@ namespace MauiDoctor.Cli
 					{
 						var isAdmin = Util.IsAdmin();
 
+						var adminMsg = Util.IsWindows ?
+							$"{Icon.Bell} [red]Administrator Permissions Required.  Try opening a new console as Administrator and running this tool again.[/]"
+							: $"{Icon.Bell} [red]Super User Permissions Required.  Try running this tool again with 'sudo'.[/]";
+
 						foreach (var remedy in diagnosis.Prescription.Remedies)
 						{
 							if (!remedy.HasPrivilegesToRun(isAdmin, Util.Platform))
 							{
-								AnsiConsole.Markup("Fix requires running with adminstrator privileges.  Try opening a terminal as administrator and running maui-doctor again.");
+								AnsiConsole.Markup(adminMsg);
 								continue;
 							}
 							try
@@ -222,6 +227,10 @@ namespace MauiDoctor.Cli
 								await remedy.Cure(cts.Token);
 
 								AnsiConsole.MarkupLine("  Fix applied.  Run doctor again to verify.");
+							}
+							catch (Exception x) when (x is AccessViolationException || x is UnauthorizedAccessException)
+							{
+								AnsiConsole.Markup(adminMsg);
 							}
 							catch (Exception ex)
 							{

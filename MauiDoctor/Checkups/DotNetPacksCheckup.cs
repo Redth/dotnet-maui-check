@@ -69,11 +69,14 @@ namespace MauiDoctor.Checkups
 			if (!missingPacks.Any())
 				return Diagonosis.Ok(this);
 
+			var remedies = missingPacks
+				.Select(ms => new DotNetPackInstallRemedy(SdkRoot, SdkVersion, ms, NuGetPackageSources));
+
 			return new Diagonosis(
 				Status.Error,
 				this,
 				new Prescription("Install Missing SDK Packs",
-				new DotNetPackInstallRemedy(SdkRoot, SdkVersion, missingPacks.ToArray(), NuGetPackageSources))); ;
+				remedies.ToArray()));
 		}
 	}
 }

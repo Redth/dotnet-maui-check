@@ -12,7 +12,7 @@
   <PropertyGroup>
     <PackageId>Redth.Net.Maui.Doctor</PackageId>
     <Title>.NET MAUI Doctor</Title>
-    <Version>0.1.0</Version>
+    <Version>0.3.0</Version>
     <Authors>Redth</Authors>
     <Owners>Redth</Owners>
     <summary>A dotnet tool for helping set up your .NET MAUI environment</summary>

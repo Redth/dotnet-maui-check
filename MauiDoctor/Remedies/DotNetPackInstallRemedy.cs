@@ -6,14 +6,14 @@ namespace MauiDoctor.Doctoring
 {
 	public class DotNetPackInstallRemedy : Remedy
 	{
-		public DotNetPackInstallRemedy(string sdkRoot, string sdkVersion, NuGetPackage[] packages, params string[] nugetPackageSources)
+		public DotNetPackInstallRemedy(string sdkRoot, string sdkVersion, NuGetPackage package, params string[] nugetPackageSources)
 		{
-			Packages = packages;
+			Package = package;
 			WorkloadManager = new DotNetWorkloadManager(sdkRoot, sdkVersion, nugetPackageSources);
 		}
 
 		public readonly DotNetWorkloadManager WorkloadManager;
-		public NuGetPackage[] Packages { get; private set; }
+		public NuGetPackage Package { get; private set; }
 
 		public override bool RequiresAdmin(Platform platform)
 		{
@@ -27,15 +27,12 @@ namespace MauiDoctor.Doctoring
 		{
 			await base.Cure(cancellationToken);
 
-			foreach (var pack in Packages)
-			{
-				ReportStatus($"Installing Pack: {pack.Id}...");
+			ReportStatus($"Installing Pack: {Package.Id}...");
 
-				if (await WorkloadManager.InstallWorkloadPack(pack.Id, cancellationToken))
-					ReportStatus($"Installed Pack: {pack.Id}.");
-				else
-					ReportStatus($"Failed to install Pack: {pack.Id}.");
-			}
+			if (await WorkloadManager.InstallWorkloadPack(Package.Id, cancellationToken))
+				ReportStatus($"Installed Pack: {Package.Id}.");
+			else
+				ReportStatus($"Failed to install Pack: {Package.Id}.");
 		}
 	}
 }
