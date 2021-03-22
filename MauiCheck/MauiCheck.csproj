@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>maui-check</ToolCommandName>
+    <PackageOutputPath>./artifacts</PackageOutputPath>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>Redth.Net.Maui.Check</PackageId>
+    <Title>.NET MAUI Check Tool</Title>
+    <Version>0.1.0</Version>
+    <Authors>Redth</Authors>
+    <Owners>Redth</Owners>
+    <summary>A dotnet tool for helping set up your .NET MAUI environment</summary>
+    <PackageDescription>
+	A dotnet tool for helping set up your .NET MAUI environment
+    </PackageDescription>
+    <Copyright>Copyright © Redth</Copyright>
+    <PackageProjectUrl>https://github.com/redth/dotnet-maui-check</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/redth/dotnet-maui-check</RepositoryUrl>
+    <AssemblyFileVersion>$(Version)</AssemblyFileVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NuGet.Packaging" Version="5.9.0" />
+    <PackageReference Include="NuGet.Protocol" Version="5.9.0" />
+    <PackageReference Include="NuGet.Versioning" Version="5.9.0" />
+    <PackageReference Include="Microsoft.Build.Framework" Version="16.9.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="vswhere" Version="2.8.4">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="plist-cil" Version="2.1.0" />
+    <PackageReference Include="Spectre.Console" Version="0.38.0" />
+    <PackageReference Include="Xamarin.LibZipSharp" Version="1.0.24" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.DotNet.MSBuildSdkResolver">
+      <HintPath>..\libs\Microsoft.DotNet.MSBuildSdkResolver.dll</HintPath>
+    </Reference>
+    <Reference Include="Boots.Core">
+      <HintPath>..\libs\Boots.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Polly">
+      <HintPath>..\libs\Polly.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

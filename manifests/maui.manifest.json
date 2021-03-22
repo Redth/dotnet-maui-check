@@ -1,74 +1,100 @@
 {
-    "doctor" : {
-        "xcode" : {
-            "minimumVersion": "12.4"
+  "check": {
+    "toolVersion": "0.1.0",
+    "openjdk": {
+      "minimumVersion": "1.8.0-1"
+    },
+    "xcode": {
+      "minimumVersion": "12.4"
+    },
+    "vswin": {
+      "minimumVersion": "16.9.0"
+    },
+    "vsmac": {
+      "minimumVersion": "8.9.0"
+    },
+    "android": {
+      "packages": [
+        {
+          "path": "emulator",
+          "version": "30.4.5"
         },
-        "vswin" : {
-            "minimumVersion" : "16.9.0"
+        {
+          "path": "build-tools;30.0.2",
+          "version": "30.0.2"
         },
-        "vsmac" : {
-            "minimumVersion" : "8.9.0"
+        {
+          "path": "platforms;android-30",
+          "version": "3"
         },
-        "android": {
-            "packages" : [
-                { 
-                    "path" : "emulator",
-                    "version" : "30.4.5"
-                },
-                {
-                    "path" : "build-tools;30.0.2",
-                    "version" : "30.0.2"
-                },
-                {
-                    "path" : "platforms;android-30",
-                    "version" : "3"
-                },
-                {
-                    "path" : "platform-tools",
-                    "version" : "31.0.0"
-                }
-            ]
+        {
+          "path": "system-images;android-30;google_apis;x86_64",
+          "version": "10",
+          "arch": "x64"
         },
-        "dotnet": {
-            "sdks" : [
-                { 
-                    "version" : "6.0.100-preview.2.21155.3",
-                    "urls" : {
-                        "win" : "https://dotnetcli.azureedge.net/dotnet/Sdk/6.0.100-preview.2.21155.3/dotnet-sdk-6.0.100-preview.2.21155.3-win-x64.exe",
-                        "osx" : "https://dotnetcli.azureedge.net/dotnet/Sdk/6.0.100-preview.2.21155.3/dotnet-sdk-6.0.100-preview.2.21155.3-osx-x64.pkg"
-                    },
-                    "packs": [
-                        { 
-                            "id" : "Microsoft.Android.Sdk",
-                            "version" : "11.0.200-ci.main.148",
-                            "workload" : "Microsoft.NET.Workload.Android",
-                            "urls" : {
-                                "win" : "https://dl.internalx.com/vsts-devdiv/Xamarin.Android/public/net6/4534967/main/f4d8fe238b15eadfc7842749bf13e5fca3e2f2d2/Microsoft.NET.Workload.Android.11.0.200.148.msi",
-                                "osx" : "https://dl.internalx.com/vsts-devdiv/Xamarin.Android/public/net6/4534967/main/f4d8fe238b15eadfc7842749bf13e5fca3e2f2d2/Microsoft.NET.Workload.Android-11.0.200-ci.f4d8fe238b15eadfc7842749bf13e5fca3e2f2d2.148.pkg"
-                            }
-                        },
-                        {
-                            "id" : "Microsoft.iOS.Sdk",
-                            "version" : "14.4.100-ci.main.1192",
-                            "workload" : "Microsoft.NET.Workload.iOS",
-                            "urls" : {
-                                "win" : "https://bosstoragemirror.azureedge.net/wrench/main/98c8649d0c7d1e3c4c8d8d09e022befa853fb1e7/4541181/package/Microsoft.NET.Workload.iOS.14.4.100-ci.main.1192.msi",
-                                "osx" : "https://bosstoragemirror.azureedge.net/wrench/main/98c8649d0c7d1e3c4c8d8d09e022befa853fb1e7/4541181/package/notarized/Microsoft.iOS.Bundle.14.4.100-ci.main.1192.pkg"
-                            }
-                        },
-                        {
-                            "id" : "Microsoft.MacCatalyst.Sdk",
-                            "version" : "14.3.100-ci.main.337",
-                            "workload" : "Microsoft.NET.Workload.MacCatalyst",
-                            "urls" : {
-                                "osx" : "https://bosstoragemirror.azureedge.net/wrench/main/98c8649d0c7d1e3c4c8d8d09e022befa853fb1e7/4541181/package/notarized/Microsoft.MacCatalyst.Bundle.14.3.100-ci.main.337.pkg"
-                            }
-                        }
-        
-                    ]
-        
-                }
-            ]
+        {
+          "path": "system-images;android-30;google_apis;x86",
+          "version": "9",
+          "arch": "x86"
+        },
+        {
+          "path": "platform-tools",
+          "version": "31.0.0"
         }
+      ],
+      "emulators": [
+        {
+          "arch": "x64",
+          "sdkId": "system-images;android-30;google_apis;x86_64",
+          "desc": "Android Emulator - x64 - API30 - Google API's",
+          "apiLevel": 30,
+          "tag": "google_apis",
+          "device": "pixel"
+        },
+        {
+          "arch": "x86",
+          "sdkId": "system-images;android-30;google_apis;x86",
+          "desc": "Android Emulator - x86 - API30 - Google API's",
+          "apiLevel": 30,
+          "tag": "google_apis",
+          "device": "pixel"
+        }
+      ]
+    },
+    "dotnet": {
+      "sdks": [
+        {
+          "version": "6.0.100-preview.2.21155.3",
+          "enableWorkloadResolver": true,
+          "urls": {
+            "win": "https://dotnetcli.azureedge.net/dotnet/Sdk/6.0.100-preview.2.21155.3/dotnet-sdk-6.0.100-preview.2.21155.3-win-x64.exe",
+            "osx": "https://dotnetcli.azureedge.net/dotnet/Sdk/6.0.100-preview.2.21155.3/dotnet-sdk-6.0.100-preview.2.21155.3-osx-x64.pkg"
+          },
+          "packageSources": [
+            "https://pkgs.dev.azure.com/azure-public/vside/_packaging/xamarin-impl/nuget/v3/index.json"
+          ],
+          "workloads": [
+            {
+              "workloadId": "microsoft-android-sdk-full",
+              "packageId": "Microsoft.NET.Workload.Android",
+              "version": "11.0.200-ci.main.148"
+            },
+            {
+              "workloadId": "microsoft-ios-sdk-full",
+              "packageId": "Microsoft.NET.Workload.iOS",
+              "version": "14.4.100-ci.main.1192"
+            },
+            {
+              "workloadId": "microsoft-maccatalyst-sdk-full",
+              "packageId": "Microsoft.NET.Workload.MacCatalyst",
+              "version": "14.3.100-ci.main.337",
+              "ignoredPackIds": [
+                "Microsoft.MacCatalyst.Templates"
+              ]
+            }
+          ]
+        }
+      ]
     }
+  }
 }
