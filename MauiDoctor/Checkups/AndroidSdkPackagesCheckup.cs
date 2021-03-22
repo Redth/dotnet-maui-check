@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using MauiDoctor.Doctoring;
 using NuGet.Versioning;
@@ -92,26 +91,8 @@ For more information see: [underline]https://aka.ms/dotnet-androidsdk-help[/]";
 				Status.Error,
 				this,
 				new Prescription("Install or Update Android SDK pacakges",
-					desc)));
-		}
-	}
-
-	public class AndroidPackagesRemedy : Remedy
-	{
-		public AndroidPackagesRemedy(AndroidSdk.AndroidSdkManager android, Manifest.AndroidPackage[] packages)
-		{
-			Android = android;
-			Packages = packages;
-		}
-
-		public AndroidSdk.AndroidSdkManager Android { get; private set; }
-		public Manifest.AndroidPackage[] Packages { get; private set; }
-
-		public override async Task Cure(CancellationToken cancellationToken)
-		{
-			await base.Cure(cancellationToken);
-
-			Android.SdkManager.Install(Packages.Select(p => p.Path).ToArray());
+					desc,
+					new AndroidPackagesRemedy(android, missingPackages.ToArray()))));
 		}
 	}
 

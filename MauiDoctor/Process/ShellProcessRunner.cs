@@ -24,7 +24,7 @@ namespace MauiDoctor
 
 		public Action<string> OutputHandler { get; private set; }
 
-		public ShellProcessRunner(string executable, string args, System.Threading.CancellationToken cancellationToken, Action<string> outputHandler = null, bool redirectStdInput = false)
+		public ShellProcessRunner(string executable, string args, System.Threading.CancellationToken cancellationToken, Action<string> outputHandler = null, bool useSystemCmd = true, bool redirectStdInput = false, bool redirectOutput = true)
 		{
 			OutputHandler = outputHandler;
 
@@ -32,13 +32,27 @@ namespace MauiDoctor
 			standardError = new List<string>();
 
 			process = new Process();
-			// process.StartInfo.FileName = Util.IsWindows ? "cmd.exe" : (File.Exists("/bin/zsh") ? "/bin/zsh" : "/bin/bash");
-			// process.StartInfo.Arguments = Util.IsWindows ? $"/c \"{executable} {args}\"" : $"-c \"{executable} {args}\"";
-			process.StartInfo.FileName = Util.IsWindows ? executable : (File.Exists("/bin/zsh") ? "/bin/zsh" : "/bin/bash");
-			process.StartInfo.Arguments = Util.IsWindows ? args : $"-c \"{executable} {args}\"";
+
+			if (useSystemCmd)
+			{
+				// process.StartInfo.FileName = Util.IsWindows ? "cmd.exe" : (File.Exists("/bin/zsh") ? "/bin/zsh" : "/bin/bash");
+				// process.StartInfo.Arguments = Util.IsWindows ? $"/c \"{executable} {args}\"" : $"-c \"{executable} {args}\"";
+				process.StartInfo.FileName = Util.IsWindows ? executable : (File.Exists("/bin/zsh") ? "/bin/zsh" : "/bin/bash");
+				process.StartInfo.Arguments = Util.IsWindows ? args : $"-c \"{executable} {args}\"";
+			}
+			else
+			{
+				process.StartInfo.FileName = executable;
+				process.StartInfo.Arguments = args;
+			}
+
 			process.StartInfo.UseShellExecute = false;
-			process.StartInfo.RedirectStandardOutput = true;
-			process.StartInfo.RedirectStandardError = true;
+
+			if (redirectOutput)
+			{
+				process.StartInfo.RedirectStandardOutput = true;
+				process.StartInfo.RedirectStandardError = true;
+			}
 
 			// Process any env variables to be set that might have been set by other checkups
 			// ie: JavaJdkCheckup sets MAUI_DOCTOR_JAVA_HOME
@@ -65,8 +79,12 @@ namespace MauiDoctor
 				}
 			};
 			process.Start();
-			process.BeginOutputReadLine();
-			process.BeginErrorReadLine();
+
+			if (redirectOutput)
+			{
+				process.BeginOutputReadLine();
+				process.BeginErrorReadLine();
+			}
 
 			if (cancellationToken != System.Threading.CancellationToken.None)
 			{
@@ -99,6 +117,9 @@ namespace MauiDoctor
 			{
 				process.WaitForExit();
 			} catch { }
+
+			if (standardError?.Any(l => l?.Contains("error: more than one device/emulator") ?? false) ?? false)
+				throw new Exception("More than one Device/Emulator detected, you must specify which Serial to target.");
 
 			return new ShellProcessResult(standardOutput, standardError, process.ExitCode);
 		}

@@ -28,6 +28,7 @@ namespace MauiDoctor.Checkups
 
 			try
 			{
+
 				var v = android.SdkManager.RequiresLicenseAcceptance();
 
 				if (!v)
@@ -47,11 +48,20 @@ namespace MauiDoctor.Checkups
 			if (string.IsNullOrEmpty(sdkMgrPath))
 				sdkMgrPath = $"sdkmanager{ext}";
 
-			return Task.FromResult(new Diagonosis(Status.Error, this, new Prescription("Read and accept Android SDK licenses.",
-
+			return Task.FromResult(
+				new Diagonosis(
+					Status.Error,
+					this,
+					new Prescription(
+						"Read and accept Android SDK licenses.",
 @$"Your Android SDK has licenses which are unread or unaccepted.
 You can use the Android SDK Manager to read and accept them.
-For more information see: [underline]https://aka.ms/dotnet-androidsdk-help[/]")));
+For more information see: [underline]https://aka.ms/dotnet-androidsdk-help[/]",
+						new ActionRemedy(t =>
+						{
+							android.SdkManager.AcceptLicensesInteractive();
+							return Task.CompletedTask;
+						}))));
 
 			//$"To read and accept Android SDK licenses, run the following command in a terminal:{Environment.NewLine}    {sdkMgrPath} --licenses")));
 		}

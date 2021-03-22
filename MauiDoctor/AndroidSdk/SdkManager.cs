@@ -348,13 +348,19 @@ namespace MauiDoctor.AndroidSdk
 			return result;
 		}
 
+		public bool InstallInteractive(params string[] packages)
+			=> InstallOrUninstall(true, packages, true);
+
 		public bool Install(params string[] packages)
 			=> InstallOrUninstall(true, packages);
+
+		public bool UninstallInteractive(params string[] packages)
+			=> InstallOrUninstall(false, packages, true);
 
 		public bool Uninstall(params string[] packages)
 			=> InstallOrUninstall(false, packages);
 
-		internal bool InstallOrUninstall(bool install, IEnumerable<string> packages)
+		internal bool InstallOrUninstall(bool install, IEnumerable<string> packages, bool interactive = false)
 		{
 			CheckSdkManagerVersion();
 
@@ -365,11 +371,14 @@ namespace MauiDoctor.AndroidSdk
 				builder.Append("--uninstall");
 			
 			foreach (var pkg in packages)
-				builder.AppendQuoted(pkg);
+				builder.Append($"'{pkg}'");
 
 			BuildStandardOptions(builder);
 
-			var output = RunWithAccept(builder);
+			if (interactive)
+				RunInteractive(builder);
+			else
+				RunWithAccept(builder);
 
 			return true;
 		}
@@ -408,7 +417,23 @@ namespace MauiDoctor.AndroidSdk
 
 			BuildStandardOptions(builder);
 
-			RunWithAccept(builder);
+			RunWithAccept(builder, TimeSpan.Zero);
+
+			return true;
+		}
+
+		public bool AcceptLicensesInteractive()
+		{
+			CheckSdkManagerVersion();
+
+			//adb devices -l
+			var builder = new ProcessArgumentBuilder();
+
+			builder.Append("--licenses");
+
+			BuildStandardOptions(builder);
+
+			RunInteractive(builder);
 
 			return true;
 		}
@@ -420,10 +445,6 @@ namespace MauiDoctor.AndroidSdk
 			if (!(sdkManager?.Exists ?? false))
 				throw new FileNotFoundException("Could not locate sdkmanager", sdkManager?.FullName);
 
-			// We need to temporarily move ./tools/ to ./tools-temp/ and run sdkmanager.bat
-			// from there on windows to avoid errors updating the ./tools/ folder while in use
-			var moveToolsTemp = GetVersion() == null;
-			
 			//adb devices -l
 			var builder = new ProcessArgumentBuilder();
 
@@ -431,7 +452,7 @@ namespace MauiDoctor.AndroidSdk
 
 			BuildStandardOptions(builder);
 
-			var o = RunWithAccept(builder, moveToolsTemp);
+			var o = RunWithAccept(builder);
 
 			return true;
 		}
@@ -442,67 +463,10 @@ namespace MauiDoctor.AndroidSdk
 			return Run(new ProcessArgumentBuilder());
 		}
 
-		//List<string> RunWithAccept(ProcessArgumentBuilder builder, bool moveToolsToTemp = false)
-		//	=> RunWithAccept(builder, TimeSpan.Zero, moveToolsToTemp);
-
-		//List<string> RunWithAccept(ProcessArgumentBuilder builder, TimeSpan timeout, bool moveToolsToTemp = false)
-		//{
-		//	var sdkManager = FindToolPath(AndroidSdkHome);
-
-		//	if (!(sdkManager?.Exists ?? false))
-		//		throw new FileNotFoundException("Could not locate sdkmanager", sdkManager?.FullName);
-
-		//	var ct = new CancellationTokenSource();
-		//	if (timeout != TimeSpan.Zero)
-		//		ct.CancelAfter(timeout);
-
-		//	// UGLY HACK AND DRAGONS 🐲🔥
-		//	// Basically, on windows sdkmanager.bat is in tools, but updating itself
-		//	// tries to delete tools and move the new one in place after it downloads
-		//	// which causes issues because sdkmanager.bat is running from that folder
-		//	string sdkToolsTempDir = null;
-		//	var didMoveToolsToTemp = false;
-
-		//	if (moveToolsToTemp && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-		//	{
-		//		// Get the actual tools dir
-		//		var sdkToolsDir = Path.Combine(sdkManager.Directory.FullName, "..");
-		//		sdkToolsTempDir = Path.Combine(sdkToolsDir, "..", "tools-temp");
-
-		//		// Perform the copy
-		//		CopyFilesRecursively(new DirectoryInfo(sdkToolsDir), new DirectoryInfo(sdkToolsTempDir));
-
-		//		// Set the sdkmanager.bat path to the new temp location
-		//		sdkManager = new FileInfo(Path.Combine(sdkToolsTempDir, "bin", "sdkmanager.bat"));
-		//		didMoveToolsToTemp = true;
-		//	}
-
-		//	var p = new ProcessRunner(sdkManager, builder, ct.Token, true);
-
-		//	while (!p.HasExited)
-		//	{
-		//		Thread.Sleep(250);
-
-		//		try
-		//		{
-		//			p.StandardInputWriteLine("y");
-		//		}
-		//		catch { }
-		//	}
-
-		//	var r = p.WaitForExit();
-
-		//	// If we used the ugly hack above, let's cleanup the temp copy
-		//	if (didMoveToolsToTemp)
-		//		Directory.Delete(sdkToolsTempDir, true);
-
-		//	return r.StandardOutput;
-		//}
-
-		List<string> RunWithAccept(ProcessArgumentBuilder builder, bool moveToolsToTemp = false)
+		List<string> RunWithAccept(ProcessArgumentBuilder builder)
 			=> RunWithAccept(builder, TimeSpan.Zero);
 
-		List<string> RunWithAccept(ProcessArgumentBuilder builder, TimeSpan timeout, bool moveToolsToTemp = false)
+		List<string> RunWithAccept(ProcessArgumentBuilder builder, TimeSpan timeout)
 		{
 			var sdkManager = FindToolPath(AndroidSdkHome);
 
@@ -513,22 +477,22 @@ namespace MauiDoctor.AndroidSdk
 			if (timeout != TimeSpan.Zero)
 				ct.CancelAfter(timeout);
 
-			var p = new ShellProcessRunner(sdkManager.FullName, builder.ToString(), ct.Token, null, true);
+			var p = new ShellProcessRunner(sdkManager.FullName, builder.ToString(), ct.Token, null, true, false, false);
 
-			while (!p.HasExited)
-			{
-				Thread.Sleep(250);
+			//while (!p.HasExited)
+			//{
+			//	Thread.Sleep(250);
 
-				try
-				{
-					p.Write("y");
-				}
-				catch { }
-			}
+			//	try
+			//	{
+			//		p.Write("y");
+			//	}
+			//	catch { }
+			//}
 
 			var r = p.WaitForExit();
 
-			return r.StandardOutput.Concat(r.StandardError).ToList();
+			return r?.StandardOutput?.Concat(r?.StandardError)?.ToList() ?? new List<string>();
 		}
 
 		List<string> Run(ProcessArgumentBuilder builder)
@@ -538,7 +502,21 @@ namespace MauiDoctor.AndroidSdk
 			if (!(sdkManager?.Exists ?? false))
 				throw new FileNotFoundException("Could not locate sdkmanager", sdkManager?.FullName);
 
-			var p = new ProcessRunner(sdkManager, builder);
+			var p = new ShellProcessRunner(sdkManager.FullName, builder.ToString(), CancellationToken.None, null, true, false, true);
+
+			var r = p.WaitForExit();
+
+			return r.StandardOutput;
+		}
+
+		List<string> RunInteractive(ProcessArgumentBuilder builder)
+		{
+			var sdkManager = FindToolPath(AndroidSdkHome);
+
+			if (!(sdkManager?.Exists ?? false))
+				throw new FileNotFoundException("Could not locate sdkmanager", sdkManager?.FullName);
+
+			var p = new ShellProcessRunner(sdkManager.FullName, builder.ToString(), CancellationToken.None, null, true, false, false);
 
 			var r = p.WaitForExit();
 

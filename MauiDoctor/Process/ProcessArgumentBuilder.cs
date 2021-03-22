@@ -11,8 +11,8 @@ namespace MauiDoctor
 		public void Append(string arg)
 			=> args.Add(arg);
 
-		public void AppendQuoted(string arg)
-			=> args.Add($"\"{arg}\"");
+		//public void AppendQuoted(string arg)
+		//	=> args.Add($"\"{arg}\"");
 
 		public override string ToString()
 			=> string.Join(" ", args);
