@@ -28,16 +28,16 @@ jobs:
           VERSION="${arrTag[2]}"
           mkdir ./output
           mkdir ./artifacts
-          dotnet build --configuration Release ./MauiDoctor.sln
-          dotnet pack --output ./artifacts -p:PackageVersion=$VERSION --configuration Release ./MauiDoctor/MauiDoctor.csproj
+          dotnet build --configuration Release ./MauiCheck.sln
+          dotnet pack --output ./artifacts -p:PackageVersion=$VERSION --configuration Release ./MauiCheck/MauiCheck.csproj
       - name: Build and Pack - CI
         if: github.event_name != 'release'
         run: |
           VERSION=$NUPKG_MAJOR-ci$GITHUB_RUN_ID
           mkdir ./output
           mkdir ./artifacts
-          dotnet build --configuration Release ./MauiDoctor.sln
-          dotnet pack --output ./artifacts -p:PackageVersion=$VERSION --configuration Release ./MauiDoctor/MauiDoctor.csproj
+          dotnet build --configuration Release ./MauiCheck.sln
+          dotnet pack --output ./artifacts -p:PackageVersion=$VERSION --configuration Release ./MauiCheck/MauiCheck.csproj
       - name: Upload Artifacts
         uses: actions/upload-artifact@v1
         with:
