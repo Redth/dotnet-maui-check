@@ -369,9 +369,9 @@ namespace MauiDoctor.AndroidSdk
 
 			if (!install)
 				builder.Append("--uninstall");
-			
+
 			foreach (var pkg in packages)
-				builder.Append($"'{pkg}'");
+				builder.AppendQuoted(pkg);
 
 			BuildStandardOptions(builder);
 
@@ -393,14 +393,18 @@ namespace MauiDoctor.AndroidSdk
 			var requiresAcceptance = false;
 
 			var cts = new CancellationTokenSource();
-			var spr = new ShellProcessRunner(sdkManager.FullName, "--licenses", cts.Token, rx =>
+			var spr = new ShellProcessRunner(new ShellProcessRunnerOptions(sdkManager.FullName, "--licenses", cts.Token)
 			{
-				if (rx.ToLowerInvariant().Contains("licenses not accepted"))
+				RedirectOutput = true,
+				OutputCallback = rx =>
 				{
-					requiresAcceptance = true;
-					cts.Cancel();
+					if (rx.ToLowerInvariant().Contains("licenses not accepted"))
+					{
+						requiresAcceptance = true;
+						cts.Cancel();
+					}
 				}
-			}, true);
+			});
 
 			spr.WaitForExit();
 			return requiresAcceptance;
@@ -477,18 +481,18 @@ namespace MauiDoctor.AndroidSdk
 			if (timeout != TimeSpan.Zero)
 				ct.CancelAfter(timeout);
 
-			var p = new ShellProcessRunner(sdkManager.FullName, builder.ToString(), ct.Token, null, true, false, false);
+			var p = new ShellProcessRunner(new ShellProcessRunnerOptions(sdkManager.FullName, builder.ToString(), ct.Token) { RedirectInput = true });
 
-			//while (!p.HasExited)
-			//{
-			//	Thread.Sleep(250);
+			while (!p.HasExited)
+			{
+				Thread.Sleep(250);
 
-			//	try
-			//	{
-			//		p.Write("y");
-			//	}
-			//	catch { }
-			//}
+				try
+				{
+					p.Write("y");
+				}
+				catch { }
+			}
 
 			var r = p.WaitForExit();
 
@@ -502,7 +506,7 @@ namespace MauiDoctor.AndroidSdk
 			if (!(sdkManager?.Exists ?? false))
 				throw new FileNotFoundException("Could not locate sdkmanager", sdkManager?.FullName);
 
-			var p = new ShellProcessRunner(sdkManager.FullName, builder.ToString(), CancellationToken.None, null, true, false, true);
+			var p = new ShellProcessRunner(new ShellProcessRunnerOptions(sdkManager.FullName, builder.ToString(), CancellationToken.None));
 
 			var r = p.WaitForExit();
 
@@ -516,7 +520,7 @@ namespace MauiDoctor.AndroidSdk
 			if (!(sdkManager?.Exists ?? false))
 				throw new FileNotFoundException("Could not locate sdkmanager", sdkManager?.FullName);
 
-			var p = new ShellProcessRunner(sdkManager.FullName, builder.ToString(), CancellationToken.None, null, true, false, false);
+			var p = new ShellProcessRunner(new ShellProcessRunnerOptions(sdkManager.FullName, builder.ToString()) { RedirectInput = false, RedirectOutput = false });
 
 			var r = p.WaitForExit();
 

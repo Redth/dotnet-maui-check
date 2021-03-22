@@ -5,16 +5,44 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MauiDoctor
 {
+	public class ShellProcessRunnerOptions
+	{
+		public ShellProcessRunnerOptions(string exe, string args)
+			: this(exe, args, CancellationToken.None)
+		{
+		}
+
+		public ShellProcessRunnerOptions(string exe, string args, CancellationToken cancellationToken)
+		{
+			Executable = exe;
+			Args = args;
+			CancellationToken = cancellationToken;
+		}
+		 
+		public string Executable { get; set; }
+		public string Args { get; set; }
+
+		public CancellationToken CancellationToken { get; set; } = CancellationToken.None;
+
+		public Action<string> OutputCallback { get; set; }
+
+		public bool RedirectOutput { get; set; } = true;
+
+		public bool RedirectInput { get; set; } = false;
+
+		public bool UseSystemShell { get; set; } = true;
+	}
+
 	public class ShellProcessRunner
 	{
-
 		public static ShellProcessResult Run(string executable, string args)
 		{
-			var p = new ShellProcessRunner(executable, args, System.Threading.CancellationToken.None);
+			var p = new ShellProcessRunner(new ShellProcessRunnerOptions(executable, args));
 			return p.WaitForExit();
 		}
 
@@ -22,33 +50,40 @@ namespace MauiDoctor
 		readonly List<string> standardError;
 		readonly Process process;
 
-		public Action<string> OutputHandler { get; private set; }
+		public readonly ShellProcessRunnerOptions Options;
 
-		public ShellProcessRunner(string executable, string args, System.Threading.CancellationToken cancellationToken, Action<string> outputHandler = null, bool useSystemCmd = true, bool redirectStdInput = false, bool redirectOutput = true)
+		public ShellProcessRunner(ShellProcessRunnerOptions options)
 		{
-			OutputHandler = outputHandler;
-
+			Options = options;
 			standardOutput = new List<string>();
 			standardError = new List<string>();
 
 			process = new Process();
 
-			if (useSystemCmd)
+			if (Options.UseSystemShell)
 			{
+				string tmpFile = null;
+
+				if (!Util.IsWindows)
+				{
+					tmpFile = Path.GetTempFileName();
+					File.WriteAllText(tmpFile, $"\"{Options.Executable}\" {Options.Args}");
+				}
+
 				// process.StartInfo.FileName = Util.IsWindows ? "cmd.exe" : (File.Exists("/bin/zsh") ? "/bin/zsh" : "/bin/bash");
 				// process.StartInfo.Arguments = Util.IsWindows ? $"/c \"{executable} {args}\"" : $"-c \"{executable} {args}\"";
-				process.StartInfo.FileName = Util.IsWindows ? executable : (File.Exists("/bin/zsh") ? "/bin/zsh" : "/bin/bash");
-				process.StartInfo.Arguments = Util.IsWindows ? args : $"-c \"{executable} {args}\"";
+				process.StartInfo.FileName = Util.IsWindows ? Options.Executable : (File.Exists("/bin/zsh") ? "/bin/zsh" : "/bin/bash");
+				process.StartInfo.Arguments = Util.IsWindows ? Options.Args : tmpFile;
 			}
 			else
 			{
-				process.StartInfo.FileName = executable;
-				process.StartInfo.Arguments = args;
+				process.StartInfo.FileName = Options.Executable;
+				process.StartInfo.Arguments = Options.Args;
 			}
 
 			process.StartInfo.UseShellExecute = false;
 
-			if (redirectOutput)
+			if (Options.RedirectOutput)
 			{
 				process.StartInfo.RedirectStandardOutput = true;
 				process.StartInfo.RedirectStandardError = true;
@@ -59,7 +94,7 @@ namespace MauiDoctor
 			foreach (var ev in Util.EnvironmentVariables)
 				process.StartInfo.Environment[ev.Key] = ev.Value?.ToString();
 
-			if (redirectStdInput)
+			if (Options.RedirectInput)
 				process.StartInfo.RedirectStandardInput = true;
 
 			process.OutputDataReceived += (s, e) =>
@@ -67,7 +102,7 @@ namespace MauiDoctor
 				if (e.Data != null)
 				{
 					standardOutput.Add(e.Data);
-					OutputHandler?.Invoke(e.Data);
+					Options?.OutputCallback?.Invoke(e.Data);
 				}
 			};
 			process.ErrorDataReceived += (s, e) =>
@@ -75,20 +110,20 @@ namespace MauiDoctor
 				if (e.Data != null)
 				{
 					standardError.Add(e.Data);
-					OutputHandler?.Invoke(e.Data);
+					Options?.OutputCallback?.Invoke(e.Data);
 				}
 			};
 			process.Start();
 
-			if (redirectOutput)
+			if (Options.RedirectOutput)
 			{
 				process.BeginOutputReadLine();
 				process.BeginErrorReadLine();
 			}
 
-			if (cancellationToken != System.Threading.CancellationToken.None)
+			if (Options.CancellationToken != System.Threading.CancellationToken.None)
 			{
-				cancellationToken.Register(() =>
+				Options.CancellationToken.Register(() =>
 				{
 					try { process.Kill(); }
 					catch { }

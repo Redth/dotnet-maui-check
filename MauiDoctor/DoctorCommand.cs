@@ -82,6 +82,9 @@ namespace MauiDoctor.Cli
 				clinic.OfferService(new AndroidSdkManagerCheckup());
 				clinic.OfferService(new AndroidSdkPackagesCheckup(chart.Doctor.Android.Packages.ToArray()));
 				clinic.OfferService(new AndroidSdkLicensesCheckup());
+
+				if (chart.Doctor.Android.Emulators?.Any() ?? false)
+					clinic.OfferService(new AndroidEmulatorCheckup(chart.Doctor.Android.Emulators.ToArray()));
 			}
 
 			if (chart.Doctor.XCode != null)

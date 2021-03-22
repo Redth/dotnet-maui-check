@@ -7,5 +7,8 @@ namespace MauiDoctor.Manifest
 	{
 		[JsonProperty("packages")]
 		public List<AndroidPackage> Packages { get; set; }
+
+		[JsonProperty("emulators")]
+		public List<AndroidEmulator> Emulators { get; set; }
 	}
 }

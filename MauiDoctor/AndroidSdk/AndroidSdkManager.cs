@@ -60,10 +60,10 @@ namespace MauiDoctor.AndroidSdk
 			Home = homeDir ?? FindHome()?.FirstOrDefault();
 
 			SdkManager = new SdkManager(Home);
-			//AvdManager = new AvdManager(Home);
+			AvdManager = new AvdManager(Home);
 			//PackageManager = new PackageManager(Home);
 			//Adb = new Adb(Home);
-			//Emulator = new Emulator(Home);
+			Emulator = new Emulator(Home);
 		}
 
 		public void Acquire()
@@ -81,12 +81,12 @@ namespace MauiDoctor.AndroidSdk
 
 		public readonly SdkManager SdkManager;
 
-		//public readonly AvdManager AvdManager;
+		public readonly AvdManager AvdManager;
 
 		//public readonly PackageManager PackageManager;
 
-		//public readonly Emulator Emulator;
+		public readonly Emulator Emulator;
 
-		//public readonly Adb Adb;
+		public readonly Adb Adb;
 	}
 }
