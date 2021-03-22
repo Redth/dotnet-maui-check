@@ -80,12 +80,12 @@ namespace MauiDoctor.Checkups
 			var desc =
 @$"Your Android SDK has missing our outdated packages.
 You can use the Android SDK Manager to install / update them.
-For more information see: [underline]https://aka.ms/dotnet-androidsdk-help[/]
-You can also try running the following {termDesc} commands:
+For more information see: [underline]https://aka.ms/dotnet-androidsdk-help[/]";
+//You can also try running the following {termDesc} commands:
 
-{sdkMgrPath} {cmdLine}
-  {pkgs}
-";
+//{sdkMgrPath} {cmdLine}
+//  {pkgs}
+//";
 
 
 			return Task.FromResult(new Diagonosis(

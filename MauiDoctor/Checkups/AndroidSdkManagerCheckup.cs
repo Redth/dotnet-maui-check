@@ -46,8 +46,8 @@ namespace MauiDoctor.Checkups
 
 								if (SdkManagerPath != null)
 								{
-									history.SetEnvironmentVariable("ANDROID_SDK_ROOT", SdkManagerPath.FullName);
-									history.SetEnvironmentVariable("ANDROID_HOME", SdkManagerPath.FullName);
+									history.SetEnvironmentVariable("ANDROID_SDK_ROOT", SelectedHome.FullName);
+									history.SetEnvironmentVariable("ANDROID_HOME", SelectedHome.FullName);
 								}
 
 								ReportStatus($"{home.FullName} ({v}) installed.", Status.Ok);

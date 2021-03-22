@@ -48,7 +48,12 @@ namespace MauiDoctor.Checkups
 				sdkMgrPath = $"sdkmanager{ext}";
 
 			return Task.FromResult(new Diagonosis(Status.Error, this, new Prescription("Read and accept Android SDK licenses.",
-				$"To read and accept Android SDK licenses, run the following command in a terminal:{Environment.NewLine}    {sdkMgrPath} --licenses")));
+
+@$"Your Android SDK has licenses which are unread or unaccepted.
+You can use the Android SDK Manager to read and accept them.
+For more information see: [underline]https://aka.ms/dotnet-androidsdk-help[/]")));
+
+			//$"To read and accept Android SDK licenses, run the following command in a terminal:{Environment.NewLine}    {sdkMgrPath} --licenses")));
 		}
 	}
 }
