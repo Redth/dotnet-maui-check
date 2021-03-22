@@ -12,7 +12,7 @@ namespace MauiDoctor.Checkups
 	{
 		public AndroidEmulatorCheckup(params AndroidEmulator[] emulators)
 		{
-			RequiredEmulators = emulators;
+			RequiredEmulators = emulators.Where(e => e.IsArchCompatible()).ToArray();
 		}
 
 		public override IEnumerable<CheckupDependency> Dependencies
@@ -52,6 +52,10 @@ namespace MauiDoctor.Checkups
 			if (!missingEmulators.Any())
 				return Task.FromResult(Diagonosis.Ok(this));
 
+			var devices = android.AvdManager.ListDevices();
+
+			var preferredDevice = devices.FirstOrDefault(d => d.Name.Contains("pixel", StringComparison.OrdinalIgnoreCase));
+
 			return Task.FromResult(new Diagonosis(
 				Status.Error,
 				this,
@@ -59,7 +63,7 @@ namespace MauiDoctor.Checkups
 					missingEmulators.Select(me =>
 						new ActionRemedy(async t =>
 						{
-							android.AvdManager.Create($"Android_Emulator_{me.ApiLevel}", me.SdkId, interactive: true);
+							android.AvdManager.Create($"Android_Emulator_{me.ApiLevel}", me.SdkId, device: preferredDevice?.Id, tag: "google_apis", force: true, interactive: true);
 						})).ToArray())));
 		}
 	}

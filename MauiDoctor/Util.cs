@@ -31,6 +31,16 @@ namespace MauiDoctor
 			}
 		}
 
+		public static bool Is64
+		{
+			get
+			{
+				if (Platform == Platform.Windows && RuntimeInformation.OSArchitecture == Architecture.X86)
+					return false;
+				return true;
+			}
+		}
+
 
 		public static bool IsWindows
 			=> Platform == Platform.Windows;

@@ -61,10 +61,10 @@ namespace MauiDoctor.AndroidSdk
 		}
 
 
-		public void Create(string name, string sdkId, string device = null, string path = null, bool force = false, bool interactive = false)
+		public void Create(string name, string sdkId, string device = null, string path = null, string tag = null, bool force = false, bool interactive = false)
 		{
 			var args = new List<string> {
-				"create", "avd", "-n", name, "-k", $"\"{sdkId}\""
+				"create", "avd", "--name", name, "--package", $"\"{sdkId}\""
 			};
 
 			if (!string.IsNullOrEmpty(device))
@@ -187,6 +187,7 @@ namespace MauiDoctor.AndroidSdk
 		}
 
 		static Regex rxListDevices = new Regex(@"id:\s+(?<id>[^\n]+)\s+Name:\s+(?<name>[^\n]+)\s+OEM\s?:\s+(?<oem>[^\n]+)", RegexOptions.Singleline | RegexOptions.Compiled);
+		static Regex rxDeviceId = new Regex(@"(?<num>\d+)\s+or\s+""(?<name>(.*?))""");
 
 		public IEnumerable<AvdDevice> ListDevices()
 		{
@@ -201,15 +202,25 @@ namespace MauiDoctor.AndroidSdk
 			{
 				foreach (Match m in matches)
 				{
-					var a = new AvdDevice
-					{
-						Name = m.Groups?["name"]?.Value,
-						Id = m.Groups?["id"]?.Value,
-						Oem = m.Groups?["oem"]?.Value
-					};
+					var id = m.Groups?["id"]?.Value;
 
-					if (!string.IsNullOrWhiteSpace(a.Name))
-						r.Add(a);
+					if (!string.IsNullOrEmpty(id))
+					{
+						var idMatch = rxDeviceId.Match(id);
+
+						if (idMatch?.Success ?? false)
+						{
+							var a = new AvdDevice
+							{
+								Name = m.Groups?["name"]?.Value,
+								Id = idMatch.Groups?["name"]?.Value,
+								Oem = m.Groups?["oem"]?.Value
+							};
+
+							if (!string.IsNullOrWhiteSpace(a.Name))
+								r.Add(a);
+						}
+					}
 				}
 			}
 

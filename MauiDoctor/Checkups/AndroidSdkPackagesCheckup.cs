@@ -11,7 +11,7 @@ namespace MauiDoctor.Checkups
 	{
 		public AndroidSdkPackagesCheckup(Manifest.AndroidPackage[] requiredPackages = null)
 		{
-			RequiredPackages = requiredPackages;
+			RequiredPackages = requiredPackages.Where(p => p.IsArchCompatible()).ToArray();
 		}
 
 		public override IEnumerable<CheckupDependency> Dependencies
