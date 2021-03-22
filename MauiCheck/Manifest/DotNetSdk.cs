@@ -12,7 +12,7 @@ namespace DotNetCheck.Manifest
 		public string Version { get; set; }
 
 		[JsonProperty("packs")]
-		public List<NuGetPackage> Packs { get; set; }
+		public List<DotNetSdkPack> Packs { get; set; }
 
 		[JsonProperty("workloads")]
 		public List<DotNetWorkload> Workloads { get; set; }

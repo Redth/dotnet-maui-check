@@ -8,19 +8,19 @@ namespace DotNetCheck.Solutions
 {
 	public class DotNetPackInstallSolution : Solution
 	{
-		public DotNetPackInstallSolution(string sdkRoot, string sdkVersion, NuGetPackage package, params string[] nugetPackageSources)
+		public DotNetPackInstallSolution(string sdkRoot, string sdkVersion, DotNetSdkPack package, params string[] nugetPackageSources)
 		{
 			Package = package;
 			WorkloadManager = new DotNetWorkloadManager(sdkRoot, sdkVersion, nugetPackageSources);
 		}
 
 		public readonly DotNetWorkloadManager WorkloadManager;
-		public NuGetPackage Package { get; private set; }
+		public DotNetSdkPack Package { get; private set; }
 
 		public override bool RequiresAdmin(Platform platform)
 		{
-			if (platform == Platform.Windows)
-				return true;
+			//if (platform == Platform.Windows)
+			//	return true;
 
 			return base.RequiresAdmin(platform);
 		}

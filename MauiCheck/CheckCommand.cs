@@ -108,7 +108,7 @@ namespace DotNetCheck.Cli
 						manager.ContributeDiagnostic(new DotNetWorkloadsCheckup(sdk.Version, sdk.Workloads.ToArray(), sdk.PackageSources.ToArray()));
 
 					// Always run the packs checkup even if manifest is empty, since the workloads may resolve some required packs dynamically that aren't from the manifest
-					manager.ContributeDiagnostic(new DotNetPacksCheckup(sdk.Version, sdk.Packs?.ToArray() ?? Array.Empty<Manifest.NuGetPackage>(), sdk.PackageSources.ToArray()));
+					manager.ContributeDiagnostic(new DotNetPacksCheckup(sdk.Version, sdk.Packs?.ToArray() ?? Array.Empty<Manifest.DotNetSdkPack>(), sdk.PackageSources.ToArray()));
 				}
 
 				manager.ContributeDiagnostic(new DotNetSentinelCheckup());

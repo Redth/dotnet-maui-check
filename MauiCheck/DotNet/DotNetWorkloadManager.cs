@@ -115,27 +115,31 @@ namespace DotNetCheck.DotNet
 			var manifestRoot = GetSdkManifestRoot();
 			var manifestDir = Path.Combine(manifestRoot, packageId);
 
-			return DownloadAndInstallNuGet(packageId, manifestPackageVersion, manifestDir, cancelToken);
+			return DownloadAndInstallNuGet(packageId, manifestPackageVersion, manifestDir, cancelToken, true);
 		}
 
 		public async Task<bool> InstallWorkloadPack(string packId, CancellationToken cancelToken)
 		{
-			var packsRoot = Path.Combine(SdkRoot, "packs");
-
 			var packInfo = workloadResolver.TryGetPackInfo(packId);
 
 			if (packInfo != null && NuGetVersion.TryParse(packInfo.Version, out var version))
 			{
+				if (packInfo.Kind == WorkloadPackKind.Template)
+				{
+					return await DownloadAndInstallNuGet(packId, version, packInfo.Path, cancelToken, false);
+				}
+
 				var actualPackId = GetAliasToPackId(packInfo);
 
 				if (!string.IsNullOrEmpty(actualPackId))
 				{
+					var packsRoot = Path.Combine(SdkRoot, "packs");
 					var packPath = Path.Combine(packsRoot, actualPackId, packInfo.Version);
 
 					if (!Directory.Exists(packPath))
 						Directory.CreateDirectory(packPath);
 
-					return await DownloadAndInstallNuGet(actualPackId, version, packPath, cancelToken);
+					return await DownloadAndInstallNuGet(actualPackId, version, packPath, cancelToken, true);
 				}
 			}
 
@@ -178,14 +182,22 @@ namespace DotNetCheck.DotNet
 					var aliasOrId = pathSegments.FirstOrDefault(p => p.StartsWith(packId, StringComparison.OrdinalIgnoreCase));
 
 					if (!string.IsNullOrEmpty(aliasOrId))
+					{
+						if (aliasOrId.EndsWith(".nupkg", StringComparison.OrdinalIgnoreCase))
+							aliasOrId = aliasOrId.Substring(0, aliasOrId.Length - 6);
+						
 						return aliasOrId;
+					}
 				}
 			}
+
+			if (packId.EndsWith(".nupkg", StringComparison.OrdinalIgnoreCase))
+				packId = packId.Substring(0, packId.Length - 6);
 
 			return packId;
 		}
 
-		async Task<bool> DownloadAndInstallNuGet(string packageId, NuGetVersion packageVersion, string destinationDirectory, CancellationToken cancelToken)
+		async Task<bool> DownloadAndInstallNuGet(string packageId, NuGetVersion packageVersion, string destination, CancellationToken cancelToken, bool extract)
 		{
 			var nugetCache = new SourceCacheContext();
 			var nugetLogger = NullLogger.Instance;
@@ -220,11 +232,17 @@ namespace DotNetCheck.DotNet
 
 								if (tmpZipFile.Exists && tmpZipFile.Length > 0)
 								{
-									if (!Directory.Exists(destinationDirectory))
-										Directory.CreateDirectory(destinationDirectory);
+									if (extract)
+									{
+										if (!Directory.Exists(destination))
+											Directory.CreateDirectory(destination);
 
-									ZipFile.ExtractToDirectory(tmpZipFile.FullName, destinationDirectory);
-
+										ZipFile.ExtractToDirectory(tmpZipFile.FullName, destination);
+									}
+									else
+									{
+										File.Copy(tmpZipFile.FullName, destination, true);
+									}
 									return true;
 								}
 							}
@@ -235,7 +253,11 @@ namespace DotNetCheck.DotNet
 					return true;
 
 				}
-				catch { }
+				catch (Exception ex) 
+				{
+					Console.WriteLine(ex);
+					throw ex;
+				}
 			}
 
 			return false;

@@ -12,7 +12,7 @@ namespace DotNetCheck.Checkups
 {
 	public class DotNetPacksCheckup : Checkup
 	{
-		public DotNetPacksCheckup(string sdkVersion, Manifest.NuGetPackage[] requiredPacks, params string[] nugetPackageSources) : base()
+		public DotNetPacksCheckup(string sdkVersion, Manifest.DotNetSdkPack[] requiredPacks, params string[] nugetPackageSources) : base()
 		{
 			SdkVersion = sdkVersion;
 			RequiredPacks = requiredPacks;
@@ -29,7 +29,7 @@ namespace DotNetCheck.Checkups
 		public readonly string SdkRoot;
 		public readonly string SdkVersion;
 		public readonly string[] NuGetPackageSources;
-		public readonly Manifest.NuGetPackage[] RequiredPacks;
+		public readonly Manifest.DotNetSdkPack[] RequiredPacks;
 
 		public override IEnumerable<CheckupDependency> Dependencies
 			=> new List<CheckupDependency> { new CheckupDependency("dotnetworkloads") };
@@ -42,13 +42,13 @@ namespace DotNetCheck.Checkups
 		{
 			var sdkPacks = workloadManager.GetAllInstalledWorkloadPacks();
 
-			var missingPacks = new List<Manifest.NuGetPackage>();
+			var missingPacks = new List<Manifest.DotNetSdkPack>();
 
-			var requiredPacks = new List<Manifest.NuGetPackage>();
+			var requiredPacks = new List<Manifest.DotNetSdkPack>();
 			requiredPacks.AddRange(RequiredPacks);
 
 			if (history.TryGetState<WorkloadResolver.PackInfo[]>("dotnetworkloads", "required_packs", out var p) && p.Any())
-				requiredPacks.AddRange(p.Select(pi => new Manifest.NuGetPackage { Id = pi.Id, Version = pi.Version }));
+				requiredPacks.AddRange(p.Select(pi => new Manifest.DotNetSdkPack { Id = pi.Id, Version = pi.Version }));
 
 			var uniqueRequiredPacks = requiredPacks
 				.GroupBy(p => p.Id + p.Version.ToString())
