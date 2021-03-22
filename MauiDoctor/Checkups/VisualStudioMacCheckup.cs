@@ -23,7 +23,7 @@ namespace MauiDoctor.Checkups
 		public NuGetVersion MinimumVersion { get; private set; } = new NuGetVersion("8.9.0");
 		public NuGetVersion ExactVersion { get; private set; }
 
-		public override string Id => "visuastudio";
+		public override string Id => "visualstudio";
 
 		public override string Title => $"Visual Studio {MinimumVersion.ThisOrExact(ExactVersion)}";
 
@@ -45,6 +45,39 @@ namespace MauiDoctor.Checkups
 					ReportStatus($"Visual Studio for Mac ({vs.Version})", null);
 				}
 			}
+
+
+			// Check VSCode sentinel files, ie:
+			// ~/.vscode/extensions/ms-dotnettools.csharp-1.23.9/.omnisharp/1.37.8-beta.15/omnisharp/.msbuild/Current/Bin
+
+			var vscodeExtPath = Path.Combine(
+				Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+				".vscode",
+				"extensions");
+
+			var sentinelFiles = new List<string>();
+			var vscodeExtDir = new DirectoryInfo(vscodeExtPath);
+
+			if (vscodeExtDir.Exists)
+			{
+				var sdkResolverDirs = Directory.EnumerateDirectories(vscodeExtPath, "*Microsoft.DotNet.MSBuildSdkResolver", SearchOption.AllDirectories);
+
+				if (sdkResolverDirs?.Any() ?? false)
+				{
+					foreach (var r in sdkResolverDirs)
+					{
+						if (!Directory.Exists(r))
+							continue;
+
+						var sentinelFile = Path.Combine(r, "EnableWorkloadResolver.sentinel");
+
+						sentinelFiles.Add(sentinelFile);
+					}
+				}
+			}
+
+			if (sentinelFiles.Any())
+				history.AddNotes(this, "sentinel_files", sentinelFiles.ToArray());
 
 			if (ok)
 				return Diagonosis.Ok(this);

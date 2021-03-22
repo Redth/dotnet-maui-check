@@ -39,7 +39,23 @@ namespace MauiDoctor.Checkups
 			{
 				// Check if exists
 				if (!File.Exists(file))
-					missingFiles.Add(file);
+				{
+					try { File.Create(file); }
+					catch { }
+				}
+
+				if (!file.Contains("omnisharp"))
+				{
+					if (!File.Exists(file))
+					{
+						ReportStatus(file + " does not exist.", Status.Error);
+						missingFiles.Add(file);
+					}
+					else
+					{
+						ReportStatus(file + " exists.", Status.Ok);
+					}
+				}
 			}
 
 			if (missingFiles.Any())

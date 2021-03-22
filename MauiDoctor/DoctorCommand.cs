@@ -87,10 +87,10 @@ namespace MauiDoctor.Cli
 			if (chart.Doctor.XCode != null)
 				clinic.OfferService(new XCodeCheckup(chart.Doctor.XCode.MinimumVersion, chart.Doctor.XCode.ExactVersion));
 
-			if (chart.Doctor.VSMac != null && !string.IsNullOrEmpty(chart.Doctor.VSMac.MinimumVersion))
+			if (Util.IsMac && chart.Doctor.VSMac != null && !string.IsNullOrEmpty(chart.Doctor.VSMac.MinimumVersion))
 				clinic.OfferService(new VisualStudioMacCheckup(chart.Doctor.VSMac.MinimumVersion, chart.Doctor.VSMac.ExactVersion));
 
-			if (chart.Doctor.VSWin != null && !string.IsNullOrEmpty(chart.Doctor.VSWin.MinimumVersion))
+			if (Util.IsWindows && chart.Doctor.VSWin != null && !string.IsNullOrEmpty(chart.Doctor.VSWin.MinimumVersion))
 				clinic.OfferService(new VisualStudioWindowsCheckup(chart.Doctor.VSWin.MinimumVersion, chart.Doctor.VSWin.ExactVersion));
 
 
@@ -106,6 +106,8 @@ namespace MauiDoctor.Cli
 					// Always run the packs checkup even if manifest is empty, since the workloads may resolve some required packs dynamically that aren't from the manifest
 					clinic.OfferService(new DotNetPacksCheckup(sdk.Version, sdk.Packs?.ToArray() ?? Array.Empty<Manifest.NuGetPackage>(), sdk.PackageSources.ToArray()));
 				}
+
+				clinic.OfferService(new DotNetSentinelCheckup());
 			}
 
 
@@ -181,14 +183,18 @@ namespace MauiDoctor.Cli
 
 				var msg = !string.IsNullOrEmpty(diagnosis.Message) ? " - " + diagnosis.Message : string.Empty;
 
-				//AnsiConsole.MarkupLine($"[{statusColor}]{statusEmoji} {checkup.Title}{msg}[/]");
-
 				if (diagnosis.HasPrescription)
 				{
-					AnsiConsole.MarkupLine($"  [bold blue]{Icon.Recommend} Recommendation:[/] {diagnosis.Prescription.Name}");
+
+					Console.WriteLine();
+					AnsiConsole.Render(new Rule());
+					AnsiConsole.MarkupLine($"[bold blue]{Icon.Recommend} Recommendation:[/][blue] {diagnosis.Prescription.Name}[/]");
 
 					if (!string.IsNullOrEmpty(diagnosis.Prescription.Description))
-						AnsiConsole.MarkupLine("  " + diagnosis.Prescription.Description);
+						AnsiConsole.MarkupLine("" + diagnosis.Prescription.Description + "");
+
+					AnsiConsole.Render(new Rule());
+					Console.WriteLine();
 
 					// See if we should fix
 					// needs to have a remedy available to even bother asking/trying
@@ -197,7 +203,7 @@ namespace MauiDoctor.Cli
 							// --fix + --non-interactive == auto fix, no prompt
 							(settings.NonInteractive && settings.Fix)
 							// interactive (default) + prompt/confirm they want to fix
-							|| (!settings.NonInteractive && AnsiConsole.Confirm($"    [bold]{Icon.Bell} Attempt to fix?[/]"))
+							|| (!settings.NonInteractive && AnsiConsole.Confirm($"[bold]{Icon.Bell} Attempt to fix?[/]"))
 						);
 
 					if (doFix)
@@ -226,7 +232,7 @@ namespace MauiDoctor.Cli
 									
 								await remedy.Cure(cts.Token);
 
-								AnsiConsole.MarkupLine("  Fix applied.  Run doctor again to verify.");
+								AnsiConsole.MarkupLine("[bold]Fix applied.  Run doctor again to verify.[/]");
 							}
 							catch (Exception x) when (x is AccessViolationException || x is UnauthorizedAccessException)
 							{
@@ -234,7 +240,7 @@ namespace MauiDoctor.Cli
 							}
 							catch (Exception ex)
 							{
-								AnsiConsole.MarkupLine("  Fix failed - " + ex.Message);
+								AnsiConsole.MarkupLine("[bold red]Fix failed - " + ex.Message + "[/]");
 							}
 						}
 					}

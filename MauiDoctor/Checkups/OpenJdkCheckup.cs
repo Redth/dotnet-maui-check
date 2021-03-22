@@ -56,7 +56,7 @@ namespace MauiDoctor.Checkups
 				{
 					ok = true;
 					ReportStatus($"{jdk.Version} ({jdk.Directory})", Status.Ok);
-					Util.SetDoctorEnvironmentVariable("JAVA_HOME", jdk.Directory.FullName);
+					history.SetEnvironmentVariable("JAVA_HOME", jdk.Directory.FullName);
 				}
 				else
 					ReportStatus($"{jdk.Version} ({jdk.Directory})", null);

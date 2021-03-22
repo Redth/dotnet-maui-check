@@ -24,7 +24,7 @@ namespace MauiDoctor.Checkups
 		public override Task<Diagonosis> Examine(PatientHistory history)
 		{
 			var android = new AndroidSdk.AndroidSdkManager(
-				Util.GetDoctorEnvironmentVariable("ANDROID_SDK_ROOT") ?? Util.GetDoctorEnvironmentVariable("ANDROID_HOME"));
+				history.GetEnvironmentVariable("ANDROID_SDK_ROOT") ?? history.GetEnvironmentVariable("ANDROID_HOME"));
 
 			try
 			{
@@ -47,14 +47,8 @@ namespace MauiDoctor.Checkups
 			if (string.IsNullOrEmpty(sdkMgrPath))
 				sdkMgrPath = $"sdkmanager{ext}";
 
-			return Task.FromResult(new Diagonosis(Status.Error, this, new Prescription("Android SDK has licenses which need to be accepted.",
+			return Task.FromResult(new Diagonosis(Status.Error, this, new Prescription("Read and accept Android SDK licenses.",
 				$"To read and accept Android SDK licenses, run the following command in a terminal:{Environment.NewLine}    {sdkMgrPath} --licenses")));
-
-				//,new ActionRemedy((r, ct) =>
-				//{
-				//	android.SdkManager.AcceptLicenses();
-				//	return Task.CompletedTask;
-				//}))));
 		}
 	}
 }

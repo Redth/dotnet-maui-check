@@ -23,7 +23,7 @@ namespace MauiDoctor.Checkups
 		public NuGetVersion MinimumVersion { get; private set; } = new NuGetVersion("16.9.0");
 		public NuGetVersion ExactVersion { get; private set; }
 
-		public override string Id => "visuastudio";
+		public override string Id => "visualstudio";
 
 		public override string Title => $"Visual Studio {MinimumVersion.ThisOrExact(ExactVersion)}";
 

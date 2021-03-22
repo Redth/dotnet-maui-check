@@ -27,7 +27,7 @@ namespace MauiDoctor.Checkups
 		public override Task<Diagonosis> Examine(PatientHistory history)
 		{
 			var android = new AndroidSdk.AndroidSdkManager(
-				Util.GetDoctorEnvironmentVariable("ANDROID_SDK_ROOT") ?? Util.GetDoctorEnvironmentVariable("ANDROID_HOME"));
+				history.GetEnvironmentVariable("ANDROID_SDK_ROOT") ?? history.GetEnvironmentVariable("ANDROID_HOME"));
 
 			var packages = android.SdkManager.List().InstalledPackages;
 
@@ -35,29 +35,64 @@ namespace MauiDoctor.Checkups
 
 			foreach (var rp in RequiredPackages)
 			{
-				if (!packages.Any(p => p.Path.Equals(rp.Path, StringComparison.OrdinalIgnoreCase)
-					&& NuGetVersion.Parse(p.Version) >= NuGetVersion.Parse(rp.Version)))
+				var package = packages.FirstOrDefault(p => p.Path.Equals(rp.Path, StringComparison.OrdinalIgnoreCase));
+
+				if (package != null)
+				{
+					if (NuGetVersion.Parse(package.Version) >= NuGetVersion.Parse(rp.Version))
+					{
+						ReportStatus($"{rp.Path} ({rp.Version})", Status.Ok);
+					}
+					else
+					{
+						ReportStatus($"{rp.Path} ({package.Version}) needs updating to {rp.Version}.", Status.Error);
+						missingPackages.Add(rp);
+					}
+				}
+				else
 				{
 					ReportStatus($"{rp.Path} ({rp.Version}) missing.", Status.Error);
 					missingPackages.Add(rp);
 				}
-				else
-				{
-					ReportStatus($"{rp.Path} ({rp.Version})", Status.Ok);
-				}
+
 			}
 
 			if (!missingPackages.Any())
 				return Task.FromResult(Diagonosis.Ok(this));
 
-			var remedies = Util.IsMac ? new AndroidPackagesRemedy[] { new AndroidPackagesRemedy(android, missingPackages.ToArray()) } : null;
+			//var remedies = Util.IsMac ? new AndroidPackagesRemedy[] { new AndroidPackagesRemedy(android, missingPackages.ToArray()) } : null;
+
+
+			var cmdLine = Util.IsWindows ? "^" : "\\";
+			var ext = Util.IsWindows ? ".bat" : string.Empty;
+			var termDesc = Util.IsWindows ? "Console" : "Terminal";
+
+			var sdkMgrPath = android.SdkManager.FindToolPath(android.Home)?.FullName;
+
+
+			if (string.IsNullOrEmpty(sdkMgrPath))
+				sdkMgrPath = $"sdkmanager{ext}";
+
+			var term = $"{sdkMgrPath} install";
+
+			var pkgs = string.Join($" {cmdLine}{Environment.NewLine}  ", missingPackages.Select(mp => $"\"{mp.Path}\""));
+
+			var desc =
+@$"Your Android SDK has missing our outdated packages.
+You can use the Android SDK Manager to install / update them.
+For more information see: [underline]https://aka.ms/dotnet-androidsdk-help[/]
+You can also try running the following {termDesc} commands:
+
+{sdkMgrPath} {cmdLine}
+  {pkgs}
+";
+
 
 			return Task.FromResult(new Diagonosis(
 				Status.Error,
 				this,
-				new Prescription("Install missing Android SDK items",
-					"Your Android SDK is missing some required packages.  You can use the Android SDK Manager to install them. For more information see: https://aka.ms/dotnet-androidsdk-help",
-					remedies)));
+				new Prescription("Install or Update Android SDK pacakges",
+					desc)));
 		}
 	}
 

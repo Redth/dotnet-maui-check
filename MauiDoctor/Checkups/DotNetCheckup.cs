@@ -73,7 +73,7 @@ namespace MauiDoctor.Checkups
 
 			// Find newest compatible sdk
 			if (bestSdk != null)
-				Util.SetDoctorEnvironmentVariable("DOTNET_SDK", bestSdk.Directory.FullName);
+				history.SetEnvironmentVariable("DOTNET_SDK", bestSdk.Directory.FullName);
 
 			// Add sentinel files that should be considered
 			if (sentinelFiles.Any())
