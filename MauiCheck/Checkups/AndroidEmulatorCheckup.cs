@@ -30,7 +30,10 @@ namespace DotNetCheck.Checkups
 			var android = new AndroidSdk.AndroidSdkManager(
 				history.GetEnvironmentVariable("ANDROID_SDK_ROOT") ?? history.GetEnvironmentVariable("ANDROID_HOME"));
 
-			var avds = android.AvdManager.ListAvds();
+			var avds = AndroidSdk.AvdManager.ListAvdsFromFiles();
+
+			if (!avds.Any())
+				avds = android.AvdManager.ListAvds();
 
 			if (avds.Any())
 			{
