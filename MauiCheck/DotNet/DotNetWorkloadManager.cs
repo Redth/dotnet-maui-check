@@ -65,26 +65,8 @@ namespace DotNetCheck.DotNet
 
 						yield return workloadId;
 					}
-
 				}
 			}
-
-
-
-
-
-			//var manifestDirs = manifestProvider.GetManifestDirectories();
-
-			//foreach (var manifestDir in manifestDirs)
-			//{
-			//	var dirInfo = new DirectoryInfo(manifestDir);
-			//	if (dirInfo.Exists)
-			//	{
-			//		Workloadre
-
-			//		yield return dirInfo.Name;
-			//	}
-			//}
 		}
 
 		public IEnumerable<WorkloadResolver.PackInfo> GetPacksInWorkload(string workloadId)
