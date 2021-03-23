@@ -30,10 +30,22 @@ namespace DotNetCheck.Cli
 			AnsiConsole.MarkupLine("If problems are detected, this tool may offer the option to try and fix them for you, or suggest a way to fix them yourself.");
 			AnsiConsole.WriteLine();
 			AnsiConsole.MarkupLine("Thanks for choosing .NET MAUI!");
-
-			AnsiConsole.WriteLine();
-
 			AnsiConsole.Render(new Rule());
+
+			if (!Util.IsAdmin())
+			{
+				var suTxt = Util.IsWindows ? "Administrator" : "Superuser (su)";
+
+				AnsiConsole.MarkupLine($"[bold red]{Icon.Bell} {suTxt} is required to fix most issues.  Consider exiting and running the tool with {suTxt} permissions.");
+
+				AnsiConsole.Render(new Rule());
+
+				if (!settings.NonInteractive)
+				{
+					if (!AnsiConsole.Confirm("Would you still like to continue?", false))
+						return 1;
+				}
+			}
 
 			var manager = new CheckupManager();
 			var cts = new System.Threading.CancellationTokenSource();
@@ -251,8 +263,9 @@ namespace DotNetCheck.Cli
 			AnsiConsole.Render(new Rule());
 			AnsiConsole.WriteLine();
 
+			var hasErrors = results.Values.Any(d => d.Status == Models.Status.Error);
 
-			if (results.Values.Any(d => d.Status == Models.Status.Error))
+			if (hasErrors)
 			{
 				AnsiConsole.MarkupLine($"[bold red]{Icon.Bell} There were one or more problems detected.[/]");
 				AnsiConsole.MarkupLine($"[bold red]Please review the errors and correct them and run {ToolCommand} again.[/]");
@@ -264,7 +277,13 @@ namespace DotNetCheck.Cli
 
 			Console.Title = ToolName;
 
-			return 0;
+			if (!settings.NonInteractive)
+			{
+				AnsiConsole.MarkupLine("Press return to exit...");
+				Console.ReadLine();
+			}
+
+			return hasErrors ? 1 : 0;
 		}
 
 		void checkupStatusUpdated(object sender, CheckupStatusEventArgs e)
