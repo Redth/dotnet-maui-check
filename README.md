@@ -28,7 +28,10 @@ You can specify an alternative file or URL with the `--manifest <URL>` option:
 maui-check --manifest /some/other/file
 ```
 
-## Fix silently
+## Fix without prompt
 
 You can try using the `--fix` argument to automatically enable solutions to run without being prompted.
 
+## Non-Interactive
+
+If you're running on CI you may want to run without any required input with the `--non-interactive` argument.  You can combine this with `--fix` to automatically fix without prompting.
