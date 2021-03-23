@@ -36,7 +36,7 @@ namespace DotNetCheck.Cli
 			{
 				var suTxt = Util.IsWindows ? "Administrator" : "Superuser (su)";
 
-				AnsiConsole.MarkupLine($"[bold red]{Icon.Bell} {suTxt} is required to fix most issues.  Consider exiting and running the tool with {suTxt} permissions.");
+				AnsiConsole.MarkupLine($"[bold red]{Icon.Bell} {suTxt} is required to fix most issues.  Consider exiting and running the tool with {suTxt} permissions.[/]");
 
 				AnsiConsole.Render(new Rule());
 
