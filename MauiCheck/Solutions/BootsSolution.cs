@@ -6,35 +6,35 @@ namespace DotNetCheck.Solutions
 {
 	public class BootsSolution : Solution
 	{
-		public BootsSolution(string url, string title)
+		public BootsSolution(Uri url, string title)
 		{
 			Url = url;
 			Title = title;
 		}
 
-		public string Url { get; set; }
+		public Uri Url { get; set; }
 		public string Title { get; set; }
 
 		public override async Task Implement(System.Threading.CancellationToken cancellationToken)
 		{
 			await base.Implement(cancellationToken);
 
-			ReportStatus($"Installing {Title ?? Url}...");
+			ReportStatus($"Installing {Title ?? Url.ToString()}...");
 
 			var boots = new Boots.Core.Bootstrapper
 			{
-				Url = Url,
+				Url = Url.ToString(),
 				Logger = System.IO.TextWriter.Null
 			};
 
 			try
 			{
 				await boots.Install(cancellationToken);
-				ReportStatus($"Installed {Title ?? Url}.");
+				ReportStatus($"Installed {Title ?? Url.ToString()}.");
 			}
 			catch
 			{
-				ReportStatus($":warning: Installation failed for {Title ?? Url}.");
+				ReportStatus($":warning: Installation failed for {Title ?? Url.ToString()}.");
 				throw;
 			}
 		}

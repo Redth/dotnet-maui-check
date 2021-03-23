@@ -52,7 +52,8 @@
           "version": "6.0.100-preview.2.21155.3",
           "enableWorkloadResolver": true,
           "urls": {
-            "win": "https://dotnetcli.azureedge.net/dotnet/Sdk/6.0.100-preview.2.21155.3/dotnet-sdk-6.0.100-preview.2.21155.3-win-x64.exe",
+            "win64": "https://dotnetcli.azureedge.net/dotnet/Sdk/6.0.100-preview.2.21155.3/dotnet-sdk-6.0.100-preview.2.21155.3-win-x64.exe",
+            "win": "https://dotnetcli.azureedge.net/dotnet/Sdk/6.0.100-preview.2.21155.3/dotnet-sdk-6.0.100-preview.2.21155.3-win-x86.exe",
             "osx": "https://dotnetcli.azureedge.net/dotnet/Sdk/6.0.100-preview.2.21155.3/dotnet-sdk-6.0.100-preview.2.21155.3-osx-x64.pkg"
           },
           "packageSources": [

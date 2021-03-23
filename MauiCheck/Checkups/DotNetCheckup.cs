@@ -85,11 +85,25 @@ namespace DotNetCheck.Checkups
 			{
 				var str = SdkListToString();
 
-				var remedies = missingSdks.Select(ms =>
-					new BootsSolution(ms.Urls.For(Util.Platform).ToString(), ".NET SDK " + ms.Version)
-					{
-						AdminRequirements = new[] { (Platform.Windows, true) }
-					});
+				var msExeUrls = missingSdks
+					.Where(ms => ms.Urls.ForCurrent().AbsolutePath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase));
+
+				var bootsUrls = missingSdks
+					.Where(ms => !ms.Urls.ForCurrent().AbsolutePath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase));
+
+
+				var remedies = bootsUrls
+					.Select(ms =>
+						new BootsSolution(ms.Urls.ForCurrent(), ".NET SDK " + ms.Version)
+						{
+							AdminRequirements = new[] { (Platform.Windows, true) }
+						} as Solution)
+					.Concat(msExeUrls
+						.Select(ms =>
+						new MsInstallerSolution(ms.Urls.ForCurrent(), ".NET SDK " + ms.Version)
+						{
+							AdminRequirements = new[] { (Platform.Windows, true) }
+						}));
 
 				return new DiagnosticResult(Status.Error, this, $".NET SDK {str} not installed.",
 						new Suggestion($"Download .NET SDK {str}",
