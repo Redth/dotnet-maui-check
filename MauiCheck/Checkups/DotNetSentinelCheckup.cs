@@ -13,7 +13,7 @@ namespace DotNetCheck.Checkups
 	{
 		public override string Id => "dotnetsentinel";
 
-		public override string Title => $".NET Core SDK - EnableWorkloadResolver.sentinel";
+		public override string Title => $".NET SDK - EnableWorkloadResolver.sentinel";
 
 		public override IEnumerable<CheckupDependency> Dependencies
 			=> new List<CheckupDependency> {

@@ -33,13 +33,6 @@ namespace DotNetCheck.Cli
 
 			AnsiConsole.WriteLine();
 
-			if (!settings.NonInteractive)
-			{
-				AnsiConsole.Markup("Press any key to start...");
-				Console.ReadKey();
-				AnsiConsole.WriteLine();
-			}
-
 			AnsiConsole.Render(new Rule());
 
 			var manager = new CheckupManager();
@@ -80,10 +73,8 @@ namespace DotNetCheck.Cli
 
 			if (manifest.Check.Android != null)
 			{
-				manager.ContributeDiagnostic(new AndroidSdkManagerCheckup());
-				manager.ContributeDiagnostic(new AndroidSdkPackagesCheckup(manifest.Check.Android.Packages.ToArray()));
-				manager.ContributeDiagnostic(new AndroidSdkLicensesCheckup());
-
+				manager.ContributeDiagnostic(new XAndroidSdkPackagesCheckup(manifest.Check.Android.Packages.ToArray()));
+			
 				if (manifest.Check.Android.Emulators?.Any() ?? false)
 					manager.ContributeDiagnostic(new AndroidEmulatorCheckup(manifest.Check.Android.Emulators.ToArray()));
 			}

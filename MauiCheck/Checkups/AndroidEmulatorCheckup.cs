@@ -17,13 +17,13 @@ namespace DotNetCheck.Checkups
 		}
 
 		public override IEnumerable<CheckupDependency> Dependencies
-			=> new List<CheckupDependency> { new CheckupDependency("androidsdk"), new CheckupDependency("androidsdkpackages") };
+			=> new List<CheckupDependency> { new CheckupDependency("androidsdk") };
 
 		public Manifest.AndroidEmulator[] RequiredEmulators { get; private set; }
 
 		public override string Id => "androidemulator";
 
-		public override string Title => "Android SDK - Emulator Created";
+		public override string Title => "Android Emulator";
 
 		public override Task<DiagnosticResult> Examine(SharedState history)
 		{
@@ -31,6 +31,16 @@ namespace DotNetCheck.Checkups
 				history.GetEnvironmentVariable("ANDROID_SDK_ROOT") ?? history.GetEnvironmentVariable("ANDROID_HOME"));
 
 			var avds = android.AvdManager.ListAvds();
+
+
+			if (avds.Any())
+			{
+				var emu = avds.FirstOrDefault();
+
+				ReportStatus($"Emulator: {emu.Name ?? emu.SdkId} found.", Status.Ok);
+
+				return Task.FromResult(DiagnosticResult.Ok(this));
+			}
 
 			var missingEmulators = new List<AndroidEmulator>();
 

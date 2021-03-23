@@ -53,10 +53,6 @@ namespace DotNetCheck.AndroidSdk
 		{
 			if (FindToolPath(AndroidSdkHome)?.Exists ?? false)
 				return;
-
-			var sdkManager = new SdkManager(AndroidSdkHome);
-
-			sdkManager.Acquire(SdkPackageId);
 		}
 	}
 }

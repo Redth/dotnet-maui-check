@@ -7,6 +7,7 @@
     <ToolCommandName>maui-check</ToolCommandName>
     <PackageOutputPath>./artifacts</PackageOutputPath>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <CodePage>28592</CodePage>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -39,6 +40,15 @@
     <PackageReference Include="plist-cil" Version="2.1.0" />
     <PackageReference Include="Spectre.Console" Version="0.38.0" />
     <PackageReference Include="Xamarin.LibZipSharp" Version="1.0.24" />
+    <PackageReference Include="Mono.Posix.NETStandard" Version="5.20.1-preview" Condition=" '$(OS)' != 'Windows_NT' " />
+    <PackageReference Include="ini-parser-netstandard" Version="2.5.2" />
+    <PackageReference Include="SharpZipLib" Version="1.2.0" />
+    <PackageReference Include="Polly" Version="7.1.0" />
+    <PackageReference Include="Xwt" Version="0.2.211">
+      <!-- There is no netstandard2.0 version of this package -->
+      <NoWarn>NU1701</NoWarn>
+    </PackageReference>
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="5.0.0" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.DotNet.MSBuildSdkResolver">
@@ -47,8 +57,20 @@
     <Reference Include="Boots.Core">
       <HintPath>..\libs\Boots.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Polly">
-      <HintPath>..\libs\Polly.dll</HintPath>
+    <Reference Include="Mono.AndroidTools">
+      <HintPath>..\libs\Mono.AndroidTools.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Android.Tools.AndroidSdk">
+      <HintPath>..\libs\Xamarin.Android.Tools.AndroidSdk.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Installer.AndroidSDK">
+      <HintPath>..\libs\Xamarin.Installer.AndroidSDK.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Installer.Common">
+      <HintPath>..\libs\Xamarin.Installer.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.AndroidTools">
+      <HintPath>..\libs\Xamarin.AndroidTools.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>

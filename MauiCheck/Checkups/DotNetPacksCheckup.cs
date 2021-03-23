@@ -36,7 +36,7 @@ namespace DotNetCheck.Checkups
 
 		public override string Id => "dotnetpacks";
 
-		public override string Title => $".NET Core SDK - Packs ({SdkVersion})";
+		public override string Title => $".NET SDK - Packs ({SdkVersion})";
 
 		public override async Task<DiagnosticResult> Examine(SharedState history)
 		{

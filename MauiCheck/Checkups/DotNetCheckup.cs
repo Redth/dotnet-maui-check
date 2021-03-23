@@ -22,7 +22,7 @@ namespace DotNetCheck.Checkups
 
 		public override string Id => "dotnet";
 
-		public override string Title => $".NET Core SDK";
+		public override string Title => $".NET SDK";
 
 		string SdkListToString()
 			=> (RequiredSdks?.Any() ?? false) ? "(" + string.Join(", ", RequiredSdks.Select(s => s.Version)) + ")" : string.Empty;

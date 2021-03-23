@@ -59,34 +59,11 @@ namespace DotNetCheck.AndroidSdk
 
 			Home = homeDir ?? FindHome()?.FirstOrDefault();
 
-			SdkManager = new SdkManager(Home);
 			AvdManager = new AvdManager(Home);
-			//PackageManager = new PackageManager(Home);
-			//Adb = new Adb(Home);
-			Emulator = new Emulator(Home);
-		}
-
-		public void Acquire()
-		{
-			SdkManager.Acquire(
-				SdkManager
-				//, Adb,
-				//Emulator,
-				//PackageManager
-				//AvdManager
-				);
 		}
 
 		public readonly DirectoryInfo Home;
 
-		public readonly SdkManager SdkManager;
-
 		public readonly AvdManager AvdManager;
-
-		//public readonly PackageManager PackageManager;
-
-		public readonly Emulator Emulator;
-
-		public readonly Adb Adb;
 	}
 }

@@ -255,7 +255,6 @@ namespace DotNetCheck.DotNet
 				}
 				catch (Exception ex) 
 				{
-					Console.WriteLine(ex);
 					throw ex;
 				}
 			}

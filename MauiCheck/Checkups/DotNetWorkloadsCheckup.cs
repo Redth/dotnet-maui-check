@@ -36,7 +36,7 @@ namespace DotNetCheck.Checkups
 
 		public override string Id => "dotnetworkloads";
 
-		public override string Title => $".NET Core SDK - Workloads ({SdkVersion})";
+		public override string Title => $".NET SDK - Workloads ({SdkVersion})";
 
 		public override async Task<DiagnosticResult> Examine(SharedState history)
 		{

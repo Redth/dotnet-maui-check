@@ -39,7 +39,7 @@ namespace DotNetCheck.Models
 		}
 
 		public string GetEnvironmentVariable(string name)
-			=> envVars?[name];
+			=> envVars.ContainsKey(name) ? envVars?[name] : null;
 
 		public bool TryGetEnvironmentVariable(string name, out string value)
 			=> envVars.TryGetValue(name, out value);

@@ -15,6 +15,13 @@ namespace DotNetCheck
 	{
 		static Task<int> Main(string[] args)
 		{
+
+			var instance = System.Text.CodePagesEncodingProvider.Instance;
+			System.Text.Encoding.RegisterProvider(instance);
+
+			var iso_8859_2 = System.Text.Encoding.GetEncoding("ISO-8859-2");
+
+
 			var app = new CommandApp();
 
 			app.Configure(config =>
