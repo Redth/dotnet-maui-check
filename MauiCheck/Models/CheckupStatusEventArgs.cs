@@ -20,9 +20,9 @@ namespace DotNetCheck.Models
 		public int Progress { get; private set; }
 	}
 
-	public class CureStatusEventArgs : EventArgs
+	public class RemedyStatusEventArgs : EventArgs
 	{
-		public CureStatusEventArgs(Solution remedy, string message, int progress = -1)
+		public RemedyStatusEventArgs(Solution remedy, string message, int progress = -1)
 			: base()
 		{
 			Remedy = remedy;

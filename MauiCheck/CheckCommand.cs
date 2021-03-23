@@ -48,7 +48,7 @@ namespace DotNetCheck.Cli
 			var checkupStatus = new Dictionary<string, Models.Status>();
 			var sharedState = new SharedState();
 
-			var results = new List<DiagnosticResult>();
+			var results = new Dictionary<string, DiagnosticResult>();
 			var consoleStatus = AnsiConsole.Status();
 
 			AnsiConsole.Markup($"[bold blue]{Icon.Thinking} Synchronizing configuration...[/]");
@@ -119,8 +119,18 @@ namespace DotNetCheck.Cli
 
 			AnsiConsole.MarkupLine(" ok");
 
-			foreach (var checkup in checkups)
+			var checkupId = string.Empty;
+
+			for (int i = 0; i < checkups.Count(); i++)
 			{
+				var checkup = checkups.ElementAt(i);
+
+				// If the ID is the same, it's a retry
+				var isRetry = checkupId == checkup.Id;
+
+				// Track the last used id so we can detect retry
+				checkupId = checkup.Id;
+
 				var skipCheckup = false;
 
 				// Make sure our dependencies succeeded first
@@ -138,13 +148,13 @@ namespace DotNetCheck.Cli
 
 				if (skipCheckup)
 				{
-					checkupStatus.Add(checkup.Id, Models.Status.Error);
+					checkupStatus[checkup.Id] = Models.Status.Error;
 					AnsiConsole.WriteLine();
 					AnsiConsole.MarkupLine($"[bold red]{Icon.Error} Skipped: " + checkup.Title + "[/]");
 					continue;
 				}
 
-				checkup.OnStatusUpdated += (s, e) =>
+				void checkupStatusUpdated(object sender, CheckupStatusEventArgs e)
 				{
 					var msg = "";
 					if (e.Status == Models.Status.Error)
@@ -157,7 +167,8 @@ namespace DotNetCheck.Cli
 						msg = $"{Icon.ListItem} {e.Message}";
 
 					AnsiConsole.MarkupLine("  " + msg);
-				};
+				}
+				checkup.OnStatusUpdated += checkupStatusUpdated;
 
 				AnsiConsole.WriteLine();
 				AnsiConsole.MarkupLine($"[bold]{Icon.Checking} " + checkup.Title + " Checkup[/]...");
@@ -174,10 +185,10 @@ namespace DotNetCheck.Cli
 					diagnosis = new DiagnosticResult(Models.Status.Error, checkup, ex.Message);
 				}
 
-				results.Add(diagnosis);
+				results[checkup.Id] = diagnosis;
 
 				// Cache the status for dependencies
-				checkupStatus.Add(checkup.Id, diagnosis.Status);
+				checkupStatus[checkup.Id] = diagnosis.Status;
 
 				if (diagnosis.Status == Models.Status.Ok)
 					continue;
@@ -210,7 +221,7 @@ namespace DotNetCheck.Cli
 							|| (!settings.NonInteractive && AnsiConsole.Confirm($"[bold]{Icon.Bell} Attempt to fix?[/]"))
 						);
 
-					if (doFix)
+					if (doFix && !isRetry)
 					{
 						var isAdmin = Util.IsAdmin();
 
@@ -218,8 +229,14 @@ namespace DotNetCheck.Cli
 							$"{Icon.Bell} [red]Administrator Permissions Required.  Try opening a new console as Administrator and running this tool again.[/]"
 							: $"{Icon.Bell} [red]Super User Permissions Required.  Try running this tool again with 'sudo'.[/]";
 
+						void remedyStatusUpdated(object sender, RemedyStatusEventArgs e)
+						{
+							AnsiConsole.MarkupLine("  " + e.Message);
+						}
+
 						foreach (var remedy in diagnosis.Suggestion.Solutions)
 						{
+
 							if (!remedy.HasPrivilegesToRun(isAdmin, Util.Platform))
 							{
 								AnsiConsole.Markup(adminMsg);
@@ -227,16 +244,16 @@ namespace DotNetCheck.Cli
 							}
 							try
 							{
-								remedy.OnStatusUpdated += (s, e) =>
-								{
-									AnsiConsole.MarkupLine("  " + e.Message);
-								};
+								remedy.OnStatusUpdated += remedyStatusUpdated;
 
 								AnsiConsole.MarkupLine($"{Icon.Thinking} Attempting to fix: " + checkup.Title);
 									
 								await remedy.Implement(cts.Token);
 
-								AnsiConsole.MarkupLine($"[bold]Fix applied.  Run {ToolCommand} again to verify.[/]");
+								// RETRY The check again
+								i--;
+
+								AnsiConsole.MarkupLine($"[bold]Fix applied.  Checking again...[/]");
 							}
 							catch (Exception x) when (x is AccessViolationException || x is UnauthorizedAccessException)
 							{
@@ -246,16 +263,22 @@ namespace DotNetCheck.Cli
 							{
 								AnsiConsole.MarkupLine("[bold red]Fix failed - " + ex.Message + "[/]");
 							}
+							finally
+							{
+								remedy.OnStatusUpdated -= remedyStatusUpdated;
+							}
 						}
 					}
 				}
+
+				checkup.OnStatusUpdated -= checkupStatusUpdated;
 			}
 
 			AnsiConsole.Render(new Rule());
 			AnsiConsole.WriteLine();
 
 
-			if (results.Any(d => d.Status == Models.Status.Error))
+			if (results.Values.Any(d => d.Status == Models.Status.Error))
 			{
 				AnsiConsole.MarkupLine($"[bold red]{Icon.Bell} There were one or more problems detected.[/]");
 				AnsiConsole.MarkupLine($"[bold red]Please review the errors and correct them and run {ToolCommand} again.[/]");

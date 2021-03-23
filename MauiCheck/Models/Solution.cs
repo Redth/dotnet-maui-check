@@ -35,8 +35,8 @@ namespace DotNetCheck.Models
 			=> Task.CompletedTask;
 
 		public void ReportStatus(string message)
-			=> OnStatusUpdated?.Invoke(this, new CureStatusEventArgs(this, message));
+			=> OnStatusUpdated?.Invoke(this, new RemedyStatusEventArgs(this, message));
 
-		public event EventHandler<CureStatusEventArgs> OnStatusUpdated;
+		public event EventHandler<RemedyStatusEventArgs> OnStatusUpdated;
 	}
 }
