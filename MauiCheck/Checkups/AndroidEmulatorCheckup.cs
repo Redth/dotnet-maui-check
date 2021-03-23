@@ -32,7 +32,6 @@ namespace DotNetCheck.Checkups
 
 			var avds = android.AvdManager.ListAvds();
 
-
 			if (avds.Any())
 			{
 				var emu = avds.FirstOrDefault();

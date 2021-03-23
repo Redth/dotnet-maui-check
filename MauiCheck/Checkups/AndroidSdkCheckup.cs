@@ -50,6 +50,9 @@ namespace DotNetCheck.Checkups
 					"For more information see: [underline]https://aka.ms/dotnet-androidsdk-help[/]")));
 			}
 
+			history.SetEnvironmentVariable("ANDROID_SDK_ROOT", sdkInstance.Path);
+			history.SetEnvironmentVariable("ANDROID_HOME", sdkInstance.Path);
+
 			var allNotInstalled = sdkInstance?.Components?.AllNotInstalled();
 
 			foreach (var package in RequiredPackages)

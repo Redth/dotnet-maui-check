@@ -145,20 +145,6 @@ namespace DotNetCheck.Cli
 					continue;
 				}
 
-				void checkupStatusUpdated(object sender, CheckupStatusEventArgs e)
-				{
-					var msg = "";
-					if (e.Status == Models.Status.Error)
-						msg = $"[red]{Icon.Error} {e.Message}[/]";
-					else if (e.Status == Models.Status.Warning)
-						msg = $"[darkorange3_1]{Icon.Warning} {e.Message}[/]";
-					else if (e.Status == Models.Status.Ok)
-						msg = $"[green]{Icon.Success} {e.Message}[/]";
-					else
-						msg = $"{Icon.ListItem} {e.Message}";
-
-					AnsiConsole.MarkupLine("  " + msg);
-				}
 				checkup.OnStatusUpdated += checkupStatusUpdated;
 
 				AnsiConsole.WriteLine();
@@ -191,7 +177,6 @@ namespace DotNetCheck.Cli
 
 				if (diagnosis.HasSuggestion)
 				{
-
 					Console.WriteLine();
 					AnsiConsole.Render(new Rule());
 					AnsiConsole.MarkupLine($"[bold blue]{Icon.Recommend} Recommendation:[/][blue] {diagnosis.Suggestion.Name}[/]");
@@ -220,14 +205,10 @@ namespace DotNetCheck.Cli
 							$"{Icon.Bell} [red]Administrator Permissions Required.  Try opening a new console as Administrator and running this tool again.[/]"
 							: $"{Icon.Bell} [red]Super User Permissions Required.  Try running this tool again with 'sudo'.[/]";
 
-						void remedyStatusUpdated(object sender, RemedyStatusEventArgs e)
-						{
-							AnsiConsole.MarkupLine("  " + e.Message);
-						}
+						var didFix = false;
 
 						foreach (var remedy in diagnosis.Suggestion.Solutions)
 						{
-
 							if (!remedy.HasPrivilegesToRun(isAdmin, Util.Platform))
 							{
 								AnsiConsole.Markup(adminMsg);
@@ -241,9 +222,7 @@ namespace DotNetCheck.Cli
 									
 								await remedy.Implement(cts.Token);
 
-								// RETRY The check again
-								i--;
-
+								didFix = true;
 								AnsiConsole.MarkupLine($"[bold]Fix applied.  Checking again...[/]");
 							}
 							catch (Exception x) when (x is AccessViolationException || x is UnauthorizedAccessException)
@@ -259,6 +238,10 @@ namespace DotNetCheck.Cli
 								remedy.OnStatusUpdated -= remedyStatusUpdated;
 							}
 						}
+
+						// RETRY The check again
+						if (didFix)
+							i--;
 					}
 				}
 
@@ -282,6 +265,26 @@ namespace DotNetCheck.Cli
 			Console.Title = ToolName;
 
 			return 0;
+		}
+
+		void checkupStatusUpdated(object sender, CheckupStatusEventArgs e)
+		{
+			var msg = "";
+			if (e.Status == Models.Status.Error)
+				msg = $"[red]{Icon.Error} {e.Message}[/]";
+			else if (e.Status == Models.Status.Warning)
+				msg = $"[darkorange3_1]{Icon.Warning} {e.Message}[/]";
+			else if (e.Status == Models.Status.Ok)
+				msg = $"[green]{Icon.Success} {e.Message}[/]";
+			else
+				msg = $"{Icon.ListItem} {e.Message}";
+
+			AnsiConsole.MarkupLine("  " + msg);
+		}
+
+		void remedyStatusUpdated(object sender, RemedyStatusEventArgs e)
+		{
+			AnsiConsole.MarkupLine("  " + e.Message);
 		}
 	}
 }
