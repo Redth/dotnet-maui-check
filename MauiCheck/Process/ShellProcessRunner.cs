@@ -159,13 +159,6 @@ namespace DotNetCheck
 			return new ShellProcessResult(standardOutput, standardError, process.ExitCode);
 		}
 
-		public async Task<ShellProcessResult> WaitForExitAsync()
-		{
-			await process.WaitForExitAsync();
-
-			return new ShellProcessResult(standardOutput, standardError, process.ExitCode);
-		}
-
 		public class ShellProcessResult
 		{
 			public readonly List<string> StandardOutput;
