@@ -7,7 +7,6 @@
     <ToolCommandName>maui-check</ToolCommandName>
     <PackageOutputPath>./artifacts</PackageOutputPath>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <CodePage>28592</CodePage>
   </PropertyGroup>
 
   <PropertyGroup>

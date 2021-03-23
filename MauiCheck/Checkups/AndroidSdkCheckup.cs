@@ -31,23 +31,26 @@ namespace DotNetCheck.Checkups
 
 		public override Task<DiagnosticResult> Examine(SharedState history)
 		{
-			var android = new AndroidSdk.AndroidSdkManager(
-				history.GetEnvironmentVariable("ANDROID_SDK_ROOT") ?? history.GetEnvironmentVariable("ANDROID_HOME"));
-
-			var androidSdkPath = android.Home.FullName;
-
 			var missingPackages = new List<IAndroidComponent>();
 
 			var installer = new AndroidSDKInstaller(new Helper(), AndroidManifestType.GoogleV2);
 
 			installer.Discover();
 
-			var sdkInstance = installer.FindInstance(androidSdkPath);
+			var sdkInstance = installer.FindInstance(null);
 
+			if (string.IsNullOrEmpty(sdkInstance?.Path))
+			{
+				return Task.FromResult(
+				new DiagnosticResult(
+					Status.Error,
+					this,
+					"Failed to find Android SDK.",
+					new Suggestion("Install the Android SDK",
+					"For more information see: [underline]https://aka.ms/dotnet-androidsdk-help[/]")));
+			}
 
-
-			var allInstalled = sdkInstance.Components.AllInstalled();
-			var allNotInstalled = sdkInstance.Components.AllNotInstalled();
+			var allNotInstalled = sdkInstance?.Components?.AllNotInstalled();
 
 			foreach (var package in RequiredPackages)
 			{
@@ -55,7 +58,6 @@ namespace DotNetCheck.Checkups
 				var notInstalled = allNotInstalled.
 					FirstOrDefault(c => c.Path== package.Path && c.Revision == (v ?? c.Revision));
 
-				
 				if (notInstalled != null)
 				{
 					ReportStatus($"{package.Path} ({package.Version}) missing.", Status.Error);
