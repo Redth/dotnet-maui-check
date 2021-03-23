@@ -1,4 +1,10 @@
-﻿namespace DotNetCheck.AndroidSdk
+﻿using IniParser;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
+namespace DotNetCheck.AndroidSdk
 {
 	public partial class AvdManager
 	{
@@ -24,27 +30,61 @@
 				return $"{Name} | {Device} | {Target} | {Path} | {BasedOn}";
 			}
 
-			public string SdkId { get; private set; }
+			public string SdkId { get; internal set; }
 
-			internal void ParseConfig()
+			public static Avd From(string avdPath)
 			{
 				try
 				{
-					var configFile = System.IO.Path.Combine(Path, "config.ini");
+					var avdIniFile = System.IO.Path.Combine(avdPath, "..", System.IO.Path.GetFileNameWithoutExtension(avdPath) + ".ini");
+					var configIniFile = System.IO.Path.Combine(avdPath, "config.ini");
 
-					if (!System.IO.File.Exists(configFile))
-						return;
-
-					foreach (var line in System.IO.File.ReadAllLines(configFile))
+					if (File.Exists(avdIniFile))
 					{
-						if (line.StartsWith("image.sysdir.1="))
+						var avdIni = ParseIni(avdIniFile);
+						
+						if (File.Exists(configIniFile))
 						{
-							SdkId = line.Substring(15).Trim('/', '\\').Replace('/', ';').Replace('\\', ';');
-							break;
+							var configIni = ParseIni(configIniFile);
+
+							var avd = new Avd();
+							avd.Name = System.IO.Path.GetFileNameWithoutExtension(avdIniFile);
+							avd.Path = avdPath;
+							if (avdIni.TryGetValue("target", out var avdTarget))
+								avd.Target = avdTarget;
+							if (configIni.TryGetValue("hw.device.name", out var avdDevice))
+								avd.Device = avdDevice;
+							if (configIni.TryGetValue("image.sysdir.1", out var avdBasedOn))
+								avd.SdkId = avdBasedOn?.Trim('\\', '/')?.Replace('\\', ';')?.Replace('/', ';');
+
+							return avd;
 						}
 					}
 				}
-				catch { }
+				catch (Exception ex)
+				{
+					throw ex;
+				}
+
+				return null;
+			}
+
+			internal static Dictionary<string, string> ParseIni(string filename)
+			{
+				var d = new Dictionary<string, string>();
+
+				if (File.Exists(filename))
+				{
+					foreach (var line in File.ReadAllLines(filename))
+					{
+						var parts = line?.Split(new char[] { '=' }, 2);
+
+						if (parts?.Any() ?? false)
+							d[parts[0]] = parts[1];
+					}
+				}
+
+				return d;
 			}
 		}
 	}

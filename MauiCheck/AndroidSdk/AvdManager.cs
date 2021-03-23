@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.IO;
 using System.Runtime.InteropServices;
+using IniParser;
 
 namespace DotNetCheck.AndroidSdk
 {
@@ -166,24 +167,66 @@ namespace DotNetCheck.AndroidSdk
 			{
 				foreach (Match m in matches)
 				{
-					var a = new Avd
-					{
-						Name = m.Groups?["name"]?.Value,
-						Device = m.Groups?["device"]?.Value,
-						Path = m.Groups?["path"]?.Value,
-						Target = m.Groups?["target"]?.Value,
-						BasedOn = m.Groups?["basedon"]?.Value
-					};
+					var path = m.Groups?["path"]?.Value;
 
-					if (!string.IsNullOrWhiteSpace(a.Name))
+					if (!string.IsNullOrEmpty(path) && Directory.Exists(path))
 					{
-						a.ParseConfig();
-						r.Add(a);
+						var avd = Avd.From(path);
+
+						var parsedName = m.Groups?["name"]?.Value;
+						if (string.IsNullOrEmpty(avd.Name) && !string.IsNullOrEmpty(parsedName))
+							avd.Name = parsedName;
+
+						var parsedDevice = m.Groups?["device"]?.Value;
+						if (string.IsNullOrEmpty(avd.Device) && !string.IsNullOrEmpty(parsedDevice))
+							avd.Device = parsedDevice;
+
+						var parsedTarget = m.Groups?["target"]?.Value;
+						if (string.IsNullOrEmpty(avd.Target) && !string.IsNullOrEmpty(parsedTarget))
+							avd.Target = parsedTarget;
+
+						var parsedBasedOn = m.Groups?["basedon"]?.Value;
+						if (string.IsNullOrEmpty(avd.BasedOn) && !string.IsNullOrEmpty(parsedBasedOn))
+							avd.BasedOn = parsedBasedOn;
+
+						r.Add(avd);
 					}
 				}
 			}
 
 			return r;
+		}
+
+		public static IEnumerable<Avd> ListAvdsFromFiles()
+		{
+			var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".android", "avd");
+
+			if (Directory.Exists(folder))
+			{
+				var files = Directory.EnumerateFiles(folder, "*.ini", SearchOption.TopDirectoryOnly);
+
+				foreach (var file in files)
+				{
+					Avd avd = default;
+
+					try
+					{
+						var ini = Avd.ParseIni(file);
+
+						if (ini.TryGetValue("path", out var avdPath))
+						{
+							if (Directory.Exists(avdPath))
+							{
+								avd = Avd.From(avdPath);
+							}
+						}
+					}
+					catch { }
+
+					if (avd != null)
+						yield return avd;
+				}
+			}
 		}
 
 		static Regex rxListDevices = new Regex(@"id:\s+(?<id>[^\n]+)\s+Name:\s+(?<name>[^\n]+)\s+OEM\s?:\s+(?<oem>[^\n]+)", RegexOptions.Singleline | RegexOptions.Compiled);
