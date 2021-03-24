@@ -15,23 +15,32 @@ namespace DotNetCheck.Checkups
 
 		public override string Title => $".NET SDK - EnableWorkloadResolver.sentinel";
 
-		public override IEnumerable<CheckupDependency> Dependencies
-			=> new List<CheckupDependency> {
-				new CheckupDependency("dotnet"),
-				new CheckupDependency("visualstudio", false)
-			};
-
-		public override Task<DiagnosticResult> Examine(SharedState history)
+		IEnumerable<string> GetAllSentinelFiles(SharedState history)
 		{
 			var files = new List<string>();
 
-			var contributingCheckupIds = new[] { "dotnet", "visualstudio" };
-
-			foreach (var checkupId in contributingCheckupIds)
+			if (history.TryGetStateFromAll<string[]>("sentinel_files", out var s))
 			{
-				if (history.TryGetState<string[]>(checkupId, "sentinel_files", out var dotnetSentinelFiles) && (dotnetSentinelFiles?.Any() ?? false))
-					files.AddRange(dotnetSentinelFiles);
+				foreach (var set in s)
+					files.AddRange(set);
 			}
+
+			return files;
+		}
+
+		public override IEnumerable<CheckupDependency> DeclareDependencies(IEnumerable<string> checkupIds)
+			=> new [] {
+				new CheckupDependency("dotnet"),
+				new CheckupDependency("vswin", false),
+				new CheckupDependency("vsmac", false)
+			};
+
+		public override bool ShouldExamine(SharedState history)
+			=> GetAllSentinelFiles(history)?.Any() ?? false;
+
+		public override Task<DiagnosticResult> Examine(SharedState history)
+		{
+			var files = GetAllSentinelFiles(history);
 
 			var missingFiles = new List<string>();
 

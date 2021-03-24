@@ -12,6 +12,11 @@ namespace DotNetCheck.Checkups
 {
 	public class DotNetWorkloadsCheckup : Checkup
 	{
+		public DotNetWorkloadsCheckup() : base()
+		{
+			throw new Exception("Do not IOC this type directly");
+		}
+
 		public DotNetWorkloadsCheckup(string sdkVersion, Manifest.DotNetWorkload[] requiredWorkloads, params string[] nugetPackageSources) : base()
 		{
 			SdkVersion = sdkVersion;
@@ -31,10 +36,10 @@ namespace DotNetCheck.Checkups
 		public readonly string[] NuGetPackageSources;
 		public readonly Manifest.DotNetWorkload[] RequiredWorkloads;
 
-		public override IEnumerable<CheckupDependency> Dependencies
-			=> new List<CheckupDependency> { new CheckupDependency("dotnet") };
+		public override IEnumerable<CheckupDependency> DeclareDependencies(IEnumerable<string> checkupIds)
+			=> new [] { new CheckupDependency("dotnet") };
 
-		public override string Id => "dotnetworkloads";
+		public override string Id => "dotnetworkloads-" + SdkVersion;
 
 		public override string Title => $".NET SDK - Workloads ({SdkVersion})";
 

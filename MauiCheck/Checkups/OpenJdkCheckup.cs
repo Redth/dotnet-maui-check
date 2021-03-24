@@ -28,20 +28,20 @@ namespace DotNetCheck.Checkups
 
 	public class OpenJdkCheckup : Models.Checkup
 	{
-		public OpenJdkCheckup(string minimumVersion, string exactVersion = null)
-		{
-			MinimumVersion = NuGetVersion.Parse(minimumVersion);
-			ExactVersion = exactVersion != null ? NuGetVersion.Parse(exactVersion) : null;
-		}
+		public NuGetVersion MinimumVersion
+			=> Extensions.ParseVersion(Manifest?.Check?.OpenJdk?.MinimumVersion, new NuGetVersion("1.8.0-1"));
 
-		public NuGetVersion MinimumVersion { get; private set; } = new NuGetVersion("1.8.0-1");
-		public NuGetVersion ExactVersion { get; private set; }
+		public NuGetVersion ExactVersion
+			=> Extensions.ParseVersion(Manifest?.Check?.OpenJdk?.ExactVersion);
 
 		public override string Id => "openjdk";
 
 		public override string Title => $"OpenJDK {MinimumVersion.ThisOrExact(ExactVersion)}";
 
 		static string PlatformJavaCExtension => Util.IsWindows ? ".exe" : string.Empty;
+
+		public override bool ShouldExamine(SharedState history)
+			=> Manifest?.Check?.OpenJdk != null;
 
 		public override Task<DiagnosticResult> Examine(SharedState history)
 		{

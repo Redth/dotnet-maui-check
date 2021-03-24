@@ -15,15 +15,11 @@ namespace DotNetCheck.Cli
 {
 	public class CheckCommand : AsyncCommand<CheckSettings>
 	{
-		const string ToolName = ".NET MAUI Check";
-		const string ToolPackageId = "Redth.Net.Maui.Check";
-		const string ToolCommand = "maui-check";
-
 		public override async Task<int> ExecuteAsync(CommandContext context, CheckSettings settings)
 		{
-			Console.Title = ToolName;
+			Console.Title = ToolInfo.ToolName;
 
-			AnsiConsole.MarkupLine($"[underline bold green]{Icon.Ambulance} {ToolName} {Icon.Recommend}[/]");
+			AnsiConsole.MarkupLine($"[underline bold green]{Icon.Ambulance} {ToolInfo.ToolName} {Icon.Recommend}[/]");
 			AnsiConsole.Render(new Rule());
 
 			AnsiConsole.MarkupLine("This tool will attempt to evaluate your .NET MAUI development environment.");
@@ -47,7 +43,6 @@ namespace DotNetCheck.Cli
 				}
 			}
 
-			var manager = new CheckupManager();
 			var cts = new System.Threading.CancellationTokenSource();
 
 			var checkupStatus = new Dictionary<string, Models.Status>();
@@ -59,66 +54,14 @@ namespace DotNetCheck.Cli
 			AnsiConsole.Markup($"[bold blue]{Icon.Thinking} Synchronizing configuration...[/]");
 
 			var manifest = await Manifest.Manifest.FromFileOrUrl(settings.Manifest);
-			var toolVersion = manifest?.Check?.ToolVersion ?? "0.1.0";
 
-			var fileVersion = NuGetVersion.Parse(FileVersionInfo.GetVersionInfo(this.GetType().Assembly.Location).FileVersion);
-
-			if (string.IsNullOrEmpty(toolVersion) || !NuGetVersion.TryParse(toolVersion, out var toolVer) || fileVersion < toolVer)
-			{
-				Console.WriteLine();
-				AnsiConsole.MarkupLine($"[bold red]{Icon.Error} Updating to version {toolVersion} or newer is required:[/]");
-				AnsiConsole.MarkupLine($"[red]Update with the following:[/]");
-
-				var installCmdVer = string.IsNullOrEmpty(toolVersion) ? "" : $" --version {toolVersion}";
-				AnsiConsole.Markup($"  dotnet tool install --global {ToolPackageId}{installCmdVer}");
-
+			if (!ToolInfo.Validate(manifest))
 				return -1;
-			}
 
 			AnsiConsole.MarkupLine(" ok");
 			AnsiConsole.Markup($"[bold blue]{Icon.Thinking} Scheduling appointments...[/]");
 
-			if (manifest.Check.OpenJdk != null)
-			{
-				manager.ContributeDiagnostic(new OpenJdkCheckup(manifest.Check.OpenJdk.MinimumVersion, manifest.Check.OpenJdk.ExactVersion));
-			}
-
-			if (manifest.Check.Android != null)
-			{
-				manager.ContributeDiagnostic(new XAndroidSdkPackagesCheckup(manifest.Check.Android.Packages.ToArray()));
-			
-				if (manifest.Check.Android.Emulators?.Any() ?? false)
-					manager.ContributeDiagnostic(new AndroidEmulatorCheckup(manifest.Check.Android.Emulators.ToArray()));
-			}
-
-			if (manifest.Check.XCode != null)
-				manager.ContributeDiagnostic(new XCodeCheckup(manifest.Check.XCode.MinimumVersion, manifest.Check.XCode.ExactVersion));
-
-			if (Util.IsMac && manifest.Check.VSMac != null && !string.IsNullOrEmpty(manifest.Check.VSMac.MinimumVersion))
-				manager.ContributeDiagnostic(new VisualStudioMacCheckup(manifest.Check.VSMac.MinimumVersion, manifest.Check.VSMac.ExactVersion));
-
-			if (Util.IsWindows && manifest.Check.VSWin != null && !string.IsNullOrEmpty(manifest.Check.VSWin.MinimumVersion))
-				manager.ContributeDiagnostic(new VisualStudioWindowsCheckup(manifest.Check.VSWin.MinimumVersion, manifest.Check.VSWin.ExactVersion));
-
-
-			if (manifest.Check.DotNet?.Sdks?.Any() ?? false)
-			{
-				manager.ContributeDiagnostic(new DotNetCheckup(manifest.Check.DotNet.Sdks.ToArray()));
-
-				foreach (var sdk in manifest.Check.DotNet.Sdks)
-				{
-					if (sdk.Workloads?.Any() ?? false)
-						manager.ContributeDiagnostic(new DotNetWorkloadsCheckup(sdk.Version, sdk.Workloads.ToArray(), sdk.PackageSources.ToArray()));
-
-					// Always run the packs checkup even if manifest is empty, since the workloads may resolve some required packs dynamically that aren't from the manifest
-					manager.ContributeDiagnostic(new DotNetPacksCheckup(sdk.Version, sdk.Packs?.ToArray() ?? Array.Empty<Manifest.DotNetSdkPack>(), sdk.PackageSources.ToArray()));
-				}
-
-				manager.ContributeDiagnostic(new DotNetSentinelCheckup());
-			}
-
-
-			var checkups = manager.BuildCheckupGraph();
+			var checkups = CheckupManager.BuildCheckupGraph(manifest);
 
 			AnsiConsole.MarkupLine(" ok");
 
@@ -128,26 +71,47 @@ namespace DotNetCheck.Cli
 			{
 				var checkup = checkups.ElementAt(i);
 
+				// Set the manifest
+				checkup.Manifest = manifest;
+
 				// If the ID is the same, it's a retry
 				var isRetry = checkupId == checkup.Id;
 
 				// Track the last used id so we can detect retry
 				checkupId = checkup.Id;
 
+				if (!checkup.ShouldExamine(sharedState))
+				{
+					checkupStatus[checkup.Id] = Models.Status.Ok;
+					continue;
+				}
+
 				var skipCheckup = false;
 
+				var dependencies = checkup.DeclareDependencies(checkups.Select(c => c.Id));
+
 				// Make sure our dependencies succeeded first
-				if (checkup.Dependencies?.Any() ?? false)
+				if (dependencies?.Any() ?? false)
 				{
-					foreach (var dep in checkup.Dependencies)
+					foreach (var dep in dependencies)
 					{
-						if (!checkupStatus.TryGetValue(dep.CheckupId, out var depStatus) || depStatus == Models.Status.Error)
+						var depCheckup = checkups.FirstOrDefault(c => c.Id.StartsWith(dep.CheckupId, StringComparison.OrdinalIgnoreCase));
+
+						if (depCheckup != null && depCheckup.IsPlatformSupported(Util.Platform))
 						{
-							skipCheckup = dep.IsRequired;
-							break;
+							if (!checkupStatus.TryGetValue(dep.CheckupId, out var depStatus) || depStatus == Models.Status.Error)
+							{
+								skipCheckup = dep.IsRequired;
+								break;
+							}
 						}
 					}
 				}
+
+				// See if --skip was specified
+				if (settings.Skip?.Any(s => s.Equals(checkup.Id, StringComparison.OrdinalIgnoreCase)
+					|| s.Equals(checkup.GetType().Name, StringComparison.OrdinalIgnoreCase)) ?? false)
+					skipCheckup = true;
 
 				if (skipCheckup)
 				{
@@ -268,14 +232,14 @@ namespace DotNetCheck.Cli
 			if (hasErrors)
 			{
 				AnsiConsole.MarkupLine($"[bold red]{Icon.Bell} There were one or more problems detected.[/]");
-				AnsiConsole.MarkupLine($"[bold red]Please review the errors and correct them and run {ToolCommand} again.[/]");
+				AnsiConsole.MarkupLine($"[bold red]Please review the errors and correct them and run {ToolInfo.ToolCommand} again.[/]");
 			}
 			else
 			{
 				AnsiConsole.MarkupLine($"[bold blue]{Icon.Success} Congratulations, everything looks great![/]");
 			}
 
-			Console.Title = ToolName;
+			Console.Title = ToolInfo.ToolName;
 
 			if (!settings.NonInteractive)
 			{

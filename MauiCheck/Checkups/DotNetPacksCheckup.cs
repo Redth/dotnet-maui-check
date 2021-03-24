@@ -12,6 +12,11 @@ namespace DotNetCheck.Checkups
 {
 	public class DotNetPacksCheckup : Checkup
 	{
+		public DotNetPacksCheckup() : base()
+		{
+			throw new Exception("Do not IOC this type directly");
+		}
+
 		public DotNetPacksCheckup(string sdkVersion, Manifest.DotNetSdkPack[] requiredPacks, params string[] nugetPackageSources) : base()
 		{
 			SdkVersion = sdkVersion;
@@ -31,12 +36,33 @@ namespace DotNetCheck.Checkups
 		public readonly string[] NuGetPackageSources;
 		public readonly Manifest.DotNetSdkPack[] RequiredPacks;
 
-		public override IEnumerable<CheckupDependency> Dependencies
-			=> new List<CheckupDependency> { new CheckupDependency("dotnetworkloads") };
+		public override IEnumerable<CheckupDependency> DeclareDependencies(IEnumerable<string> checkupIds)
+			=> checkupIds
+				?.Where(id => id.StartsWith("dotnetworkloads"))
+				?.Select(id => new CheckupDependency(id, false));
 
-		public override string Id => "dotnetpacks";
+		public override string Id => "dotnetpacks-" + SdkVersion;
 
 		public override string Title => $".NET SDK - Packs ({SdkVersion})";
+
+		public override bool ShouldExamine(SharedState history)
+			=> GetAllRequiredPacks(history)?.Any() ?? false;
+
+		IEnumerable<Manifest.DotNetSdkPack> GetAllRequiredPacks(SharedState history)
+		{
+			var requiredPacks = new List<Manifest.DotNetSdkPack>();
+			requiredPacks.AddRange(RequiredPacks);
+
+			if (history.TryGetStateFromAll<WorkloadResolver.PackInfo[]>("required_packs", out var p) && p.Any())
+			{
+				foreach (var packset in p)
+						requiredPacks.AddRange(packset.Select(pi => new Manifest.DotNetSdkPack { Id = pi.Id, Version = pi.Version }));
+			}
+
+			return requiredPacks
+				.GroupBy(p => p.Id + p.Version.ToString())
+				.Select(g => g.First());
+		}
 
 		public override async Task<DiagnosticResult> Examine(SharedState history)
 		{
@@ -44,17 +70,7 @@ namespace DotNetCheck.Checkups
 
 			var missingPacks = new List<Manifest.DotNetSdkPack>();
 
-			var requiredPacks = new List<Manifest.DotNetSdkPack>();
-			requiredPacks.AddRange(RequiredPacks);
-
-			if (history.TryGetState<WorkloadResolver.PackInfo[]>("dotnetworkloads", "required_packs", out var p) && p.Any())
-				requiredPacks.AddRange(p.Select(pi => new Manifest.DotNetSdkPack { Id = pi.Id, Version = pi.Version }));
-
-			var uniqueRequiredPacks = requiredPacks
-				.GroupBy(p => p.Id + p.Version.ToString())
-				.Select(g => g.First());
-
-			foreach (var rp in uniqueRequiredPacks)
+			foreach (var rp in GetAllRequiredPacks(history))
 			{
 				if (!sdkPacks.Any(sp => sp.Id == rp.Id && sp.Version == rp.Version))
 				{

@@ -58,19 +58,20 @@ namespace DotNetCheck.Solutions
 							var buffer = new byte[81920];
 							long totalReadLen = 0;
 							var readLen = 0;
-							double lastReportedProgress = 0;
+
+							var lastPercent = 0;
 
 							while ((readLen = await download.ReadAsync(buffer, 0, buffer.Length, cancelToken)) != 0)
 							{
 								await fs.WriteAsync(buffer, 0, readLen, cancelToken).ConfigureAwait(false);
 								totalReadLen += readLen;
 
-								var percent = ((double)totalReadLen / (double)contentLength) * 100d;
+								var percent = (int)(((double)totalReadLen / (double)contentLength) * 100d);
 
-								if (lastReportedProgress + percent >= 10)
+								if (percent % 10 == 0 && percent != lastPercent)
 								{
-									lastReportedProgress += percent;
-									ReportStatus($"Downloading... {lastReportedProgress:0}%...");
+									lastPercent = percent;
+									ReportStatus($"Downloading... {percent}%...");
 								}
 							}
 						}

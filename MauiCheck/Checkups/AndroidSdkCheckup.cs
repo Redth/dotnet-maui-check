@@ -11,23 +11,22 @@ using Xamarin.Installer.AndroidSDK.Manager;
 
 namespace DotNetCheck.Checkups
 {
-	public class XAndroidSdkPackagesCheckup : Models.Checkup
+	public class AndroidSdkPackagesCheckup : Models.Checkup
 	{
-		public XAndroidSdkPackagesCheckup(Manifest.AndroidPackage[] requiredPackages = null)
-		{
-			RequiredPackages = requiredPackages.Where(p => p.IsArchCompatible()).ToArray();
-		}
+		public override IEnumerable<CheckupDependency> DeclareDependencies(IEnumerable<string> checkupIds)
+			=> new [] { new CheckupDependency("openjdk") };
 
-		public override IEnumerable<CheckupDependency> Dependencies
-			=> new List<CheckupDependency> { new CheckupDependency("openjdk") };
-
-		public Manifest.AndroidPackage[] RequiredPackages { get; private set; }
+		public IEnumerable<Manifest.AndroidPackage> RequiredPackages
+			=> Manifest?.Check?.Android?.Packages;
 
 		public override string Id => "androidsdk";
 
 		public override string Title => "Android SDK";
 
 		List<string> temporaryFiles = new List<string>();
+
+		public override bool ShouldExamine(SharedState history)
+			=> RequiredPackages?.Any() ?? false;
 
 		public override Task<DiagnosticResult> Examine(SharedState history)
 		{

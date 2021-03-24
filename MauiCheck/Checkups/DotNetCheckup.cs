@@ -7,18 +7,15 @@ using DotNetCheck.DotNet;
 using DotNetCheck.Models;
 using DotNetCheck.Solutions;
 using Microsoft.NET.Sdk.WorkloadManifestReader;
+using Newtonsoft.Json.Linq;
 using NuGet.Versioning;
 
 namespace DotNetCheck.Checkups
 {
 	public class DotNetCheckup : Checkup
 	{
-		public DotNetCheckup(params Manifest.DotNetSdk[] requiredSdks) : base()
-		{
-			RequiredSdks = requiredSdks;
-		}
-
-		public Manifest.DotNetSdk[] RequiredSdks { get; private set; }
+		public IEnumerable<Manifest.DotNetSdk> RequiredSdks
+			=> Manifest?.Check?.DotNet?.Sdks;
 
 		public override string Id => "dotnet";
 
@@ -26,6 +23,9 @@ namespace DotNetCheck.Checkups
 
 		string SdkListToString()
 			=> (RequiredSdks?.Any() ?? false) ? "(" + string.Join(", ", RequiredSdks.Select(s => s.Version)) + ")" : string.Empty;
+
+		public override bool ShouldExamine(SharedState history)
+			=> RequiredSdks?.Any() ?? false;
 
 		public override async Task<DiagnosticResult> Examine(SharedState history)
 		{

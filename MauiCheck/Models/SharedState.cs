@@ -31,6 +31,24 @@ namespace DotNetCheck.Models
 			return notes != default;
 		}
 
+		public bool TryGetStateFromAll<T>(string key, out IEnumerable<T> notes) where T : class
+		{
+			var all = new List<T>();
+
+			if (charts?.Values?.Any() ?? false)
+			{
+				foreach (var v in charts.Values)
+				{
+					if (v.TryGetValue(key, out var v2) && v2 is T typedValue)
+						all.Add(typedValue);
+				}
+			}
+
+			notes = all;
+
+			return all?.Any() ?? false;
+		}
+
 		public void SetEnvironmentVariable(string name, string value)
 		{
 			envVars[name] = value;

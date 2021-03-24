@@ -7,6 +7,8 @@ namespace DotNetCheck.Manifest
 {
 	public partial class Manifest
 	{
+		public const string DefaultManifestUrl = "https://aka.ms/dotnet-maui-check-manifest";
+
 		public static Task<Manifest> FromFileOrUrl(string fileOrUrl)
 		{
 			if (fileOrUrl.StartsWith("http", StringComparison.OrdinalIgnoreCase))

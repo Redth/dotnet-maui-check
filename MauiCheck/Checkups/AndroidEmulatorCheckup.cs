@@ -11,19 +11,18 @@ namespace DotNetCheck.Checkups
 {
 	public class AndroidEmulatorCheckup : Checkup
 	{
-		public AndroidEmulatorCheckup(params AndroidEmulator[] emulators)
-		{
-			RequiredEmulators = emulators.Where(e => e.IsArchCompatible()).ToArray();
-		}
+		public override IEnumerable<CheckupDependency> DeclareDependencies(IEnumerable<string> checkupIds)
+			=> new [] { new CheckupDependency("androidsdk") };
 
-		public override IEnumerable<CheckupDependency> Dependencies
-			=> new List<CheckupDependency> { new CheckupDependency("androidsdk") };
-
-		public Manifest.AndroidEmulator[] RequiredEmulators { get; private set; }
+		public IEnumerable<AndroidEmulator> RequiredEmulators
+			=> Manifest?.Check?.Android?.Emulators;
 
 		public override string Id => "androidemulator";
 
 		public override string Title => "Android Emulator";
+
+		public override bool ShouldExamine(SharedState history)
+			=> RequiredEmulators?.Any() ?? false;
 
 		public override Task<DiagnosticResult> Examine(SharedState history)
 		{

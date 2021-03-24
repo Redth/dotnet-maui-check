@@ -1,18 +1,31 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace DotNetCheck.Models
 {
 	public abstract class Checkup
 	{
+		public Checkup()
+		{ }
+
 		public abstract string Id { get; }
 
-		public virtual IEnumerable<CheckupDependency> Dependencies { get; } = Enumerable.Empty<CheckupDependency>();
+		public virtual IEnumerable<CheckupDependency> DeclareDependencies(IEnumerable<string> checkupIds)
+			=> Enumerable.Empty<CheckupDependency>();
 
 		public abstract string Title { get; }
 		public virtual string Description { get; } = string.Empty;
+
+		public Manifest.Manifest Manifest { get; internal set; }
+
+		public virtual bool ShouldExamine(SharedState history)
+		{
+			return true;
+		}
 
 		public abstract Task<DiagnosticResult> Examine(SharedState history);
 

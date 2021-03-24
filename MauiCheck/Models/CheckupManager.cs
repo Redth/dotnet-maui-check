@@ -5,23 +5,36 @@ using System.Threading.Tasks;
 
 namespace DotNetCheck.Models
 {
-	public class CheckupManager
+	public static class CheckupManager
 	{
-		public CheckupManager()
+		static List<Checkup> registeredCheckups = new List<Checkup>();
+		static List<CheckupContributor> registeredCheckupContributors = new List<CheckupContributor>();
+
+		public static void RegisterCheckups(params Checkup[] checkups)
+			=> registeredCheckups.AddRange(checkups);
+
+		public static void RegisterCheckupContributors(params CheckupContributor[] checkupContributors)
+			=> registeredCheckupContributors.AddRange(checkupContributors);
+
+		public static IEnumerable<Checkup> BuildCheckupGraph(Manifest.Manifest manifest)
 		{
-		}
+			var checkups = new List<Checkup>();
 
-		readonly List<Checkup> checkups = new List<Checkup>();
+			checkups.AddRange(registeredCheckups);
 
-		public void ContributeDiagnostic(Checkup checkup)
-			=> checkups.Add(checkup);
+			foreach (var c in registeredCheckupContributors)
+			{
+				var contributed = c.Contribute(manifest);
+				if (contributed?.Any() ?? false)
+					checkups.AddRange(contributed);
+			}
 
-		public IEnumerable<Checkup> BuildCheckupGraph()
-		{
 			var filtered = checkups.Where(c => c.IsPlatformSupported(Util.Platform));
+			var checkupIds = filtered.Select(c => c.Id);
 
 			var sorted = TopologicalSort<Checkup>(filtered, c =>
-				checkups.Where(dc => c.Dependencies.Any(d => d.CheckupId == dc.Id)));
+				filtered.Where(dc => c.DeclareDependencies(checkupIds).Any(d => dc.IsPlatformSupported(Util.Platform)
+									&& d.CheckupId.StartsWith(dc.Id, StringComparison.OrdinalIgnoreCase))));
 
 			return sorted;
 		}

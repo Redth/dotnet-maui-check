@@ -18,5 +18,13 @@ namespace DotNetCheck
 
 		public static NuGetVersion ThisOrExact(this NuGetVersion minimumVersion, NuGetVersion exactVersion)
 			=> exactVersion == null ? minimumVersion : exactVersion;
+
+		public static NuGetVersion ParseVersion(string version, NuGetVersion defaultVersion = null)
+		{
+			if (!string.IsNullOrEmpty(version) && NuGetVersion.TryParse(version, out var nv))
+				return nv;
+
+			return defaultVersion;
+		}
 	}
 }

@@ -5,12 +5,15 @@ namespace DotNetCheck.Cli
 	public class CheckSettings : CommandSettings
 	{
 		[CommandOption("-m|--manifest <FILE_OR_URL>")]
-		public string Manifest { get; set; } = "https://aka.ms/dotnet-maui-check-manifest";
+		public string Manifest { get; set; } = global::DotNetCheck.Manifest.Manifest.DefaultManifestUrl;
 
 		[CommandOption("-f|--fix")]
 		public bool Fix { get; set; }
 
 		[CommandOption("-n|--non-interactive")]
 		public bool NonInteractive { get; set; }
+
+		[CommandOption("-s|--skip <CHECKUP_ID>")]
+		public string[] Skip { get; set; }
 	}
 }

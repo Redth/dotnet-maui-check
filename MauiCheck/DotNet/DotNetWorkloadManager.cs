@@ -108,6 +108,10 @@ namespace DotNetCheck.DotNet
 			{
 				if (packInfo.Kind == WorkloadPackKind.Template)
 				{
+					var templatePacksDir = Path.GetDirectoryName(packInfo.Path);
+					if (!Directory.Exists(templatePacksDir))
+						Directory.CreateDirectory(templatePacksDir);
+
 					return await DownloadAndInstallNuGet(packId, version, packInfo.Path, cancelToken, false);
 				}
 
@@ -219,7 +223,7 @@ namespace DotNetCheck.DotNet
 										if (!Directory.Exists(destination))
 											Directory.CreateDirectory(destination);
 
-										ZipFile.ExtractToDirectory(tmpZipFile.FullName, destination);
+										ZipFile.ExtractToDirectory(tmpZipFile.FullName, destination, true);
 									}
 									else
 									{

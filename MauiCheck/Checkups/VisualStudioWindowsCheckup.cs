@@ -11,21 +11,21 @@ namespace DotNetCheck.Checkups
 {
 	public class VisualStudioWindowsCheckup : Checkup
 	{
-		public VisualStudioWindowsCheckup(string minimumVersion, string exactVersion = null)
-		{
-			MinimumVersion = NuGetVersion.Parse(minimumVersion);
-			ExactVersion = exactVersion != null ? NuGetVersion.Parse(exactVersion) : null;
-		}
-
 		public override bool IsPlatformSupported(Platform platform)
 			=> platform == Platform.Windows;
 
-		public NuGetVersion MinimumVersion { get; private set; } = new NuGetVersion("16.9.0");
-		public NuGetVersion ExactVersion { get; private set; }
+		public NuGetVersion MinimumVersion
+			=> Extensions.ParseVersion(Manifest?.Check?.VSWin?.MinimumVersion, new NuGetVersion("16.9.0"));
 
-		public override string Id => "visualstudio";
+		public NuGetVersion ExactVersion
+			=> Extensions.ParseVersion(Manifest?.Check?.VSWin?.ExactVersion);
+
+		public override string Id => "vswin";
 
 		public override string Title => $"Visual Studio {MinimumVersion.ThisOrExact(ExactVersion)}";
+		
+		public override bool ShouldExamine(SharedState history)
+			=> Manifest?.Check?.VSWin != null;
 
 		public override async Task<DiagnosticResult> Examine(SharedState history)
 		{

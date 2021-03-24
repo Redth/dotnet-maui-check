@@ -11,21 +11,21 @@ namespace DotNetCheck.Checkups
 {
 	public class VisualStudioMacCheckup : Checkup
 	{
-		public VisualStudioMacCheckup(string minimumVersion, string exactVersion = null)
-		{
-			MinimumVersion = NuGetVersion.Parse(minimumVersion);
-			ExactVersion = exactVersion != null ? NuGetVersion.Parse(exactVersion) : null;
-		}
-
 		public override bool IsPlatformSupported(Platform platform)
 			=> platform == Platform.OSX;
 
-		public NuGetVersion MinimumVersion { get; private set; } = new NuGetVersion("8.9.0");
-		public NuGetVersion ExactVersion { get; private set; }
+		public NuGetVersion MinimumVersion
+			=> Extensions.ParseVersion(Manifest?.Check?.VSMac?.MinimumVersion, new NuGetVersion("8.9.0"));
 
-		public override string Id => "visualstudio";
+		public NuGetVersion ExactVersion
+			=> Extensions.ParseVersion(Manifest?.Check?.VSMac?.ExactVersion);
+
+		public override string Id => "vsmac";
 
 		public override string Title => $"Visual Studio {MinimumVersion.ThisOrExact(ExactVersion)}";
+
+		public override bool ShouldExamine(SharedState history)
+			=> Manifest?.Check?.VSMac != null;
 
 		public override async Task<DiagnosticResult> Examine(SharedState history)
 		{

@@ -8,27 +8,21 @@ namespace DotNetCheck.Checkups
 {
 	public class XCodeCheckup : Checkup
 	{
-		public XCodeCheckup(string minimumVersion, string exactVersion = null)
-			: this(NuGetVersion.Parse(minimumVersion), string.IsNullOrEmpty(exactVersion) ? null : NuGetVersion.Parse(exactVersion))
-		{
-		}
-
-		public XCodeCheckup(SemanticVersion minimumVersion, SemanticVersion exactVersion = null)
-		{
-			ExactVersion = exactVersion;
-			MinimumVersion = minimumVersion;
-		}
-
 		public override bool IsPlatformSupported(Platform platform)
 			=> platform == Platform.OSX;
 
-		public SemanticVersion MinimumVersion { get; private set; } = NuGetVersion.Parse("12.3");
+		public NuGetVersion MinimumVersion
+			=> Extensions.ParseVersion(Manifest?.Check?.XCode?.MinimumVersion, new NuGetVersion("12.3"));
 
-		public SemanticVersion ExactVersion { get; private set; }
+		public NuGetVersion ExactVersion
+			=> Extensions.ParseVersion(Manifest?.Check?.XCode?.ExactVersion);
 
 		public override string Id => "xcode";
 
 		public override string Title => $"XCode {MinimumVersion.ThisOrExact(ExactVersion)}";
+
+		public override bool ShouldExamine(SharedState history)
+			=> Manifest?.Check?.XCode != null;
 
 		public override async Task<DiagnosticResult> Examine(SharedState history)
 		{

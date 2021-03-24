@@ -5,13 +5,11 @@ using System.Threading.Tasks;
 using DotNetCheck.Checkups;
 using DotNetCheck.Cli;
 using DotNetCheck.Models;
-using NuGet.Versioning;
-using Spectre.Console;
 using Spectre.Console.Cli;
 
 namespace DotNetCheck
 {
-	class Program
+	internal class Program
 	{
 		static Task<int> Main(string[] args)
 		{
@@ -22,14 +20,39 @@ namespace DotNetCheck
 			// Test that it loads
 			_ = System.Text.Encoding.GetEncoding("ISO-8859-2");
 
+			CheckupManager.RegisterCheckups(
+				new OpenJdkCheckup(),
+				new AndroidEmulatorCheckup(),
+				new VisualStudioMacCheckup(),
+				new VisualStudioWindowsCheckup(),
+				new AndroidSdkPackagesCheckup(),
+				new XCodeCheckup(),
+				new DotNetCheckup());
+
+			CheckupManager.RegisterCheckupContributors(
+				new DotNetSdkCheckupContributor());
+
+			CheckupManager.RegisterCheckups(new DotNetSentinelCheckup());
+
 			var app = new CommandApp();
 
 			app.Configure(config =>
 			{
 				config.AddCommand<CheckCommand>("check");
+				config.AddCommand<ListCheckupCommand>("list");
 			});
 
-			return app.RunAsync(new[] { "check" }.Concat(args));
+			var finalArgs = new List<string>();
+
+			var firstArg = args?.FirstOrDefault()?.Trim()?.ToLowerInvariant() ?? string.Empty;
+
+			if (firstArg != "list")
+				finalArgs.Add("check");
+
+			if (args?.Any() ?? false)
+				finalArgs.AddRange(args);
+
+			return app.RunAsync(finalArgs);
 		}
 	}
 }
