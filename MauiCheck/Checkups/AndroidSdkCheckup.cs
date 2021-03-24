@@ -79,7 +79,7 @@ namespace DotNetCheck.Checkups
 			var installationSet = installer.GetInstallationSet(sdkInstance, missingPackages);
 
 			var desc =
-@$"Your Android SDK has missing our outdated packages.
+@$"Your Android SDK has missing or outdated packages.
 You can use the Android SDK Manager to install / update them.
 For more information see: [underline]https://aka.ms/dotnet-androidsdk-help[/]";
 
