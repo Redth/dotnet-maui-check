@@ -172,6 +172,8 @@ namespace DotNetCheck.DotNet
 						var p = new ShellProcessRunner(new ShellProcessRunnerOptions(dotnetExe, $"new -i \"{packInfo.Path}\""));
 						return p.WaitForExit()?.ExitCode == 0;
 					}
+
+					return r;
 				}
 
 				var actualPackId = GetAliasToPackId(packInfo);
@@ -185,7 +187,7 @@ namespace DotNetCheck.DotNet
 						Directory.CreateDirectory(packPath);
 
 					return await DownloadAndInstallNuGet(actualPackId, version, packPath, cancelToken, true);
-}
+				}
 			}
 
 			return false;
