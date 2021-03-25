@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace DotNetCheck
 {
@@ -12,6 +13,14 @@ namespace DotNetCheck
 		public const string ToolName = ".NET MAUI Check";
 		public const string ToolPackageId = "Redth.Net.Maui.Check";
 		public const string ToolCommand = "maui-check";
+
+		public static async Task<Manifest.Manifest> LoadManifest(string fileOrUrl, bool dev)
+		{
+			var f = fileOrUrl ??
+				(dev ? Manifest.Manifest.DevManifestUrl : Manifest.Manifest.DefaultManifestUrl);
+
+			return await Manifest.Manifest.FromFileOrUrl(f);
+		}
 
 		public static bool Validate(Manifest.Manifest manifest)
 		{

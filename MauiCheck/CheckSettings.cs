@@ -5,7 +5,7 @@ namespace DotNetCheck.Cli
 	public class CheckSettings : CommandSettings
 	{
 		[CommandOption("-m|--manifest <FILE_OR_URL>")]
-		public string Manifest { get; set; } = global::DotNetCheck.Manifest.Manifest.DefaultManifestUrl;
+		public string Manifest { get; set; }
 
 		[CommandOption("-f|--fix")]
 		public bool Fix { get; set; }
@@ -15,5 +15,8 @@ namespace DotNetCheck.Cli
 
 		[CommandOption("-s|--skip <CHECKUP_ID>")]
 		public string[] Skip { get; set; }
+
+		[CommandOption("-d|--dev")]
+		public bool Dev { get; set; }
 	}
 }

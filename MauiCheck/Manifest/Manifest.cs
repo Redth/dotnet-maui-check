@@ -8,6 +8,7 @@ namespace DotNetCheck.Manifest
 	public partial class Manifest
 	{
 		public const string DefaultManifestUrl = "https://aka.ms/dotnet-maui-check-manifest";
+		public const string DevManifestUrl = "https://aka.ms/dotnet-maui-check-manifest-dev";
 
 		public static Task<Manifest> FromFileOrUrl(string fileOrUrl)
 		{

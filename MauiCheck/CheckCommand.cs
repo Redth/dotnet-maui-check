@@ -53,7 +53,7 @@ namespace DotNetCheck.Cli
 
 			AnsiConsole.Markup($"[bold blue]{Icon.Thinking} Synchronizing configuration...[/]");
 
-			var manifest = await Manifest.Manifest.FromFileOrUrl(settings.Manifest);
+			var manifest = await ToolInfo.LoadManifest(settings.Manifest, settings.Dev);
 
 			if (!ToolInfo.Validate(manifest))
 				return -1;
