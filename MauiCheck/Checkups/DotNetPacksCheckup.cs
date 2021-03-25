@@ -72,7 +72,8 @@ namespace DotNetCheck.Checkups
 
 			foreach (var rp in GetAllRequiredPacks(history))
 			{
-				if (!sdkPacks.Any(sp => sp.Id == rp.Id && sp.Version == rp.Version))
+				if (!sdkPacks.Any(sp => sp.Id == rp.Id && sp.Version == rp.Version)
+					&& !workloadManager.TemplateExistsOnDisk(rp.Id, rp.Version))
 				{
 					ReportStatus($"{rp.Id} ({rp.Version}) not installed.", Status.Warning);
 					missingPacks.Add(rp);

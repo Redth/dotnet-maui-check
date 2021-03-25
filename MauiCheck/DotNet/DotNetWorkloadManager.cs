@@ -100,6 +100,30 @@ namespace DotNetCheck.DotNet
 			return DownloadAndInstallNuGet(packageId, manifestPackageVersion, manifestDir, cancelToken, true);
 		}
 
+		public bool TemplateExistsOnDisk(string packId, string packVersion)
+		{
+			var sdkTemplatePacksFolder = Path.Combine(SdkRoot, "template-packs");
+
+			if (Directory.Exists(sdkTemplatePacksFolder)
+				&& (Directory.EnumerateFiles(sdkTemplatePacksFolder, $"{packId}.{packVersion}*.nupkg", SearchOption.AllDirectories).Any()
+				|| Directory.EnumerateFiles(sdkTemplatePacksFolder, $"{packId}.{packVersion.ToLowerInvariant()}*.nupkg", SearchOption.AllDirectories).Any()))
+				return true;
+
+			var userTemplateEngineDir = Path.Combine(
+				Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+				".templateengine",
+				"dotnetcli",
+				$"v{SdkVersion}",
+				"packages");
+
+			if (Directory.Exists(userTemplateEngineDir)
+				&& (Directory.EnumerateFiles(userTemplateEngineDir, $"{packId}.{packVersion}*.nupkg", SearchOption.AllDirectories).Any()
+				|| Directory.EnumerateFiles(userTemplateEngineDir, $"{packId}.{packVersion.ToLowerInvariant()}*.nupkg", SearchOption.AllDirectories).Any()))
+				return true;
+
+			return false;
+		}
+
 		public async Task<bool> InstallWorkloadPack(string sdkRoot, Manifest.DotNetSdkPack sdkPack, CancellationToken cancelToken)
 		{
 			WorkloadResolver.PackInfo packInfo;
