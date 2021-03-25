@@ -78,6 +78,14 @@
                 "Microsoft.MacCatalyst.Templates"
               ]
             }
+          ],
+          "packs": [
+            {
+              "id": "Microsoft.Maui.Templates",
+              "version": "6.0.100-preview.3.255",
+              "skipManifestCheck": false,
+              "packKind": "template"
+            }
           ]
         }
       ]
