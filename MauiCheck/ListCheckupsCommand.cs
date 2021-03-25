@@ -24,6 +24,13 @@ namespace DotNetCheck
 				AnsiConsole.WriteLine(c.GetType().Name.ToString() + " (" + c.Id + ")");
 			}
 
+			if (!settings.NonInteractive)
+			{
+				AnsiConsole.WriteLine();
+				AnsiConsole.WriteLine("Press enter to exit...");
+				Console.ReadLine();
+			}
+
 			return 0;
 		}
 
