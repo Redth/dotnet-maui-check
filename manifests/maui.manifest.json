@@ -83,7 +83,7 @@
             {
               "id": "Microsoft.Maui.Templates",
               "version": "6.0.100-preview.3.255",
-              "skipManifestCheck": false,
+              "skipManifestCheck": true,
               "packKind": "template"
             }
           ]
