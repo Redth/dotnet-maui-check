@@ -10,8 +10,4 @@ namespace DotNetCheck.Manifest
 		[JsonProperty("version")]
 		public string Version { get; set; }
 	}
-
-	public partial class DotNetSdkPack : NuGetPackage
-	{
-	}
 }

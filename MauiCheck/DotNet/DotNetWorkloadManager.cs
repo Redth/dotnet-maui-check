@@ -100,9 +100,32 @@ namespace DotNetCheck.DotNet
 			return DownloadAndInstallNuGet(packageId, manifestPackageVersion, manifestDir, cancelToken, true);
 		}
 
-		public async Task<bool> InstallWorkloadPack(string packId, CancellationToken cancelToken)
+		public async Task<bool> InstallWorkloadPack(string sdkRoot, Manifest.DotNetSdkPack sdkPack, CancellationToken cancelToken)
 		{
-			var packInfo = workloadResolver.TryGetPackInfo(packId);
+			WorkloadResolver.PackInfo packInfo;
+
+			if (sdkPack.SkipManifestCheck && NuGetVersion.TryParse(sdkPack.Version, out var packVersion))
+			{
+				var kind = sdkPack?.PackKind?.ToLowerInvariant() switch
+				{
+					"sdk" => WorkloadPackKind.Sdk,
+					"framework" => WorkloadPackKind.Framework,
+					"library" => WorkloadPackKind.Library,
+					"template" => WorkloadPackKind.Template,
+					"tool" => WorkloadPackKind.Tool,
+					_ => WorkloadPackKind.Sdk
+				};
+
+				var path = kind == WorkloadPackKind.Template ?
+					Path.Combine(Path.GetTempPath(), $"{sdkPack.Id}.{sdkPack.Version}.nupkg")
+					: Path.Combine(sdkRoot, "sdk", $"{sdkPack.Id}", sdkPack.Version);
+
+				packInfo = new WorkloadResolver.PackInfo(sdkPack.Id, sdkPack.Version, kind, path);
+			}
+			else
+			{
+				packInfo = workloadResolver.TryGetPackInfo(sdkPack.Id);
+			}
 
 			if (packInfo != null && NuGetVersion.TryParse(packInfo.Version, out var version))
 			{
@@ -112,7 +135,19 @@ namespace DotNetCheck.DotNet
 					if (!Directory.Exists(templatePacksDir))
 						Directory.CreateDirectory(templatePacksDir);
 
-					return await DownloadAndInstallNuGet(packId, version, packInfo.Path, cancelToken, false);
+					var r = await DownloadAndInstallNuGet(packInfo.Id, version, packInfo.Path, cancelToken, false);
+
+					// Short circuit the installation into the template-packs dir since this one might not
+					// be a part of any workload manifest, so we need to install with dotnet new -i
+					if (sdkPack.SkipManifestCheck)
+					{
+						var osExt = Util.IsWindows ? ".exe" : string.Empty;
+						var dotnetResolver = new Microsoft.DotNet.DotNetSdkResolver.NETCoreSdkResolver();
+						var dotnetExe = Path.Combine(dotnetResolver.GetDotnetExeDirectory(), $"dotnet{osExt}");
+
+						var p = new ShellProcessRunner(new ShellProcessRunnerOptions(dotnetExe, $"new -i \"{packInfo.Path}\""));
+						return p.WaitForExit()?.ExitCode == 0;
+					}
 				}
 
 				var actualPackId = GetAliasToPackId(packInfo);
@@ -126,7 +161,7 @@ namespace DotNetCheck.DotNet
 						Directory.CreateDirectory(packPath);
 
 					return await DownloadAndInstallNuGet(actualPackId, version, packPath, cancelToken, true);
-				}
+}
 			}
 
 			return false;

@@ -11,11 +11,13 @@ namespace DotNetCheck.Solutions
 		public DotNetPackInstallSolution(string sdkRoot, string sdkVersion, DotNetSdkPack package, params string[] nugetPackageSources)
 		{
 			Package = package;
+			SdkRoot = sdkRoot;
 			WorkloadManager = new DotNetWorkloadManager(sdkRoot, sdkVersion, nugetPackageSources);
 		}
 
 		public readonly DotNetWorkloadManager WorkloadManager;
 		public DotNetSdkPack Package { get; private set; }
+		public readonly string SdkRoot;
 
 		public override bool RequiresAdmin(Platform platform)
 		{
@@ -31,7 +33,7 @@ namespace DotNetCheck.Solutions
 
 			ReportStatus($"Installing Pack: {Package.Id}...");
 
-			if (await WorkloadManager.InstallWorkloadPack(Package.Id, cancellationToken))
+			if (await WorkloadManager.InstallWorkloadPack(SdkRoot, Package, cancellationToken))
 				ReportStatus($"Installed Pack: {Package.Id}.");
 			else
 				ReportStatus($"Failed to install Pack: {Package.Id}.");
