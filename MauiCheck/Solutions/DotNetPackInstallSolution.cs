@@ -19,14 +19,6 @@ namespace DotNetCheck.Solutions
 		public DotNetSdkPack Package { get; private set; }
 		public readonly string SdkRoot;
 
-		public override bool RequiresAdmin(Platform platform)
-		{
-			//if (platform == Platform.Windows)
-			//	return true;
-
-			return base.RequiresAdmin(platform);
-		}
-
 		public override async Task Implement(CancellationToken cancellationToken)
 		{
 			await base.Implement(cancellationToken);

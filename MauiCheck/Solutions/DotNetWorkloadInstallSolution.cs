@@ -18,13 +18,6 @@ namespace DotNetCheck.Solutions
 		public readonly DotNetWorkloadManager WorkloadManager;
 		public DotNetWorkload Workload { get; private set; }
 
-		public override bool RequiresAdmin(Platform platform)
-		{
-			if (platform == Platform.Windows)
-				return true;
-
-			return base.RequiresAdmin(platform);
-		}
 
 		public override async Task Implement(CancellationToken cancellationToken)
 		{

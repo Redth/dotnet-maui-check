@@ -188,11 +188,6 @@ namespace DotNetCheck.Cli
 
 						foreach (var remedy in diagnosis.Suggestion.Solutions)
 						{
-							if (!remedy.HasPrivilegesToRun(isAdmin, Util.Platform))
-							{
-								AnsiConsole.Markup(adminMsg);
-								continue;
-							}
 							try
 							{
 								remedy.OnStatusUpdated += remedyStatusUpdated;

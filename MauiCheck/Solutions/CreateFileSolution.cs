@@ -19,9 +19,6 @@ namespace DotNetCheck.Solutions
 
 		public readonly string Filename;
 
-		public override bool RequiresAdmin(Platform platform)
-			=> true;
-
 		public override Task Implement(CancellationToken cancellationToken)
 		{
 			if (!File.Exists(Filename))
