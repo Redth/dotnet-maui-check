@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace DotNetCheck.Manifest
@@ -13,6 +14,9 @@ namespace DotNetCheck.Manifest
 
 		[JsonProperty("version")]
 		public string Version { get; set; }
+
+		[JsonProperty("workloadVersion")]
+		public string WorkloadVersion { get; set; }
 
 		[JsonProperty("ignoredPackIds")]
 		public List<string> IgnoredPackIds { get; set; }
