@@ -63,7 +63,13 @@
             {
               "workloadId": "microsoft-android-sdk-full",
               "packageId": "Microsoft.NET.Workload.Android",
-              "version": "11.0.200-ci.main.148"
+              "version": "11.0.200-ci.main.148",
+              "exec": [
+                {
+                  "arch": "osx",
+                  "cmd": "chmod +x \"$DOTNET_ROOT\\packs\\Microsoft.Android.Sdk.*\\*\\tools\\Darwin\\**\\*.*"
+                }
+              ]
             },
             {
               "workloadId": "microsoft-ios-sdk-full",
@@ -89,6 +95,26 @@
           ]
         }
       ]
-    }
+    },
+    "filepermissions": [
+      {
+        "arch": "osx",
+        "execute": true,
+        "patterns": [
+          "$DOTNET_ROOT/packs/Microsoft.Android.Sdk/*/tools/Darwin/*",
+          "$DOTNET_ROOT/packs/Microsoft.Android.Sdk/*/tools/Darwin/ndk/*",
+
+          "$DOTNET_ROOT/packs/Microsoft.iOS.Sdk/*/tools/bin/*",
+          "$DOTNET_ROOT/packs/Microsoft.iOS.Sdk/*/tools/lib/mlaunch/mlaunch.app/Contents/MacOS/*",
+          "$DOTNET_ROOT/packs/Microsoft.iOS.Sdk/*/tools/lib/mlaunch/mlaunch.app/Contents/MonoBundle/*",
+          "$DOTNET_ROOT/packs/Microsoft.iOS.Sdk/*/tools/lib/bgen/*",
+
+          "$DOTNET_ROOT/packs/Microsoft.MacCatalyst.Sdk/*/tools/bin/*",
+          "$DOTNET_ROOT/packs/Microsoft.MacCatalyst.Sdk/*/tools/lib/mlaunch/mlaunch.app/Contents/MacOS/*",
+          "$DOTNET_ROOT/packs/Microsoft.MacCatalyst.Sdk/*/tools/lib/mlaunch/mlaunch.app/Contents/MonoBundle/*",
+          "$DOTNET_ROOT/packs/Microsoft.MacCatalyst.Sdk/*/tools/lib/bgen/*"
+        ]
+      }
+    ]
   }
 }

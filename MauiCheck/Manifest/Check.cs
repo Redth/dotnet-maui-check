@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace DotNetCheck.Manifest
 {
@@ -24,5 +25,8 @@ namespace DotNetCheck.Manifest
 
 		[JsonProperty("dotnet")]
 		public DotNet DotNet { get; set; }
+
+		[JsonProperty("filepermissions")]
+		public List<FilePermissions> FilePermissions { get; set; }
 	}
 }
