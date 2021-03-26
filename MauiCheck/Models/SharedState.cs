@@ -62,7 +62,7 @@ namespace DotNetCheck.Models
 		public bool TryGetEnvironmentVariable(string name, out string value)
 			=> envVars.TryGetValue(name, out value);
 
-		public IEnumerable<KeyValuePair<string, string>> GetEnvironmentVariables()
+		public IReadOnlyDictionary<string, string> GetEnvironmentVariables()
 			=> envVars;
 	}
 }

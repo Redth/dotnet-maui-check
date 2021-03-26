@@ -80,6 +80,8 @@ namespace DotNetCheck.DotNet
 				}
 			}
 
+			sharedState.SetEnvironmentVariable("DOTNET_ROOT", sdkRoot);
+
 			// First try and use the actual resolver logic
 			DotNetSdkLocation = new DirectoryInfo(sdkRoot);
 			DotNetExeLocation = new FileInfo(Path.Combine(DotNetSdkLocation.FullName, DotNetExeName));
