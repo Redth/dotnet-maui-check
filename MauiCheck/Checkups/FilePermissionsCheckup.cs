@@ -35,13 +35,21 @@ namespace DotNetCheck.Checkups
 
 			var ok = true;
 
+			var env = history.GetEnvironmentVariables();
+
 			foreach (var p in permissions)
 			{
 				foreach (var pattern in p.Patterns)
 				{
-					var proc = new ShellProcessRunner(new ShellProcessRunnerOptions("chmod", $"+x \"{pattern}\"")
+					var fixedPattern = pattern;
+
+					foreach (var ev in env)
+						fixedPattern = fixedPattern.Replace($"${ev.Key}", ev.Value);
+
+					var proc = new ShellProcessRunner(new ShellProcessRunnerOptions("/bin/chmod", $"-r +x {fixedPattern}")
 					{
-						UseSystemShell = true
+						UseSystemShell = false,
+						EnvironmentVariables = env,
 					});
 
 					if (proc.WaitForExit().ExitCode != 0)
@@ -49,7 +57,7 @@ namespace DotNetCheck.Checkups
 				}
 			}
 
-			return Task.FromResult(new DiagnosticResult(ok ? Status.Ok : Status.Error, this));
+			return Task.FromResult(new DiagnosticResult(Status.Ok, this));
 		}
 	}
 }

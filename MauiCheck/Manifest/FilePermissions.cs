@@ -8,7 +8,7 @@ namespace DotNetCheck.Manifest
 		[JsonProperty("arch")]
 		public string Arch { get; set; }
 
-		[JsonProperty("pattern")]
+		[JsonProperty("patterns")]
 		public List<string> Patterns { get; set; }
 
 		[JsonProperty("execute")]

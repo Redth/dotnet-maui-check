@@ -101,8 +101,8 @@
         "arch": "osx",
         "execute": true,
         "patterns": [
-          "$DOTNET_ROOT/packs/Microsoft.Android.Sdk/*/tools/Darwin/*",
-          "$DOTNET_ROOT/packs/Microsoft.Android.Sdk/*/tools/Darwin/ndk/*",
+          "$DOTNET_ROOT/packs/Microsoft.Android.Sdk*/*/tools/Darwin/*",
+          "$DOTNET_ROOT/packs/Microsoft.Android.Sdk*/*/tools/Darwin/ndk/*",
 
           "$DOTNET_ROOT/packs/Microsoft.iOS.Sdk/*/tools/bin/*",
           "$DOTNET_ROOT/packs/Microsoft.iOS.Sdk/*/tools/lib/mlaunch/mlaunch.app/Contents/MacOS/*",
