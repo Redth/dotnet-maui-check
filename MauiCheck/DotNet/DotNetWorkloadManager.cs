@@ -279,10 +279,20 @@ namespace DotNetCheck.DotNet
 								{
 									if (extract)
 									{
+										// Try and clear out the directory first in case anything old remains
+										if (Directory.Exists(destination))
+										{
+											try { Directory.Delete(destination, true); }
+											catch { }
+										}
+
 										if (!Directory.Exists(destination))
 											Directory.CreateDirectory(destination);
 
-										ZipFile.ExtractToDirectory(tmpZipFile.FullName, destination, true);
+										using var zip = Xamarin.Tools.Zip.ZipArchive.Open(tmpZipFile.FullName, FileMode.Open, destination, false);
+										zip.ExtractAll(destination);
+
+										//ZipFile.ExtractToDirectory(tmpZipFile.FullName, destination, true);
 									}
 									else
 									{
