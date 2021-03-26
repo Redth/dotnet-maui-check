@@ -15,6 +15,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace DotNetCheck.DotNet
 {
@@ -38,7 +39,41 @@ namespace DotNetCheck.DotNet
 
 		public readonly string[] NuGetPackageSources;
 
-		public IEnumerable<string> GetInstalledWorkloads()
+
+		public IEnumerable<(string packageId, NuGetVersion packageVersion)> GetInstalledWorkloadNuGetPackages()
+		{
+			foreach (var dir in manifestProvider.GetManifestDirectories())
+			{
+				if (Directory.Exists(dir))
+				{
+					var nuspec = Directory.EnumerateFiles(dir, "*.nuspec", SearchOption.TopDirectoryOnly)?.FirstOrDefault();
+
+					if (nuspec != null)
+					{
+						var xml = new XmlDocument();
+						xml.Load(nuspec);
+
+						var nsUri = xml.DocumentElement.NamespaceURI;
+						var nsManager = new XmlNamespaceManager(new NameTable());
+						nsManager.AddNamespace("nuspec", nsUri);
+
+						var idNode = xml.SelectSingleNode("/nuspec:package/nuspec:metadata/nuspec:id", nsManager);
+						var versionNode = xml.SelectSingleNode("/nuspec:package/nuspec:metadata/nuspec:version", nsManager);
+
+						if (idNode != null && versionNode != null)
+						{
+							var id = idNode.InnerText;
+							var ver = versionNode.InnerText;
+
+							if (!string.IsNullOrEmpty(id) && NuGetVersion.TryParse(ver, out var v))
+								yield return (id, v);
+						}
+					}
+				}
+			}
+		}
+
+		public IEnumerable<(string id, Int64 version)> GetInstalledWorkloads()
 		{
 			var workloadManifestReaderType = typeof(WorkloadResolver).Assembly.GetType("Microsoft.NET.Sdk.WorkloadManifestReader.WorkloadManifestReader");
 
@@ -57,13 +92,16 @@ namespace DotNetCheck.DotNet
 
 					var workloadsDict = workloadManifest.GetType().GetProperty("Workloads").GetValue(workloadManifest);
 
+					var workloadVersion = (Int64)workloadManifest.GetType().GetProperty("Version").GetValue(workloadManifest);
+
+
 					var workloadsDictKeys = workloadsDict.GetType().GetProperty("Keys").GetValue(workloadsDict) as System.Collections.ICollection;
 
 					foreach (var key in workloadsDictKeys)
 					{
 						var workloadId = key.ToString();
 
-						yield return workloadId;
+						yield return (workloadId, workloadVersion);
 					}
 				}
 			}

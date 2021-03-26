@@ -44,6 +44,7 @@ namespace DotNetCheck.Checkups
 			var workloadManager = new DotNetWorkloadManager(SdkRoot, SdkVersion, NuGetPackageSources);
 
 			var installedWorkloads = workloadManager.GetInstalledWorkloads();
+			var installedPackageWorkloads = workloadManager.GetInstalledWorkloadNuGetPackages();
 
 			var missingWorkloads = new List<Manifest.DotNetWorkload>();
 
@@ -51,14 +52,19 @@ namespace DotNetCheck.Checkups
 
 			foreach (var rp in RequiredWorkloads)
 			{
-				if (!installedWorkloads.Any(sp => sp == rp.Id))
+				NuGetVersion rpVersion;
+				if (!NuGetVersion.TryParse(rp.Version, out rpVersion))
+					rpVersion = new NuGetVersion(0, 0, 0);
+
+				if (!installedPackageWorkloads.Any(sp => sp.packageId.Equals(rp.PackageId, StringComparison.OrdinalIgnoreCase) && sp.packageVersion >= rpVersion)
+					|| !installedWorkloads.Any(sp => sp.id.Equals(rp.Id, StringComparison.OrdinalIgnoreCase)))
 				{
-					ReportStatus($"{rp.Id} not installed.", Status.Error);
+					ReportStatus($"{rp.Id} ({rp.PackageId} : {rp.Version}) not installed.", Status.Error);
 					missingWorkloads.Add(rp);
 				}
 				else
 				{
-					ReportStatus($"{rp.Id} installed.", Status.Ok);
+					ReportStatus($"{rp.Id} ({rp.PackageId} : {rp.Version}) installed.", Status.Ok);
 
 					var workloadPacks = workloadManager.GetPacksInWorkload(rp.Id);
 
