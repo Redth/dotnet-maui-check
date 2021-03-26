@@ -49,11 +49,13 @@ namespace DotNetCheck
 		readonly List<string> standardOutput;
 		readonly List<string> standardError;
 		readonly Process process;
+		readonly bool verbose;
 
 		public readonly ShellProcessRunnerOptions Options;
 
 		public ShellProcessRunner(ShellProcessRunnerOptions options)
 		{
+			verbose = Util.Verbose;
 			Options = options;
 			standardOutput = new List<string>();
 			standardError = new List<string>();
@@ -101,6 +103,9 @@ namespace DotNetCheck
 			{
 				if (e.Data != null)
 				{
+					if (verbose)
+						Console.WriteLine(e.Data);
+
 					standardOutput.Add(e.Data);
 					Options?.OutputCallback?.Invoke(e.Data);
 				}
@@ -109,6 +114,9 @@ namespace DotNetCheck
 			{
 				if (e.Data != null)
 				{
+					if (verbose)
+						Console.WriteLine(e.Data);
+
 					standardError.Add(e.Data);
 					Options?.OutputCallback?.Invoke(e.Data);
 				}

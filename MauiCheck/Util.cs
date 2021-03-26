@@ -7,6 +7,8 @@ namespace DotNetCheck
 {
 	public class Util
 	{
+		public static bool Verbose { get; set; }
+
 		public static Dictionary<string, string> EnvironmentVariables { get; } = new Dictionary<string, string>();
 
 		public static Platform Platform

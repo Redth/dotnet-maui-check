@@ -17,6 +17,8 @@ namespace DotNetCheck.Cli
 	{
 		public override async Task<int> ExecuteAsync(CommandContext context, CheckSettings settings)
 		{
+			Util.Verbose = settings.Verbose;
+
 			Console.Title = ToolInfo.ToolName;
 
 			AnsiConsole.MarkupLine($"[underline bold green]{Icon.Ambulance} {ToolInfo.ToolName} {Icon.Recommend}[/]");
@@ -62,7 +64,9 @@ namespace DotNetCheck.Cli
 			AnsiConsole.Markup($"[bold blue]{Icon.Thinking} Scheduling appointments...[/]");
 
 			if (!string.IsNullOrEmpty(settings.DotNetSdkRoot))
+			{
 				sharedState.SetEnvironmentVariable("DOTNET_ROOT", settings.DotNetSdkRoot);
+			}
 
 			var checkups = CheckupManager.BuildCheckupGraph(manifest, sharedState);
 

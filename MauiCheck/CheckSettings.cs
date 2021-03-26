@@ -21,5 +21,8 @@ namespace DotNetCheck.Cli
 
 		[CommandOption("--dotnet <SDK_ROOT>")]
 		public string DotNetSdkRoot { get; set; }
+
+		[CommandOption("-v|--verbose")]
+		public bool Verbose { get; set; }
 	}
 }
