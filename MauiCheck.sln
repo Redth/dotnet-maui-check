@@ -5,6 +5,7 @@ VisualStudioVersion = 16.0.810.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CF98FDE3-0227-48C4-876B-346013A7D70A}"
 	ProjectSection(SolutionItems) = preProject
+		manifests\maui-dev.manifest.json = manifests\maui-dev.manifest.json
 		manifests\maui.manifest.json = manifests\maui.manifest.json
 	EndProjectSection
 EndProject
