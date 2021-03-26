@@ -11,13 +11,17 @@ namespace DotNetCheck.Solutions
 	{
 		public DotNetWorkloadInstallSolution(string sdkRoot, string sdkVersion, DotNetWorkload workload, params string[] nugetPackageSources)
 		{
+			SdkRoot = sdkRoot;
+			SdkVersion = sdkVersion;
+			NuGetPackageSources = nugetPackageSources;
 			Workload = workload;
-			WorkloadManager = new DotNetWorkloadManager(sdkRoot, sdkVersion, nugetPackageSources);
 		}
 
-		public readonly DotNetWorkloadManager WorkloadManager;
-		public DotNetWorkload Workload { get; private set; }
+		public readonly string SdkRoot;
+		public readonly string SdkVersion;
+		public readonly string[] NuGetPackageSources;
 
+		public readonly DotNetWorkload Workload;
 
 		public override async Task Implement(CancellationToken cancellationToken)
 		{
@@ -25,8 +29,10 @@ namespace DotNetCheck.Solutions
 
 			ReportStatus($"Installing Workload: {Workload.Id}...");
 
+			var workloadManager = new DotNetWorkloadManager(SdkRoot, SdkVersion, NuGetPackageSources);
+
 			if (NuGetVersion.TryParse(Workload.Version, out var version)
-				&& await WorkloadManager.InstallWorkloadManifest(Workload.PackageId, version, cancellationToken))
+				&& await workloadManager.InstallWorkloadManifest(Workload.PackageId, version, cancellationToken))
 			{
 				ReportStatus($"Installed Workload: {Workload.Id}.");
 			}

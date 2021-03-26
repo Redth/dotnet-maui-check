@@ -25,11 +25,7 @@ namespace DotNetCheck.Checkups
 			SdkVersion = sdkVersion;
 			RequiredWorkloads = requiredWorkloads;
 			NuGetPackageSources = nugetPackageSources;
-
-			workloadManager = new DotNetWorkloadManager(SdkRoot, SdkVersion, NuGetPackageSources);
 		}
-
-		readonly DotNetWorkloadManager workloadManager;
 
 		public readonly string SdkRoot;
 		public readonly string SdkVersion;
@@ -45,6 +41,8 @@ namespace DotNetCheck.Checkups
 
 		public override async Task<DiagnosticResult> Examine(SharedState history)
 		{
+			var workloadManager = new DotNetWorkloadManager(SdkRoot, SdkVersion, NuGetPackageSources);
+
 			var installedWorkloads = workloadManager.GetInstalledWorkloads();
 
 			var missingWorkloads = new List<Manifest.DotNetWorkload>();

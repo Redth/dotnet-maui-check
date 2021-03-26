@@ -12,12 +12,14 @@ namespace DotNetCheck.Solutions
 		{
 			Package = package;
 			SdkRoot = sdkRoot;
-			WorkloadManager = new DotNetWorkloadManager(sdkRoot, sdkVersion, nugetPackageSources);
+			SdkVersion = sdkVersion;
+			NuGetPackageSources = nugetPackageSources;
 		}
 
-		public readonly DotNetWorkloadManager WorkloadManager;
 		public DotNetSdkPack Package { get; private set; }
 		public readonly string SdkRoot;
+		public readonly string SdkVersion;
+		public readonly string[] NuGetPackageSources;
 
 		public override async Task Implement(CancellationToken cancellationToken)
 		{
@@ -25,7 +27,9 @@ namespace DotNetCheck.Solutions
 
 			ReportStatus($"Installing Pack: {Package.Id}...");
 
-			if (await WorkloadManager.InstallWorkloadPack(SdkRoot, Package, cancellationToken))
+			var workloadManager = new DotNetWorkloadManager(SdkRoot, SdkVersion, NuGetPackageSources);
+
+			if (await workloadManager.InstallWorkloadPack(SdkRoot, Package, cancellationToken))
 				ReportStatus($"Installed Pack: {Package.Id}.");
 			else
 				ReportStatus($"Failed to install Pack: {Package.Id}.");
