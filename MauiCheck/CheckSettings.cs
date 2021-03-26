@@ -18,5 +18,8 @@ namespace DotNetCheck.Cli
 
 		[CommandOption("-d|--dev")]
 		public bool Dev { get; set; }
+
+		[CommandOption("--dotnet <SDK_ROOT>")]
+		public string DotNetSdkRoot { get; set; }
 	}
 }

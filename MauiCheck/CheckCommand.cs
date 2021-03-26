@@ -61,7 +61,10 @@ namespace DotNetCheck.Cli
 			AnsiConsole.MarkupLine(" ok");
 			AnsiConsole.Markup($"[bold blue]{Icon.Thinking} Scheduling appointments...[/]");
 
-			var checkups = CheckupManager.BuildCheckupGraph(manifest);
+			if (!string.IsNullOrEmpty(settings.DotNetSdkRoot))
+				sharedState.SetEnvironmentVariable("DOTNET_ROOT", settings.DotNetSdkRoot);
+
+			var checkups = CheckupManager.BuildCheckupGraph(manifest, sharedState);
 
 			AnsiConsole.MarkupLine(" ok");
 

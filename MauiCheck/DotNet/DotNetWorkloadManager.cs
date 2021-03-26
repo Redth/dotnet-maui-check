@@ -165,9 +165,7 @@ namespace DotNetCheck.DotNet
 					// be a part of any workload manifest, so we need to install with dotnet new -i
 					if (sdkPack.SkipManifestCheck)
 					{
-						var osExt = Util.IsWindows ? ".exe" : string.Empty;
-						var dotnetResolver = new Microsoft.DotNet.DotNetSdkResolver.NETCoreSdkResolver();
-						var dotnetExe = Path.Combine(dotnetResolver.GetDotnetExeDirectory(), $"dotnet{osExt}");
+						var dotnetExe = Path.Combine(sdkRoot, DotNetSdk.DotNetExeName);
 
 						var p = new ShellProcessRunner(new ShellProcessRunnerOptions(dotnetExe, $"new -i \"{packInfo.Path}\""));
 						return p.WaitForExit()?.ExitCode == 0;

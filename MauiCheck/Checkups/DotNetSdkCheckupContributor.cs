@@ -9,7 +9,7 @@ namespace DotNetCheck.Checkups
 {
 	public class DotNetSdkCheckupContributor : CheckupContributor
 	{
-		public override IEnumerable<Checkup> Contribute(Manifest.Manifest manifest)
+		public override IEnumerable<Checkup> Contribute(Manifest.Manifest manifest, SharedState sharedState)
 		{
 			var sdks = manifest?.Check?.DotNet?.Sdks;
 
@@ -22,11 +22,11 @@ namespace DotNetCheck.Checkups
 					var pkgSrcs = sdk?.PackageSources?.ToArray() ?? Array.Empty<string>();
 
 					if (sdk.Workloads?.Any() ?? false)
-						yield return new DotNetWorkloadsCheckup(sdk.Version, workloads, pkgSrcs);
+						yield return new DotNetWorkloadsCheckup(sharedState, sdk.Version, workloads, pkgSrcs);
 					
 					// Always generate a packs check even if no packs, since the workloads may dynamically
 					// discover packs required and register them with the SharedState
-					yield return new DotNetPacksCheckup(sdk.Version, packs, pkgSrcs);
+					yield return new DotNetPacksCheckup(sharedState, sdk.Version, packs, pkgSrcs);
 				}
 			}
 		}

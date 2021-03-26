@@ -17,7 +17,9 @@ namespace DotNetCheck
 			if (!ToolInfo.Validate(manifest))
 				return -1;
 
-			var checkups = CheckupManager.BuildCheckupGraph(manifest);
+			var sharedState = new SharedState();
+
+			var checkups = CheckupManager.BuildCheckupGraph(manifest, sharedState);
 
 			foreach (var c in checkups)
 			{

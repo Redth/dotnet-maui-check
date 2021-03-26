@@ -17,18 +17,18 @@ namespace DotNetCheck.Checkups
 			throw new Exception("Do not IOC this type directly");
 		}
 
-		public DotNetWorkloadsCheckup(string sdkVersion, Manifest.DotNetWorkload[] requiredWorkloads, params string[] nugetPackageSources) : base()
+		public DotNetWorkloadsCheckup(SharedState sharedState, string sdkVersion, Manifest.DotNetWorkload[] requiredWorkloads, params string[] nugetPackageSources) : base()
 		{
+			var dotnet = new DotNetSdk(sharedState);
+
+			SdkRoot = dotnet.DotNetSdkLocation.FullName;
 			SdkVersion = sdkVersion;
 			RequiredWorkloads = requiredWorkloads;
 			NuGetPackageSources = nugetPackageSources;
 
-			dotnet = new DotNetSdk();
-			SdkRoot = dotnet.DotNetSdkLocation.FullName;
 			workloadManager = new DotNetWorkloadManager(SdkRoot, SdkVersion, NuGetPackageSources);
 		}
 
-		readonly DotNetSdk dotnet;
 		readonly DotNetWorkloadManager workloadManager;
 
 		public readonly string SdkRoot;

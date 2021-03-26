@@ -16,7 +16,7 @@ namespace DotNetCheck.Models
 		public static void RegisterCheckupContributors(params CheckupContributor[] checkupContributors)
 			=> registeredCheckupContributors.AddRange(checkupContributors);
 
-		public static IEnumerable<Checkup> BuildCheckupGraph(Manifest.Manifest manifest)
+		public static IEnumerable<Checkup> BuildCheckupGraph(Manifest.Manifest manifest, SharedState sharedState)
 		{
 			var checkups = new List<Checkup>();
 
@@ -24,7 +24,7 @@ namespace DotNetCheck.Models
 
 			foreach (var c in registeredCheckupContributors)
 			{
-				var contributed = c.Contribute(manifest);
+				var contributed = c.Contribute(manifest, sharedState);
 				if (contributed?.Any() ?? false)
 					checkups.AddRange(contributed);
 			}

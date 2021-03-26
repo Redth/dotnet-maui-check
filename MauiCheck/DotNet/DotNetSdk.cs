@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using DotNetCheck.Models;
 using Microsoft.NET.Sdk.WorkloadManifestReader;
 using NuGet.Common;
 using NuGet.Packaging.Core;
@@ -22,7 +23,10 @@ namespace DotNetCheck.DotNet
 		public readonly FileInfo DotNetExeLocation;
 		public readonly DirectoryInfo DotNetSdkLocation;
 
-		public DotNetSdk()
+		public static string DotNetExeName
+			=> Util.IsWindows ? "dotnet.exe" : "dotnet";
+
+		public DotNetSdk(SharedState sharedState)
 		{
 			KnownDotnetLocations = Util.Platform switch
 			{
@@ -31,11 +35,11 @@ namespace DotNetCheck.DotNet
 					Path.Combine(
 						Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
 						"dotnet",
-						"dotnet.exe"),
+						DotNetExeName),
 					Path.Combine(
 						Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
 						"dotnet",
-						"dotnet.exe"),
+						DotNetExeName),
 				},
 				Platform.OSX => new string[]
 				{
@@ -48,29 +52,37 @@ namespace DotNetCheck.DotNet
 						Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
 						"share",
 						"dotnet",
-						"dotnet")
+						DotNetExeName)
 				},
 				_ => new string[] { }
 			};
 
-			// First try and use the actual resolver logic
-			var r = new Microsoft.DotNet.DotNetSdkResolver.NETCoreSdkResolver();
-			DotNetSdkLocation = new DirectoryInfo(r.GetDotnetExeDirectory());
+			string sdkRoot = null;
 
-			if (DotNetSdkLocation.Exists)
+			if (sharedState != null && sharedState.TryGetEnvironmentVariable("DOTNET_ROOT", out var envSdkRoot))
 			{
-				DotNetExeLocation = new FileInfo(Path.Combine(DotNetSdkLocation.FullName, Util.IsWindows ? "dotnet.exe" : "dotnet"));
+				if (Directory.Exists(envSdkRoot))
+					sdkRoot = envSdkRoot;
 			}
-			else
+
+			if (string.IsNullOrEmpty(sdkRoot) || !Directory.Exists(sdkRoot))
+			{
+				var r = new Microsoft.DotNet.DotNetSdkResolver.NETCoreSdkResolver();
+				sdkRoot = r.GetDotnetExeDirectory();
+			}
+
+			if (string.IsNullOrEmpty(sdkRoot) || !Directory.Exists(sdkRoot))
 			{
 				var l = FindDotNetLocations();
-
 				if (l != default)
 				{
-					DotNetExeLocation = l.dotnet;
-					DotNetSdkLocation = l.sdkDir;
+					sdkRoot = l.sdkDir.FullName;
 				}
 			}
+
+			// First try and use the actual resolver logic
+			DotNetSdkLocation = new DirectoryInfo(sdkRoot);
+			DotNetExeLocation = new FileInfo(Path.Combine(DotNetSdkLocation.FullName, DotNetExeName));
 		}
 
 		public bool Exists

@@ -29,7 +29,7 @@ namespace DotNetCheck.Checkups
 
 		public override async Task<DiagnosticResult> Examine(SharedState history)
 		{
-			var dn = new DotNetSdk();
+			var dn = new DotNetSdk(history);
 
 			var missingDiagnosis = new DiagnosticResult(Status.Error, this, new Suggestion(".NET SDK not installed"));
 

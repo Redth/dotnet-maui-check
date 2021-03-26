@@ -8,6 +8,6 @@ namespace DotNetCheck.Models
 {
 	public abstract class CheckupContributor
 	{
-		public abstract IEnumerable<Checkup> Contribute(Manifest.Manifest manifest);
+		public abstract IEnumerable<Checkup> Contribute(Manifest.Manifest manifest, SharedState sharedState);
 	}
 }
