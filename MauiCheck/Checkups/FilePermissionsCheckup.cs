@@ -46,7 +46,10 @@ namespace DotNetCheck.Checkups
 					foreach (var ev in env)
 						fixedPattern = fixedPattern.Replace($"${ev.Key}", ev.Value);
 
-					var proc = new ShellProcessRunner(new ShellProcessRunnerOptions("/bin/chmod", $"-R +x {fixedPattern}")
+					var shell = ShellProcessRunner.MacOSShell;
+
+					var proc = new ShellProcessRunner(
+						new ShellProcessRunnerOptions(shell, $"-c \"sudo chmod -R +x {fixedPattern}\"")
 					{
 						UseSystemShell = false,
 						EnvironmentVariables = env,

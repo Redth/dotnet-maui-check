@@ -42,6 +42,9 @@ namespace DotNetCheck
 
 	public class ShellProcessRunner
 	{
+		public static string MacOSShell
+			=> File.Exists("/bin/zsh") ? "/bin/zsh" : "/bin/bash";
+
 		public static ShellProcessResult Run(string executable, string args)
 		{
 			var p = new ShellProcessRunner(new ShellProcessRunnerOptions(executable, args));
@@ -76,7 +79,7 @@ namespace DotNetCheck
 
 				// process.StartInfo.FileName = Util.IsWindows ? "cmd.exe" : (File.Exists("/bin/zsh") ? "/bin/zsh" : "/bin/bash");
 				// process.StartInfo.Arguments = Util.IsWindows ? $"/c \"{executable} {args}\"" : $"-c \"{executable} {args}\"";
-				process.StartInfo.FileName = Util.IsWindows ? Options.Executable : (File.Exists("/bin/zsh") ? "/bin/zsh" : "/bin/bash");
+				process.StartInfo.FileName = Util.IsWindows ? Options.Executable : MacOSShell;
 				process.StartInfo.Arguments = Util.IsWindows ? Options.Args : tmpFile;
 			}
 			else
