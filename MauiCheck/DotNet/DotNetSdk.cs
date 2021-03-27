@@ -129,7 +129,11 @@ namespace DotNetCheck.DotNet
 								if (NuGetVersion.TryParse(versionStr, out var version))
 									sdks.Add(new DotNetSdkInfo(version, new DirectoryInfo(loc)));
 							}
+							else
+								Util.Log($"Directory does not exist: {loc}");
 						}
+						else
+							Util.Log($"Directory does not exist: {locStr}");
 					}
 				}
 				catch

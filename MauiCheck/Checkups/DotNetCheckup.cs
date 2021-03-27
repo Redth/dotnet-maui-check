@@ -45,7 +45,7 @@ namespace DotNetCheck.Checkups
 			{
 				foreach (var rs in RequiredSdks)
 				{
-					if (!sdks.Any(s => s.Version.Equals(NuGetVersion.Parse(rs.Version))))
+					if (!sdks.Any(s => s.Version >= NuGetVersion.Parse(rs.Version)))
 						missingSdks.Add(rs);
 				}
 			}

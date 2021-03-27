@@ -9,6 +9,12 @@ namespace DotNetCheck
 {
 	public class Util
 	{
+		public static void Log(string message)
+		{
+			if (Verbose)
+				Console.WriteLine(message);
+		}
+
 		public static bool Verbose { get; set; }
 
 		public static Dictionary<string, string> EnvironmentVariables { get; } = new Dictionary<string, string>();
