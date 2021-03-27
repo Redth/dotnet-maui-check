@@ -1,7 +1,9 @@
 ﻿using Microsoft.DotNet.MSBuildSdkResolver;
 using Microsoft.NET.Sdk.WorkloadManifestReader;
 using NuGet.Common;
+using NuGet.Packaging;
 using NuGet.Packaging.Core;
+using NuGet.Packaging.Signing;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
@@ -135,7 +137,7 @@ namespace DotNetCheck.DotNet
 			var manifestRoot = GetSdkManifestRoot();
 			var manifestDir = Path.Combine(manifestRoot, packageId);
 
-			return DownloadAndInstallNuGet(packageId, manifestPackageVersion, manifestDir, cancelToken, true);
+			return AcquireNuGet(packageId, manifestPackageVersion, manifestDir, cancelToken, true);
 		}
 
 		public bool TemplateExistsOnDisk(string packId, string packVersion)
@@ -197,7 +199,7 @@ namespace DotNetCheck.DotNet
 					if (!Directory.Exists(templatePacksDir))
 						Directory.CreateDirectory(templatePacksDir);
 
-					var r = await DownloadAndInstallNuGet(packInfo.Id, version, packInfo.Path, cancelToken, false);
+					var r = await AcquireNuGet(packInfo.Id, version, packInfo.Path, cancelToken, false);
 
 					// Short circuit the installation into the template-packs dir since this one might not
 					// be a part of any workload manifest, so we need to install with dotnet new -i
@@ -222,7 +224,7 @@ namespace DotNetCheck.DotNet
 					if (!Directory.Exists(packPath))
 						Directory.CreateDirectory(packPath);
 
-					return await DownloadAndInstallNuGet(actualPackId, version, packPath, cancelToken, true);
+					return await AcquireNuGet(actualPackId, version, packPath, cancelToken, true);
 				}
 			}
 
@@ -280,15 +282,111 @@ namespace DotNetCheck.DotNet
 			return packId;
 		}
 
-		async Task<bool> DownloadAndInstallNuGet(string packageId, NuGetVersion packageVersion, string destination, CancellationToken cancelToken, bool extract)
+		static async Task<bool> DownloadAndExtractNuGet(SourceRepository nugetSource, SourceCacheContext cache, ILogger logger, string packageId, NuGetVersion packageVersion, string destination, string[] packageSources, CancellationToken cancelToken)
 		{
-			var nugetCache = new SourceCacheContext();
-			var nugetLogger = NullLogger.Instance;
+			var tmpPath = Path.GetTempPath();
 
-			var tmpZipFile = new FileInfo(Path.GetTempFileName());
+			var nugetSettings = NuGet.Configuration.NullSettings.Instance;
+
+			var byIdRes = await nugetSource.GetResourceAsync<FindPackageByIdResource>();
+
+			// Cause a retry if this is null
+			if (byIdRes == null)
+				throw new InvalidDataException();
+
+			if (await byIdRes.DoesPackageExistAsync(packageId, packageVersion, cache, logger, cancelToken))
+			{
+				var downloaderResource = await nugetSource.GetResourceAsync<DownloadResource>(cancelToken);
+
+				using var downloader = await byIdRes.GetPackageDownloaderAsync(new PackageIdentity(packageId, packageVersion), cache, logger, cancelToken);
+
+				var downloadContext = new PackageDownloadContext(cache, tmpPath, true);
+
+				// Download the package (might come from the shared package cache).
+				var downloadResult = await downloaderResource.GetDownloadResourceResultAsync(
+					new PackageIdentity(packageId, packageVersion),
+					downloadContext,
+					tmpPath,
+					logger,
+					cancelToken);
+
+				var clientPolicy = ClientPolicyContext.GetClientPolicy(nugetSettings, logger);
+
+				var packagePathResolver = new DotNetSdkPackPackagePathResolver(destination);
+
+				var packageExtractionContext = new PackageExtractionContext(
+					PackageSaveMode.Files | PackageSaveMode.Nuspec,
+					XmlDocFileSaveMode.Skip,
+					clientPolicy,
+					logger);
+
+				// Extract the package into the target directory.
+				await PackageExtractor.ExtractPackageAsync(
+					downloadResult.PackageSource,
+					downloadResult.PackageStream,
+					packagePathResolver,
+					packageExtractionContext,
+					cancelToken);
+
+				return true;
+			}
+
+			return false;
+		}
+
+		class DotNetSdkPackPackagePathResolver : PackagePathResolver
+		{
+			public DotNetSdkPackPackagePathResolver(string rootDirectory)
+				: base(rootDirectory, false)
+			{
+			}
+
+			public override string GetPackageDirectoryName(PackageIdentity packageIdentity)
+				=> GetPathBase(packageIdentity).ToString();
+
+			public override string GetPackageFileName(PackageIdentity packageIdentity)
+				=> GetPathBase(packageIdentity) + PackagingCoreConstants.NupkgExtension;
+
+			string GetPathBase(PackageIdentity packageIdentity)
+				=> Path.Combine(packageIdentity.Id, packageIdentity.Version.ToString());
+		}
+
+		async Task<bool> DownloadNuGet(SourceRepository nugetSource, SourceCacheContext cache, ILogger logger, string packageId, NuGetVersion packageVersion, string destination, CancellationToken cancelToken)
+		{
+			var byIdRes = await nugetSource.GetResourceAsync<FindPackageByIdResource>();
+
+			// Cause a retry if this is null
+			if (byIdRes == null)
+				throw new InvalidDataException();
+
+			if (await byIdRes.DoesPackageExistAsync(packageId, packageVersion, cache, logger, cancelToken))
+			{
+				using var downloader = await byIdRes.GetPackageDownloaderAsync(new PackageIdentity(packageId, packageVersion), cache, logger, cancelToken);
+
+				if (downloader == null)
+					throw new InvalidDataException();
+
+				// Delete file if it already exists
+				if (File.Exists(destination))
+					File.Delete(destination);
+
+				await downloader.CopyNupkgFileToAsync(destination, cancelToken);
+			}
+
+			return false;
+		}
+
+
+
+		async Task<bool> AcquireNuGet(string packageId, NuGetVersion packageVersion, string destination, CancellationToken cancelToken, bool extract)
+		{
+			var nugetCache = NullSourceCacheContext.Instance;
+			var nugetLogger = NullLogger.Instance;
 
 			foreach (var pkgSrc in NuGetPackageSources)
 			{
+				var nugetSource = Repository.Factory.GetCoreV3(pkgSrc);
+
 				try
 				{
 					await Policy
@@ -299,54 +397,32 @@ namespace DotNetCheck.DotNet
 						.RetryAsync(3)
 						.ExecuteAsync(async () =>
 						{
-							var nugetSource = Repository.Factory.GetCoreV3(pkgSrc);
-
-							var byIdRes = await nugetSource.GetResourceAsync<FindPackageByIdResource>();
-
-							// Cause a retry if this is null
-							if (byIdRes == null)
-								throw new InvalidDataException();
-
-							if (await byIdRes.DoesPackageExistAsync(packageId, packageVersion, nugetCache, nugetLogger, cancelToken))
+							if (extract)
 							{
-								using var downloader = await byIdRes.GetPackageDownloaderAsync(new PackageIdentity(packageId, packageVersion), nugetCache, nugetLogger, cancelToken);
-
-								await downloader.CopyNupkgFileToAsync(tmpZipFile.FullName, cancelToken);
-
-								if (tmpZipFile.Exists && tmpZipFile.Length > 0)
-								{
-									if (extract)
-									{
-										// Try and clear out the directory first in case anything old remains
-										if (Directory.Exists(destination))
-										{
-											try { Directory.Delete(destination, true); }
-											catch { }
-										}
-
-										if (!Directory.Exists(destination))
-											Directory.CreateDirectory(destination);
-
-										//using var zip = Xamarin.Tools.Zip.ZipArchive.Open(tmpZipFile.FullName, FileMode.Open, destination, false);
-										//zip.ExtractAll(destination);
-
-										ZipFile.ExtractToDirectory(tmpZipFile.FullName, destination, true);
-									}
-									else
-									{
-										File.Copy(tmpZipFile.FullName, destination, true);
-									}
-									return true;
-								}
+								return await DownloadAndExtractNuGet(
+									nugetSource,
+									nugetCache,
+									nugetLogger,
+									packageId,
+									packageVersion,
+									destination,
+									NuGetPackageSources,
+									cancelToken);
 							}
-
-							return false;
+							else
+							{
+								return await DownloadNuGet(
+									nugetSource,
+									nugetCache,
+									nugetLogger,
+									packageId,
+									packageVersion,
+									destination,
+									cancelToken);
+							}
 						});
-
-					return true;
-
 				}
-				catch (Exception ex) 
+				catch (Exception ex)
 				{
 					throw ex;
 				}

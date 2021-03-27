@@ -27,8 +27,7 @@ namespace DotNetCheck
 				new VisualStudioWindowsCheckup(),
 				new AndroidSdkPackagesCheckup(),
 				new XCodeCheckup(),
-				new DotNetCheckup(),
-				new FilePermissionsCheckup());
+				new DotNetCheckup());
 
 			CheckupManager.RegisterCheckupContributors(
 				new DotNetSdkCheckupContributor());
