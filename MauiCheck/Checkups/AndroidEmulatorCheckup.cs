@@ -73,9 +73,10 @@ namespace DotNetCheck.Checkups
 				this,
 				new Suggestion("Create an Android Emulator",
 					missingEmulators.Select(me =>
-						new ActionSolution(async t =>
+						new ActionSolution(t =>
 						{
 							android.AvdManager.Create($"Android_Emulator_{me.ApiLevel}", me.SdkId, device: preferredDevice?.Id, tag: "google_apis", force: true, interactive: true);
+							return Task.CompletedTask;
 						})).ToArray())));
 		}
 	}

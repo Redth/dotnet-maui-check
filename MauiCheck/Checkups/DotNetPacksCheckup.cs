@@ -60,7 +60,7 @@ namespace DotNetCheck.Checkups
 				.Select(g => g.First());
 		}
 
-		public override async Task<DiagnosticResult> Examine(SharedState history)
+		public override Task<DiagnosticResult> Examine(SharedState history)
 		{
 			var workloadManager = new DotNetWorkloadManager(SdkRoot, SdkVersion, NuGetPackageSources);
 
@@ -83,16 +83,16 @@ namespace DotNetCheck.Checkups
 			}
 
 			if (!missingPacks.Any())
-				return DiagnosticResult.Ok(this);
+				return Task.FromResult(DiagnosticResult.Ok(this));
 
 			var remedies = missingPacks
 				.Select(ms => new DotNetPackInstallSolution(SdkRoot, SdkVersion, ms, NuGetPackageSources));
 
-			return new DiagnosticResult(
+			return Task.FromResult(new DiagnosticResult(
 				Status.Error,
 				this,
 				new Suggestion("Install Missing SDK Packs",
-				remedies.ToArray()));
+				remedies.ToArray())));
 		}
 	}
 }
