@@ -1,6 +1,6 @@
 {
     "check": {
-        "toolVersion": "0.1.0",
+        "toolVersion": "0.2.5",
         "openjdk": {
             "minimumVersion": "1.8.0-1"
         },
