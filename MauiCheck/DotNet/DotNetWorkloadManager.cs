@@ -362,10 +362,6 @@ namespace DotNetCheck.DotNet
 				if (downloader == null)
 					throw new InvalidDataException();
 
-				// Delete file if it already exists
-				if (File.Exists(destination))
-					File.Delete(destination);
-
 				await downloader.CopyNupkgFileToAsync(destination, cancelToken);
 
 				return true;

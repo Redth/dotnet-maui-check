@@ -101,6 +101,10 @@ For more information see: [underline]https://aka.ms/dotnet-androidsdk-help[/]";
 
 							installer.Install(sdkInstance, installationSet);
 						}
+						catch (Exception ex)
+						{
+							Util.Exception(ex);
+						}
 						finally
 						{
 							foreach (var temp in temporaryFiles)

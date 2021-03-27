@@ -112,26 +112,45 @@ namespace DotNetCheck
 			}
 			else
 			{
+				// First delete anything that exists in the destination
+				try
+				{
+					if (isFile)
+						File.Delete(destination);
+					else
+						Directory.Delete(destination, true);
+				}
+				catch (Exception ex)
+				{
+					Util.Exception(ex);
+				}
+
 				// going straight to destination, try to make sure directory exists
 				try
 				{
 					Directory.CreateDirectory(isFile ? new FileInfo(destination).Directory.FullName : destination);
 				}
-				catch (Exception ex) { Util.Exception(ex); }
+				catch (Exception ex)
+				{
+					Util.Exception(ex);
+				}
 			}
 
 			var r = await wrapping(intermediate);
 
-			if (r)
+			if (r && !Util.IsWindows)
 			{
+				// Delete the destination first as su
+				//		sudo rm -rf destination
+
 				// Copy a file to a destination as su
 				//		sudo mkdir -p destDir && sudo cp -pP intermediate destination
 
 				// Copy a folder recursively to the destination as su
 				//		sudo mkdir -p destDir && sudo cp -pPR intermediate destination
 				var args = isFile
-					? $"-c 'sudo mkdir -p \"{destDir}\" && sudo cp -pP \"{intermediate}\" \"{destination}\"'"
-					: $"-c 'sudo mkdir -p \"{destDir}\" && sudo cp -pPR \"{intermediate}/\" \"{destination}\"'";
+					? $"-c 'sudo rm -rf \"{destination}\" && sudo mkdir -p \"{destDir}\" && sudo cp -pP \"{intermediate}\" \"{destination}\"'"
+					: $"-c 'sudo rm -rf \"{destination}\" && sudo mkdir -p \"{destDir}\" && sudo cp -pPR \"{intermediate}/\" \"{destination}\"'";
 
 				if (Verbose)
 					Console.WriteLine($"{ShellProcessRunner.MacOSShell} {args}");
