@@ -32,7 +32,13 @@ namespace DotNetCheck
 			{
 				Console.WriteLine();
 				AnsiConsole.MarkupLine($"[bold red]{Icon.Error} Updating to version {toolVersion} or newer is required:[/]");
-				AnsiConsole.MarkupLine($"[red]Update with the following:[/]");
+				Console.WriteLine();
+
+				AnsiConsole.MarkupLine($"First uninstall this version:");
+				AnsiConsole.Markup($"  dotnet tool uninstall --global {ToolPackageId}");
+				Console.WriteLine();
+
+				AnsiConsole.MarkupLine($"[red]Next, install the new version:[/]");
 
 				var installCmdVer = string.IsNullOrEmpty(toolVersion) ? "" : $" --version {toolVersion}";
 				AnsiConsole.Markup($"  dotnet tool install --global {ToolPackageId}{installCmdVer}");

@@ -12,7 +12,7 @@
   <PropertyGroup>
     <PackageId>Redth.Net.Maui.Check</PackageId>
     <Title>.NET MAUI Check Tool</Title>
-    <Version>0.1.0</Version>
+    <Version>$(PackageVersion)</Version>
     <Authors>Redth</Authors>
     <Owners>Redth</Owners>
     <summary>A dotnet tool for helping set up your .NET MAUI environment</summary>
@@ -23,7 +23,7 @@
     <PackageProjectUrl>https://github.com/redth/dotnet-maui-check</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/redth/dotnet-maui-check</RepositoryUrl>
-    <AssemblyFileVersion>$(Version)</AssemblyFileVersion>
+    <AssemblyFileVersion>$(PackageVersion)</AssemblyFileVersion>
   </PropertyGroup>
 
   <ItemGroup>
