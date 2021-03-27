@@ -136,7 +136,7 @@ namespace DotNetCheck.DotNet
 		{
 			var manifestRoot = GetSdkManifestRoot();
 
-			return AcquireNuGet(packageId, manifestPackageVersion, manifestRoot, cancelToken, true);
+			return AcquireNuGet(packageId, manifestPackageVersion, manifestRoot, false, cancelToken, true);
 		}
 
 		public bool TemplateExistsOnDisk(string packId, string packVersion)
@@ -198,7 +198,7 @@ namespace DotNetCheck.DotNet
 					if (!Directory.Exists(templatePacksDir))
 						Directory.CreateDirectory(templatePacksDir);
 
-					var r = await AcquireNuGet(packInfo.Id, version, packInfo.Path, cancelToken, false);
+					var r = await AcquireNuGet(packInfo.Id, version, packInfo.Path, false, cancelToken, false);
 
 					// Short circuit the installation into the template-packs dir since this one might not
 					// be a part of any workload manifest, so we need to install with dotnet new -i
@@ -222,7 +222,7 @@ namespace DotNetCheck.DotNet
 					if (!Directory.Exists(packsRoot))
 						Directory.CreateDirectory(packsRoot);
 
-					return await AcquireNuGet(actualPackId, version, packsRoot, cancelToken, true);
+					return await AcquireNuGet(actualPackId, version, packsRoot, true, cancelToken, true);
 				}
 			}
 
@@ -280,7 +280,7 @@ namespace DotNetCheck.DotNet
 			return packId;
 		}
 
-		static async Task<bool> DownloadAndExtractNuGet(SourceRepository nugetSource, SourceCacheContext cache, ILogger logger, string packageId, NuGetVersion packageVersion, string destination, string[] packageSources, CancellationToken cancelToken)
+		static async Task<bool> DownloadAndExtractNuGet(SourceRepository nugetSource, SourceCacheContext cache, ILogger logger, string packageId, NuGetVersion packageVersion, string destination, bool appendVersionToExtractPath, CancellationToken cancelToken)
 		{
 			var tmpPath = Path.GetTempPath();
 
@@ -310,7 +310,7 @@ namespace DotNetCheck.DotNet
 
 				var clientPolicy = ClientPolicyContext.GetClientPolicy(nugetSettings, logger);
 
-				var packagePathResolver = new DotNetSdkPackPackagePathResolver(destination);
+				var packagePathResolver = new DotNetSdkPackPackagePathResolver(destination, appendVersionToExtractPath);
 
 				var packageExtractionContext = new PackageExtractionContext(
 					PackageSaveMode.Files | PackageSaveMode.Nuspec,
@@ -334,10 +334,13 @@ namespace DotNetCheck.DotNet
 
 		class DotNetSdkPackPackagePathResolver : PackagePathResolver
 		{
-			public DotNetSdkPackPackagePathResolver(string rootDirectory)
+			public DotNetSdkPackPackagePathResolver(string rootDirectory, bool appendVersionToPath)
 				: base(rootDirectory, false)
 			{
+				AppendVersionToPath = appendVersionToPath;
 			}
+
+			public readonly bool AppendVersionToPath;
 
 			public override string GetPackageDirectoryName(PackageIdentity packageIdentity)
 				=> GetPathBase(packageIdentity).ToString();
@@ -346,7 +349,9 @@ namespace DotNetCheck.DotNet
 				=> GetPathBase(packageIdentity) + PackagingCoreConstants.NupkgExtension;
 
 			string GetPathBase(PackageIdentity packageIdentity)
-				=> Path.Combine(packageIdentity.Id, packageIdentity.Version.ToString());
+				=> AppendVersionToPath
+					? Path.Combine(packageIdentity.Id, packageIdentity.Version.ToString())
+					: packageIdentity.Id;
 		}
 
 		async Task<bool> DownloadNuGet(SourceRepository nugetSource, SourceCacheContext cache, ILogger logger, string packageId, NuGetVersion packageVersion, string destination, CancellationToken cancelToken)
@@ -376,7 +381,7 @@ namespace DotNetCheck.DotNet
 
 
 
-		async Task<bool> AcquireNuGet(string packageId, NuGetVersion packageVersion, string destination, CancellationToken cancelToken, bool extract)
+		async Task<bool> AcquireNuGet(string packageId, NuGetVersion packageVersion, string destination, bool appendVersionToExtractPath, CancellationToken cancelToken, bool extract)
 		{
 			var nugetCache = NullSourceCacheContext.Instance;
 			var nugetLogger = NullLogger.Instance;
@@ -404,7 +409,7 @@ namespace DotNetCheck.DotNet
 									packageId,
 									packageVersion,
 									destination,
-									NuGetPackageSources,
+									appendVersionToExtractPath,
 									cancelToken);
 							}
 							else
