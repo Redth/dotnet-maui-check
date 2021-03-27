@@ -135,9 +135,8 @@ namespace DotNetCheck.DotNet
 		public Task<bool> InstallWorkloadManifest(string packageId, NuGetVersion manifestPackageVersion, CancellationToken cancelToken)
 		{
 			var manifestRoot = GetSdkManifestRoot();
-			var manifestDir = Path.Combine(manifestRoot, packageId);
 
-			return AcquireNuGet(packageId, manifestPackageVersion, manifestDir, cancelToken, true);
+			return AcquireNuGet(packageId, manifestPackageVersion, manifestRoot, cancelToken, true);
 		}
 
 		public bool TemplateExistsOnDisk(string packId, string packVersion)
@@ -219,12 +218,11 @@ namespace DotNetCheck.DotNet
 				if (!string.IsNullOrEmpty(actualPackId))
 				{
 					var packsRoot = Path.Combine(SdkRoot, "packs");
-					var packPath = Path.Combine(packsRoot, actualPackId, packInfo.Version);
 
-					if (!Directory.Exists(packPath))
-						Directory.CreateDirectory(packPath);
+					if (!Directory.Exists(packsRoot))
+						Directory.CreateDirectory(packsRoot);
 
-					return await AcquireNuGet(actualPackId, version, packPath, cancelToken, true);
+					return await AcquireNuGet(actualPackId, version, packsRoot, cancelToken, true);
 				}
 			}
 

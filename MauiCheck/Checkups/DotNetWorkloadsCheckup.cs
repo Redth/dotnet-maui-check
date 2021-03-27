@@ -39,7 +39,7 @@ namespace DotNetCheck.Checkups
 
 		public override string Title => $".NET SDK - Workloads ({SdkVersion})";
 
-		public override async Task<DiagnosticResult> Examine(SharedState history)
+		public override Task<DiagnosticResult> Examine(SharedState history)
 		{
 			var workloadManager = new DotNetWorkloadManager(SdkRoot, SdkVersion, NuGetPackageSources);
 
@@ -83,16 +83,16 @@ namespace DotNetCheck.Checkups
 				history.ContributeState(this, "required_packs", requiredPacks.ToArray());
 
 			if (!missingWorkloads.Any())
-				return DiagnosticResult.Ok(this);
+				return Task.FromResult(DiagnosticResult.Ok(this));
 
 			var remedies = missingWorkloads
 				.Select(mw => new DotNetWorkloadInstallSolution(SdkRoot, SdkVersion, mw, NuGetPackageSources));
 
-			return new DiagnosticResult(
+			return Task.FromResult(new DiagnosticResult(
 				Status.Error,
 				this,
 				new Suggestion("Install Missing SDK Workloads",
-				remedies.ToArray()));
+				remedies.ToArray())));
 		}
 	}
 }
