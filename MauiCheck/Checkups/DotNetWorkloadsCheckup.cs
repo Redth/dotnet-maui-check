@@ -56,7 +56,7 @@ namespace DotNetCheck.Checkups
 				if (!NuGetVersion.TryParse(rp.Version, out rpVersion))
 					rpVersion = new NuGetVersion(0, 0, 0);
 
-				if (!installedPackageWorkloads.Any(sp => sp.packageId.Equals(rp.PackageId, StringComparison.OrdinalIgnoreCase) && sp.packageVersion >= rpVersion)
+				if (!installedPackageWorkloads.Any(sp => sp.packageId.Equals(rp.PackageId, StringComparison.OrdinalIgnoreCase) && sp.packageVersion == rpVersion)
 					|| !installedWorkloads.Any(sp => sp.id.Equals(rp.Id, StringComparison.OrdinalIgnoreCase)))
 				{
 					ReportStatus($"{rp.Id} ({rp.PackageId} : {rp.Version}) not installed.", Status.Error);
