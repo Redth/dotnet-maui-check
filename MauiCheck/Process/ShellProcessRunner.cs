@@ -167,7 +167,7 @@ namespace DotNetCheck
 			try
 			{
 				process.WaitForExit();
-			} catch { }
+			} catch (Exception ex) { Util.Exception(ex); }
 
 			if (standardError?.Any(l => l?.Contains("error: more than one device/emulator") ?? false) ?? false)
 				throw new Exception("More than one Device/Emulator detected, you must specify which Serial to target.");

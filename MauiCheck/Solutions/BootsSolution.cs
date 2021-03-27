@@ -32,8 +32,9 @@ namespace DotNetCheck.Solutions
 				await boots.Install(cancellationToken);
 				ReportStatus($"Installed {Title ?? Url.ToString()}.");
 			}
-			catch
+			catch (Exception ex)
 			{
+				Util.Exception(ex);
 				ReportStatus($":warning: Installation failed for {Title ?? Url.ToString()}.");
 				throw;
 			}

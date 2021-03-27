@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Spectre.Console;
 
 namespace DotNetCheck
 {
@@ -13,6 +14,12 @@ namespace DotNetCheck
 		{
 			if (Verbose)
 				Console.WriteLine(message);
+		}
+
+		public static void Exception(Exception ex)
+		{
+			if (Verbose)
+				AnsiConsole.WriteException(ex);
 		}
 
 		public static bool Verbose { get; set; }
@@ -110,7 +117,7 @@ namespace DotNetCheck
 				{
 					Directory.CreateDirectory(isFile ? new FileInfo(destination).Directory.FullName : destination);
 				}
-				catch { }
+				catch (Exception ex) { Util.Exception(ex); }
 			}
 
 			var r = await wrapping(intermediate);

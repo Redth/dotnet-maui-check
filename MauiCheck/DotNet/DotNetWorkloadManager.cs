@@ -425,6 +425,7 @@ namespace DotNetCheck.DotNet
 				}
 				catch (Exception ex)
 				{
+					Util.Exception(ex);
 					throw ex;
 				}
 			}

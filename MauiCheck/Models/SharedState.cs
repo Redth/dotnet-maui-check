@@ -51,6 +51,8 @@ namespace DotNetCheck.Models
 
 		public void SetEnvironmentVariable(string name, string value)
 		{
+			Util.Log($"SetEnvironmentVariable: {name}={value}");
+
 			envVars[name] = value;
 
 			Util.EnvironmentVariables[name] = value;

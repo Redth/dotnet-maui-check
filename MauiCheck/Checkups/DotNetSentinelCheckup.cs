@@ -50,7 +50,7 @@ namespace DotNetCheck.Checkups
 				if (!File.Exists(file))
 				{
 					try { File.Create(file); }
-					catch { }
+					catch (Exception ex) { Util.Exception(ex); }
 				}
 
 				if (!file.Contains("omnisharp"))

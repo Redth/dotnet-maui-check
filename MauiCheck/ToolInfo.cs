@@ -19,6 +19,8 @@ namespace DotNetCheck
 			var f = fileOrUrl ??
 				(dev ? Manifest.Manifest.DevManifestUrl : Manifest.Manifest.DefaultManifestUrl);
 
+			Util.Log($"Loading Manifest from: {f}");
+
 			return await Manifest.Manifest.FromFileOrUrl(f);
 		}
 
@@ -26,27 +28,32 @@ namespace DotNetCheck
 		{
 			var toolVersion = manifest?.Check?.ToolVersion ?? "0.1.0";
 
+			Util.Log($"Required Version: {toolVersion}");
+
 			var fileVersion = NuGetVersion.Parse(FileVersionInfo.GetVersionInfo(typeof(ToolInfo).Assembly.Location).FileVersion);
+
+			Util.Log($"Current Version: {fileVersion}");
 
 			if (string.IsNullOrEmpty(toolVersion) || !NuGetVersion.TryParse(toolVersion, out var toolVer) || fileVersion < toolVer)
 			{
 				Console.WriteLine();
 				AnsiConsole.MarkupLine($"[bold red]{Icon.Error} Updating to version {toolVersion} or newer is required:[/]");
-				Console.WriteLine();
-
-				AnsiConsole.MarkupLine($"First uninstall this version:");
-				AnsiConsole.Markup($"  dotnet tool uninstall --global {ToolPackageId}");
-				Console.WriteLine();
-
-				AnsiConsole.MarkupLine($"[red]Next, install the new version:[/]");
-
-				var installCmdVer = string.IsNullOrEmpty(toolVersion) ? "" : $" --version {toolVersion}";
-				AnsiConsole.Markup($"  dotnet tool install --global {ToolPackageId}{installCmdVer}");
+				AnsiConsole.MarkupLine($"[blue]  dotnet tool update --global {ToolPackageId}[/]");
 
 				return false;
 			}
 
 			return true;
+		}
+
+		public static void ExitPrompt(bool nonInteractive)
+		{
+			if (!nonInteractive)
+			{
+				AnsiConsole.WriteLine();
+				AnsiConsole.WriteLine("Press enter to exit...");
+				Console.ReadLine();
+			}
 		}
 	}
 }

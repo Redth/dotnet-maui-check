@@ -58,7 +58,10 @@ namespace DotNetCheck.Cli
 			var manifest = await ToolInfo.LoadManifest(settings.Manifest, settings.Dev);
 
 			if (!ToolInfo.Validate(manifest))
+			{
+				ToolInfo.ExitPrompt(settings.NonInteractive);
 				return -1;
+			}
 
 			AnsiConsole.MarkupLine(" ok");
 			AnsiConsole.Markup($"[bold blue]{Icon.Thinking} Scheduling appointments...[/]");
@@ -142,6 +145,7 @@ namespace DotNetCheck.Cli
 				}
 				catch (Exception ex)
 				{
+					Util.Exception(ex);
 					diagnosis = new DiagnosticResult(Models.Status.Error, checkup, ex.Message);
 				}
 
@@ -205,10 +209,12 @@ namespace DotNetCheck.Cli
 							}
 							catch (Exception x) when (x is AccessViolationException || x is UnauthorizedAccessException)
 							{
+								Util.Exception(x);
 								AnsiConsole.Markup(adminMsg);
 							}
 							catch (Exception ex)
 							{
+								Util.Exception(ex);
 								AnsiConsole.MarkupLine("[bold red]Fix failed - " + ex.Message + "[/]");
 							}
 							finally
@@ -243,11 +249,7 @@ namespace DotNetCheck.Cli
 
 			Console.Title = ToolInfo.ToolName;
 
-			if (!settings.NonInteractive)
-			{
-				AnsiConsole.MarkupLine("Press return to exit...");
-				Console.ReadLine();
-			}
+			ToolInfo.ExitPrompt(settings.NonInteractive);
 
 			return hasErrors ? 1 : 0;
 		}
