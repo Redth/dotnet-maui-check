@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace DotNetCheck
 {
@@ -79,6 +81,58 @@ namespace DotNetCheck
 
 			return true;
 		}
+
+		public static async Task<bool> WrapWithShellCopy(string destination, bool isFile, Func<string, Task<bool>> wrapping)
+		{
+			var intermediate = destination;
+
+			var destDir = intermediate;
+			if (isFile)
+				destDir = new FileInfo(destDir).Directory.FullName;
+
+			if (!Util.IsWindows)
+			{
+				if (isFile)
+					intermediate = Path.Combine(Path.GetTempFileName());
+				else
+					intermediate = Path.Combine(Path.GetTempPath(), System.Guid.NewGuid().ToString());
+			}
+			else
+			{
+				// going straight to destination, try to make sure directory exists
+				try
+				{
+					Directory.CreateDirectory(isFile ? new FileInfo(destination).Directory.FullName : destination);
+				}
+				catch { }
+			}
+
+			var r = await wrapping(intermediate);
+
+			if (r)
+			{
+				// Copy a file to a destination as su
+				//		sudo mkdir -p destDir && sudo cp -pP intermediate destination
+
+				// Copy a folder recursively to the destination as su
+				//		sudo mkdir -p destDir && sudo cp -pPR intermediate destination
+				var args = isFile
+					? $"-c 'sudo mkdir -p \"{destDir}\" && sudo cp -pP \"{intermediate}\" \"{destination}\"'"
+					: $"-c 'sudo mkdir -p \"{destDir}\" && sudo cp -pPR \"{intermediate}/\" \"{destination}\"'";
+
+				if (Verbose)
+					Console.WriteLine($"{ShellProcessRunner.MacOSShell} {args}");
+
+				var p = new ShellProcessRunner(new ShellProcessRunnerOptions(ShellProcessRunner.MacOSShell, args)
+				{
+					RedirectOutput = Verbose
+				});
+
+				p.WaitForExit();
+			}
+
+			return r;
+		}
 	}
 
 	public enum Platform
@@ -87,6 +141,4 @@ namespace DotNetCheck
 		OSX,
 		Linux
 	}
-
-
 }

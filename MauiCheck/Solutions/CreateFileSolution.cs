@@ -19,15 +19,20 @@ namespace DotNetCheck.Solutions
 
 		public readonly string Filename;
 
-		public override Task Implement(CancellationToken cancellationToken)
+		public override async Task Implement(CancellationToken cancellationToken)
 		{
 			if (!File.Exists(Filename))
 			{
-				File.Create(Filename);
+				await Util.WrapWithShellCopy(Filename, true, f =>
+				{
+					File.Create(f);
+					return Task.FromResult(true);
+				});
+
 				ReportStatus("Created: " + Filename);
 			}
 
-			return base.Implement(cancellationToken);
+			await base.Implement(cancellationToken);
 		}
 	}
 }

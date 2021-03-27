@@ -194,10 +194,6 @@ namespace DotNetCheck.DotNet
 			{
 				if (packInfo.Kind == WorkloadPackKind.Template)
 				{
-					var templatePacksDir = Path.GetDirectoryName(packInfo.Path);
-					if (!Directory.Exists(templatePacksDir))
-						Directory.CreateDirectory(templatePacksDir);
-
 					var r = await AcquireNuGet(packInfo.Id, version, packInfo.Path, false, cancelToken, false);
 
 					// Short circuit the installation into the template-packs dir since this one might not
@@ -218,9 +214,6 @@ namespace DotNetCheck.DotNet
 				if (!string.IsNullOrEmpty(actualPackId))
 				{
 					var packsRoot = Path.Combine(SdkRoot, "packs");
-
-					if (!Directory.Exists(packsRoot))
-						Directory.CreateDirectory(packsRoot);
 
 					return await AcquireNuGet(actualPackId, version, packsRoot, true, cancelToken, true);
 				}
@@ -374,11 +367,14 @@ namespace DotNetCheck.DotNet
 					File.Delete(destination);
 
 				await downloader.CopyNupkgFileToAsync(destination, cancelToken);
+
+				return true;
 			}
 
 			return false;
 		}
 
+		
 
 
 		async Task<bool> AcquireNuGet(string packageId, NuGetVersion packageVersion, string destination, bool appendVersionToExtractPath, CancellationToken cancelToken, bool extract)
@@ -402,26 +398,28 @@ namespace DotNetCheck.DotNet
 						{
 							if (extract)
 							{
-								return await DownloadAndExtractNuGet(
-									nugetSource,
-									nugetCache,
-									nugetLogger,
-									packageId,
-									packageVersion,
-									destination,
-									appendVersionToExtractPath,
-									cancelToken);
+								return await Util.WrapWithShellCopy(destination, false, d =>
+									DownloadAndExtractNuGet(
+										nugetSource,
+										nugetCache,
+										nugetLogger,
+										packageId,
+										packageVersion,
+										d,
+										appendVersionToExtractPath,
+										cancelToken));
 							}
 							else
 							{
-								return await DownloadNuGet(
-									nugetSource,
-									nugetCache,
-									nugetLogger,
-									packageId,
-									packageVersion,
-									destination,
-									cancelToken);
+								return await Util.WrapWithShellCopy(destination, true, d =>
+									DownloadNuGet(
+										nugetSource,
+										nugetCache,
+										nugetLogger,
+										packageId,
+										packageVersion,
+										d,
+										cancelToken));
 							}
 						});
 				}

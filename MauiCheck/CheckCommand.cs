@@ -30,7 +30,7 @@ namespace DotNetCheck.Cli
 			AnsiConsole.MarkupLine("Thanks for choosing .NET MAUI!");
 			AnsiConsole.Render(new Rule());
 
-			if (!Util.IsAdmin())
+			if (!Util.IsAdmin() && Util.IsWindows)
 			{
 				var suTxt = Util.IsWindows ? "Administrator" : "Superuser (su)";
 
