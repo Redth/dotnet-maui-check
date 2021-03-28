@@ -277,6 +277,8 @@ namespace DotNetCheck.DotNet
 		{
 			var tmpPath = Path.GetTempPath();
 
+			var packageIdentity = new PackageIdentity(packageId, packageVersion);
+
 			var nugetSettings = NuGet.Configuration.NullSettings.Instance;
 
 			var byIdRes = await nugetSource.GetResourceAsync<FindPackageByIdResource>();
@@ -289,7 +291,7 @@ namespace DotNetCheck.DotNet
 			{
 				var downloaderResource = await nugetSource.GetResourceAsync<DownloadResource>(cancelToken);
 
-				using var downloader = await byIdRes.GetPackageDownloaderAsync(new PackageIdentity(packageId, packageVersion), cache, logger, cancelToken);
+				using var downloader = await byIdRes.GetPackageDownloaderAsync(packageIdentity, cache, logger, cancelToken);
 
 				var downloadContext = new PackageDownloadContext(cache, tmpPath, true);
 
@@ -304,6 +306,19 @@ namespace DotNetCheck.DotNet
 				var clientPolicy = ClientPolicyContext.GetClientPolicy(nugetSettings, logger);
 
 				var packagePathResolver = new DotNetSdkPackPackagePathResolver(destination, appendVersionToExtractPath);
+
+				var fullDestinationDir = packagePathResolver.GetInstallPath(packageIdentity);
+
+				// Try and delete the destination if it exists first
+				try
+				{
+					if (Directory.Exists(fullDestinationDir))
+						Util.Delete(fullDestinationDir, false);
+				}
+				catch (Exception ex)
+				{
+					Util.Exception(ex);
+				}
 
 				var packageExtractionContext = new PackageExtractionContext(
 					PackageSaveMode.Files | PackageSaveMode.Nuspec,
@@ -362,6 +377,17 @@ namespace DotNetCheck.DotNet
 				if (downloader == null)
 					throw new InvalidDataException();
 
+				// If the file exists in the destination, delete it first
+				try
+				{
+					if (File.Exists(destination))
+						Util.Delete(destination, true);
+				}
+				catch (Exception ex)
+				{
+					Util.Exception(ex);
+				}
+
 				await downloader.CopyNupkgFileToAsync(destination, cancelToken);
 
 				return true;
@@ -369,9 +395,6 @@ namespace DotNetCheck.DotNet
 
 			return false;
 		}
-
-		
-
 
 		async Task<bool> AcquireNuGet(string packageId, NuGetVersion packageVersion, string destination, bool appendVersionToExtractPath, CancellationToken cancelToken, bool extract)
 		{

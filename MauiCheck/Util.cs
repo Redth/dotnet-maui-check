@@ -95,6 +95,46 @@ namespace DotNetCheck
 			return true;
 		}
 
+		public static bool Delete(string path, bool isFile)
+		{
+			if (!Util.IsWindows)
+			{
+				// Delete the destination as su
+				//		sudo rm -rf destination
+				var args = $"-c 'sudo rm -rf \"{path}\"'";
+
+				if (Verbose)
+					Console.WriteLine($"{ShellProcessRunner.MacOSShell} {args}");
+
+				var p = new ShellProcessRunner(new ShellProcessRunnerOptions(ShellProcessRunner.MacOSShell, args)
+				{
+					RedirectOutput = Verbose
+				});
+
+				p.WaitForExit();
+
+				return true;
+			}
+			else
+			{
+				try
+				{
+					if (isFile)
+						File.Delete(path);
+					else
+						Directory.Delete(path, true);
+
+					return true;
+				}
+				catch (Exception ex)
+				{
+					Util.Exception(ex);
+				}
+			}
+
+			return false;
+		}
+
 		public static async Task<bool> WrapWithShellCopy(string destination, bool isFile, Func<string, Task<bool>> wrapping)
 		{
 			var intermediate = destination;
@@ -110,47 +150,28 @@ namespace DotNetCheck
 				else
 					intermediate = Path.Combine(Path.GetTempPath(), System.Guid.NewGuid().ToString());
 			}
-			else
-			{
-				// First delete anything that exists in the destination
-				try
-				{
-					if (isFile)
-						File.Delete(destination);
-					else
-						Directory.Delete(destination, true);
-				}
-				catch (Exception ex)
-				{
-					Util.Exception(ex);
-				}
 
-				// going straight to destination, try to make sure directory exists
-				try
-				{
-					Directory.CreateDirectory(isFile ? new FileInfo(destination).Directory.FullName : destination);
-				}
-				catch (Exception ex)
-				{
-					Util.Exception(ex);
-				}
+			// If windows, we'll delete the directory or file at destination here
+			if (Util.IsWindows)
+			{
+				var dir = isFile ? new FileInfo(destination).Directory.FullName : new DirectoryInfo(destination).FullName;
+
+				if (!Directory.Exists(dir))
+					Directory.CreateDirectory(dir);
 			}
 
 			var r = await wrapping(intermediate);
 
 			if (r && !Util.IsWindows)
 			{
-				// Delete the destination first as su
-				//		sudo rm -rf destination
-
 				// Copy a file to a destination as su
 				//		sudo mkdir -p destDir && sudo cp -pP intermediate destination
 
 				// Copy a folder recursively to the destination as su
-				//		sudo mkdir -p destDir && sudo cp -pPR intermediate destination
+				//		sudo mkdir -p destDir && sudo cp -pPR intermediate/ destination
 				var args = isFile
-					? $"-c 'sudo rm -rf \"{destination}\" && sudo mkdir -p \"{destDir}\" && sudo cp -pP \"{intermediate}\" \"{destination}\"'"
-					: $"-c 'sudo rm -rf \"{destination}\" && sudo mkdir -p \"{destDir}\" && sudo cp -pPR \"{intermediate}/\" \"{destination}\"'";
+					? $"-c 'sudo mkdir -p \"{destDir}\" && sudo cp -pP \"{intermediate}\" \"{destination}\"'"
+					: $"-c 'sudo mkdir -p \"{destDir}\" && sudo cp -pPR \"{intermediate}/\" \"{destination}\"'"; // note the / at the end of the dir
 
 				if (Verbose)
 					Console.WriteLine($"{ShellProcessRunner.MacOSShell} {args}");
