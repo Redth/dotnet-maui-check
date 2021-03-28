@@ -41,7 +41,11 @@ namespace DotNetCheck.Checkups
 
 		public override Task<DiagnosticResult> Examine(SharedState history)
 		{
-			var workloadManager = new DotNetWorkloadManager(SdkRoot, SdkVersion, NuGetPackageSources);
+			string sdkVersion;
+			if (!history.TryGetEnvironmentVariable("DOTNET_SDK_VERSION", out sdkVersion))
+				sdkVersion = SdkVersion;
+
+			var workloadManager = new DotNetWorkloadManager(SdkRoot, sdkVersion, NuGetPackageSources);
 
 			var installedWorkloads = workloadManager.GetInstalledWorkloads();
 			var installedPackageWorkloads = workloadManager.GetInstalledWorkloadNuGetPackages();
@@ -86,7 +90,7 @@ namespace DotNetCheck.Checkups
 				return Task.FromResult(DiagnosticResult.Ok(this));
 
 			var remedies = missingWorkloads
-				.Select(mw => new DotNetWorkloadInstallSolution(SdkRoot, SdkVersion, mw, NuGetPackageSources));
+				.Select(mw => new DotNetWorkloadInstallSolution(SdkRoot, sdkVersion, mw, NuGetPackageSources));
 
 			return Task.FromResult(new DiagnosticResult(
 				Status.Error,

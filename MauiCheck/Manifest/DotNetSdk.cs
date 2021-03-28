@@ -11,6 +11,9 @@ namespace DotNetCheck.Manifest
 		[JsonProperty("version")]
 		public string Version { get; set; }
 
+		[JsonProperty("requireExact")]
+		public bool RequireExact { get; set; }
+
 		[JsonProperty("packs")]
 		public List<DotNetSdkPack> Packs { get; set; }
 

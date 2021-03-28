@@ -45,7 +45,9 @@ namespace DotNetCheck.Checkups
 			{
 				foreach (var rs in RequiredSdks)
 				{
-					if (!sdks.Any(s => s.Version >= NuGetVersion.Parse(rs.Version)))
+					var rsVersion = NuGetVersion.Parse(rs.Version);
+
+					if (!sdks.Any(s => (rs.RequireExact && s.Version == rsVersion) || (!rs.RequireExact && s.Version >= rsVersion)))
 						missingSdks.Add(rs);
 				}
 			}
@@ -54,6 +56,7 @@ namespace DotNetCheck.Checkups
 
 			foreach (var sdk in sdks)
 			{
+				// See if the sdk is one of the required sdk's
 				var requiredSdk = RequiredSdks.FirstOrDefault(rs => sdk.Version == NuGetVersion.Parse(rs.Version));
 
 				if (requiredSdk != null)
@@ -73,9 +76,16 @@ namespace DotNetCheck.Checkups
 					ReportStatus($"{sdk.Version} - {sdk.Directory}", null);
 			}
 
+			// If we didn't get the exact one before, let's find a new enough one
+			if (bestSdk == null)
+				bestSdk = sdks.OrderByDescending(s => s.Version)?.FirstOrDefault();
+
 			// Find newest compatible sdk
 			if (bestSdk != null)
+			{
 				history.SetEnvironmentVariable("DOTNET_SDK", bestSdk.Directory.FullName);
+				history.SetEnvironmentVariable("DOTNET_SDK_VERSION", bestSdk.Version.ToString());
+			}
 
 			// Add sentinel files that should be considered
 			if (sentinelFiles.Any())
