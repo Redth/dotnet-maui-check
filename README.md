@@ -2,8 +2,7 @@
 # dotnet-maui-check
 .NET MAUI Check tool
 
-![.NET MAUI Check](https://user-images.githubusercontent.com/271950/111553662-3c65a480-875b-11eb-9e67-3738d3f7e0ad.gif)
-
+![.NET MAUI Check](https://user-images.githubusercontent.com/271950/112761851-29f53180-8fcb-11eb-92be-c843c794b2af.gif)
 
 To install:
 ```
