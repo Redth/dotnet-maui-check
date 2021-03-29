@@ -29,7 +29,21 @@
                 },
                 {
                     "path": "system-images;android-30;google_apis;x86",
-                    "version": "9"
+                    "version": "9",
+                    "alternatives": [
+                        {
+                            "path": "system-images;android-30;google_apis_playstore;x86",
+                            "version": "9"
+                        },
+                        {
+                            "path": "system-images;android-30;google_apis;x86_64",
+                            "version": "10"
+                        },
+                        {
+                            "path": "system-images;android-30;google_apis_playstore;x86_64",
+                            "version": "10"
+                        }
+                    ]
                 },
                 {
                     "path": "platform-tools",
