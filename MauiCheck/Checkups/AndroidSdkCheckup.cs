@@ -28,6 +28,19 @@ namespace DotNetCheck.Checkups
 		public override bool ShouldExamine(SharedState history)
 			=> RequiredPackages?.Any() ?? false;
 
+		class AndroidComponentWrapper
+		{
+			public IAndroidComponent Component
+			{
+				get;set;
+			}
+
+			public override string ToString()
+			{
+				return Component.Path + " - " + Component.FileSystemPath;
+			}
+		}
+
 		public override Task<DiagnosticResult> Examine(SharedState history)
 		{
 			var missingPackages = new List<IAndroidComponent>();
@@ -52,22 +65,32 @@ namespace DotNetCheck.Checkups
 			history.SetEnvironmentVariable("ANDROID_SDK_ROOT", sdkInstance.Path);
 			history.SetEnvironmentVariable("ANDROID_HOME", sdkInstance.Path);
 
-			var allNotInstalled = sdkInstance?.Components?.AllNotInstalled();
+			var installed = sdkInstance?.Components?.AllInstalled(true);
 
 			foreach (var package in RequiredPackages)
 			{
 				var v = !string.IsNullOrWhiteSpace(package.Version) ? new AndroidRevision(package.Version) : null;
-				var notInstalled = allNotInstalled.
-					FirstOrDefault(c => c.Path== package.Path && c.Revision == (v ?? c.Revision));
 
-				if (notInstalled != null)
+				var installedPkg = FindInstalledPackage(installed, package)
+					?? FindInstalledPackage(installed, package.Alternatives?.ToArray());
+
+				if (installedPkg == null)
 				{
+					var pkgToInstall = sdkInstance?.Components?.AllNotInstalled()?
+						.FirstOrDefault(p => p.Path.Equals(package.Path.Trim(), StringComparison.OrdinalIgnoreCase)
+							&& p.Revision >= (v ?? p.Revision));
+						
 					ReportStatus($"{package.Path} ({package.Version}) missing.", Status.Error);
-					missingPackages.Add(notInstalled);
+
+					if (pkgToInstall != null)
+						missingPackages.Add(pkgToInstall);
 				}
 				else
 				{
-					ReportStatus($"{package.Path} ({package.Version})", Status.Ok);
+					if (!package.Path.Equals(installedPkg.Path) || v != (installedPkg.Revision ?? installedPkg.InstalledRevision))
+						ReportStatus($"{installedPkg.Path} ({installedPkg.InstalledRevision ?? installedPkg.Revision})", Status.Ok);
+					else
+						ReportStatus($"{package.Path} ({package.Version})", Status.Ok);
 				}
 			}
 
@@ -120,6 +143,26 @@ For more information see: [underline]https://aka.ms/dotnet-androidsdk-help[/]";
 							}
 						}
 					}))));
+		}
+
+		IAndroidComponent FindInstalledPackage(IEnumerable<IAndroidComponent> installed, params Manifest.AndroidPackage[] acceptablePackages)
+		{
+			if (acceptablePackages?.Any() ?? false)
+			{
+				foreach (var p in acceptablePackages)
+				{
+					var v = !string.IsNullOrWhiteSpace(p.Version) ? new AndroidRevision(p.Version) : null;
+
+					var installedPkg = installed.FirstOrDefault(
+						i => i.Path.Equals(p.Path.Trim(), StringComparison.OrdinalIgnoreCase)
+							&& (i.Revision >= (v ?? i.Revision) || i.InstalledRevision >= (v ?? i.Revision)));
+
+					if (installedPkg != null)
+						return installedPkg;
+				}
+			}
+
+			return default;
 		}
 
 		async Task Download(HttpClient httpClient, Archive archive)

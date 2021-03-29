@@ -1,7 +1,8 @@
 {
   "profiles": {
     "MauiCheck": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "--dev"
     }
   }
 }

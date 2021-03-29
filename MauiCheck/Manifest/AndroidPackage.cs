@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace DotNetCheck.Manifest
 {
@@ -6,6 +7,9 @@ namespace DotNetCheck.Manifest
 	{
 		[JsonProperty("path")]
 		public string Path { get; set; }
+
+		[JsonProperty("alternatives")]
+		public List<AndroidPackage> Alternatives { get; set; }
 
 		[JsonProperty("version")]
 		public string Version { get; set; }

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace DotNetCheck.Manifest
 {
@@ -12,6 +13,9 @@ namespace DotNetCheck.Manifest
 
 		[JsonProperty("sdkId")]
 		public string SdkId { get; set; }
+
+		[JsonProperty("alternateSdkIds")]
+		public List<string> AlternateSdkIds { get; set; }
 
 		[JsonProperty("device")]
 		public string Device { get; set; }

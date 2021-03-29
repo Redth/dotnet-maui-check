@@ -6,6 +6,8 @@ using DotNetCheck.Models;
 using DotNetCheck.Manifest;
 using NuGet.Versioning;
 using DotNetCheck.Solutions;
+using Xamarin.Installer.AndroidSDK;
+using Xamarin.Installer.AndroidSDK.Manager;
 
 namespace DotNetCheck.Checkups
 {
@@ -75,7 +77,21 @@ namespace DotNetCheck.Checkups
 					missingEmulators.Select(me =>
 						new ActionSolution(t =>
 						{
-							android.AvdManager.Create($"Android_Emulator_{me.ApiLevel}", me.SdkId, device: preferredDevice?.Id, tag: "google_apis", force: true, interactive: true);
+							var installer = new AndroidSDKInstaller(new Helper(), AndroidManifestType.GoogleV2);
+							installer.Discover();
+
+							var sdkInstance = installer.FindInstance(null);
+
+							var installedPackages = sdkInstance.Components.AllInstalled(true);
+
+							var sdkPackage = installedPackages.FirstOrDefault(p => p.Path.Equals(me.SdkId, StringComparison.OrdinalIgnoreCase));
+
+							if (sdkPackage == null && (me.AlternateSdkIds?.Any() ?? false))
+								sdkPackage = installedPackages.FirstOrDefault(p => me.AlternateSdkIds.Any(a => a.Equals(p.Path, StringComparison.OrdinalIgnoreCase)));
+
+							var sdkId = sdkPackage?.Path ?? me.SdkId;
+
+							android.AvdManager.Create($"Android_Emulator_{me.ApiLevel}", sdkId, device: preferredDevice?.Id, tag: "google_apis", force: true, interactive: true);
 							return Task.CompletedTask;
 						})).ToArray())));
 		}

@@ -1,108 +1,113 @@
 {
-    "check": {
-        "toolVersion": "0.2.5",
-        "openjdk": {
-            "minimumVersion": "1.8.0-1"
+  "check": {
+    "toolVersion": "0.2.5",
+    "openjdk": {
+      "minimumVersion": "1.8.0-1"
+    },
+    "xcode": {
+      "minimumVersion": "12.4"
+    },
+    "vswin": {
+      "minimumVersion": "16.9.0"
+    },
+    "vsmac": {
+      "minimumVersion": "8.9.0"
+    },
+    "android": {
+      "packages": [
+        {
+          "path": "emulator",
+          "version": "30.4.5"
         },
-        "xcode": {
-            "minimumVersion": "12.4"
+        {
+          "path": "build-tools;30.0.2",
+          "version": "30.0.2"
         },
-        "vswin": {
-            "minimumVersion": "16.9.0"
+        {
+          "path": "platforms;android-30",
+          "version": "3"
         },
-        "vsmac": {
-            "minimumVersion": "8.9.0"
+        {
+          "path": "system-images;android-30;google_apis;x86",
+          "version": "9",
+          "alternatives": [
+            {
+              "path": "system-images;android-30;google_apis_playstore;x86",
+              "version": "9"
+            },
+            {
+              "path": "system-images;android-30;google_apis;x86_64",
+              "version": "10"
+            },
+            {
+              "path": "system-images;android-30;google_apis_playstore;x86_64",
+              "version": "10"
+            }
+          ]
         },
-        "android": {
-            "packages": [
-                {
-                    "path": "emulator",
-                    "version": "30.4.5"
-                },
-                {
-                    "path": "build-tools;30.0.2",
-                    "version": "30.0.2"
-                },
-                {
-                    "path": "platforms;android-30",
-                    "version": "3"
-                },
-                {
-                    "path": "system-images;android-30;google_apis;x86",
-                    "version": "9",
-                    "alternatives": [
-                        {
-                            "path": "system-images;android-30;google_apis_playstore;x86",
-                            "version": "9"
-                        },
-                        {
-                            "path": "system-images;android-30;google_apis;x86_64",
-                            "version": "10"
-                        },
-                        {
-                            "path": "system-images;android-30;google_apis_playstore;x86_64",
-                            "version": "10"
-                        }
-                    ]
-                },
-                {
-                    "path": "platform-tools",
-                    "version": "31.0.0"
-                }
-            ],
-            "emulators": [
-                {
-                    "sdkId": "system-images;android-30;google_apis;x86",
-                    "desc": "Android Emulator - x86 - API30 - Google API's",
-                    "apiLevel": 30,
-                    "tag": "google_apis",
-                    "device": "pixel"
-                }
-            ]
-        },
-        "dotnet": {
-            "sdks": [
-                {
-                    "version": "6.0.100-preview.3.21168.18",
-                    "enableWorkloadResolver": true,
-                    "urls": {
-                        "win64": "https://dotnetcli.azureedge.net/dotnet/Sdk/6.0.100-preview.3.21168.18/dotnet-sdk-6.0.100-preview.3.21168.18-win-x64.exe",
-                        "win": "https://dotnetcli.azureedge.net/dotnet/Sdk/6.0.100-preview.3.21168.18/dotnet-sdk-6.0.100-preview.3.21168.18-win-x86.exe",
-                        "osx": "https://dotnetcli.azureedge.net/dotnet/Sdk/6.0.100-preview.3.21168.18/dotnet-sdk-6.0.100-preview.3.21168.18-osx-x64.pkg"
-                    },
-                    "packageSources": [
-                        "https://pkgs.dev.azure.com/azure-public/vside/_packaging/xamarin-impl/nuget/v3/index.json"
-                    ],
-                    "workloads": [
-                        {
-                            "workloadId": "microsoft-android-sdk-full",
-                            "packageId": "Microsoft.NET.Workload.Android",
-                            "version": "11.0.200-ci.main.175"
-                        },
-                        {
-                            "workloadId": "microsoft-ios-sdk-full",
-                            "packageId": "Microsoft.NET.Workload.iOS",
-                            "version": "14.4.100-ci.main.1271"
-                        },
-                        {
-                            "workloadId": "microsoft-maccatalyst-sdk-full",
-                            "packageId": "Microsoft.NET.Workload.MacCatalyst",
-                            "version": "14.3.100-ci.main.416",
-                            "ignoredPackIds": [
-                                "Microsoft.MacCatalyst.Templates"
-                            ]
-                        }
-                    ],
-                    "packs": [
-                        {
-                            "id": "Microsoft.Maui.Templates",
-                            "version": "6.0.100-preview.3.255",
-                            "skipManifestCheck": true,
-                            "packKind": "template"
-                        }
-                    ]
-                }
-            ]
+        {
+          "path": "platform-tools",
+          "version": "31.0.0"
         }
+      ],
+      "emulators": [
+        {
+          "sdkId": "system-images;android-30;google_apis;x86",
+          "alternateSdkIds": [
+            "system-images;android-30;google_apis_playstore;x86",
+            "system-images;android-30;google_apis;x86_64",
+            "system-images;android-30;google_apis_playstore;x86_64"
+          ],
+          "desc": "Android Emulator - x86 - API30 - Google API's",
+          "apiLevel": 30,
+          "tag": "google_apis",
+          "device": "pixel"
+        }
+      ]
+    },
+    "dotnet": {
+      "sdks": [
+        {
+          "version": "6.0.100-preview.3.21168.18",
+          "enableWorkloadResolver": true,
+          "urls": {
+            "win64": "https://dotnetcli.azureedge.net/dotnet/Sdk/6.0.100-preview.3.21168.18/dotnet-sdk-6.0.100-preview.3.21168.18-win-x64.exe",
+            "win": "https://dotnetcli.azureedge.net/dotnet/Sdk/6.0.100-preview.3.21168.18/dotnet-sdk-6.0.100-preview.3.21168.18-win-x86.exe",
+            "osx": "https://dotnetcli.azureedge.net/dotnet/Sdk/6.0.100-preview.3.21168.18/dotnet-sdk-6.0.100-preview.3.21168.18-osx-x64.pkg"
+          },
+          "packageSources": [
+            "https://pkgs.dev.azure.com/azure-public/vside/_packaging/xamarin-impl/nuget/v3/index.json"
+          ],
+          "workloads": [
+            {
+              "workloadId": "microsoft-android-sdk-full",
+              "packageId": "Microsoft.NET.Workload.Android",
+              "version": "11.0.200-ci.main.175"
+            },
+            {
+              "workloadId": "microsoft-ios-sdk-full",
+              "packageId": "Microsoft.NET.Workload.iOS",
+              "version": "14.4.100-ci.main.1271"
+            },
+            {
+              "workloadId": "microsoft-maccatalyst-sdk-full",
+              "packageId": "Microsoft.NET.Workload.MacCatalyst",
+              "version": "14.3.100-ci.main.416",
+              "ignoredPackIds": [
+                "Microsoft.MacCatalyst.Templates"
+              ]
+            }
+          ],
+          "packs": [
+            {
+              "id": "Microsoft.Maui.Templates",
+              "version": "6.0.100-preview.3.255",
+              "skipManifestCheck": true,
+              "packKind": "template"
+            }
+          ]
+        }
+      ]
     }
+  }
 }
