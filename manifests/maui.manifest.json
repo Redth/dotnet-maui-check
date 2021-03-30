@@ -29,7 +29,21 @@
         },
         {
           "path": "system-images;android-30;google_apis;x86",
-          "version": "9"
+          "version": "9",
+          "alternatives": [
+            {
+              "path": "system-images;android-30;google_apis_playstore;x86",
+              "version": "9"
+            },
+            {
+              "path": "system-images;android-30;google_apis;x86_64",
+              "version": "10"
+            },
+            {
+              "path": "system-images;android-30;google_apis_playstore;x86_64",
+              "version": "10"
+            }
+          ]
         },
         {
           "path": "platform-tools",
@@ -39,9 +53,13 @@
       "emulators": [
         {
           "sdkId": "system-images;android-30;google_apis;x86",
-          "desc": "Android Emulator - x86 - API30 - Google API's",
+          "alternateSdkIds": [
+            "system-images;android-30;google_apis_playstore;x86",
+            "system-images;android-30;google_apis;x86_64",
+            "system-images;android-30;google_apis_playstore;x86_64"
+          ],
+          "desc": "Android Emulator - API30 - Google APIs",
           "apiLevel": 30,
-          "tag": "google_apis",
           "device": "pixel"
         }
       ]
