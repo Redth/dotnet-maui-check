@@ -8,6 +8,10 @@ namespace DotNetCheck.Manifest
 		[JsonProperty("urls")]
 		public Urls Urls { get; set; }
 
+		[JsonIgnore]
+		public System.Uri Url
+			=> Urls?.Get(Version);
+
 		[JsonProperty("version")]
 		public string Version { get; set; }
 

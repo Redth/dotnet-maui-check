@@ -17,10 +17,10 @@ namespace DotNetCheck.Manifest
 		[JsonProperty("linux", NullValueHandling = NullValueHandling.Ignore)]
 		public Uri Linux { get; set; }
 
-		public Uri ForCurrent()
-			=> For(Util.Platform);
+		public Uri Get(string version, Platform? platform = default)
+			=> new Uri(For(platform ?? Util.Platform)?.ToString().Replace("__VERSION__", version));
 
-		public Uri For(Platform platform)
+		Uri For(Platform platform)
 			=> platform switch
 			{
 				Platform.OSX => Osx,
