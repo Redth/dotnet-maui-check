@@ -71,9 +71,9 @@
           "version": "6.0.100-preview.3.21174.8",
           "enableWorkloadResolver": true,
           "urls": {
-            "win64": "https://dotnetcli.azureedge.net/dotnet/Sdk/__VERSION__/dotnet-sdk-__VERSION__-win-x64.exe",
-            "win": "https://dotnetcli.azureedge.net/dotnet/Sdk/__VERSION__/dotnet-sdk-__VERSION__-win-x86.exe",
-            "osx": "https://dotnetcli.azureedge.net/dotnet/Sdk/__VERSION__/dotnet-sdk-__VERSION__-osx-x64.pkg"
+            "win64": "https://dotnetcli.azureedge.net/dotnet/Sdk/6.0.100-preview.3.21174.8/dotnet-sdk-6.0.100-preview.3.21174.8-win-x64.exe",
+            "win": "https://dotnetcli.azureedge.net/dotnet/Sdk/6.0.100-preview.3.21174.8/dotnet-sdk-6.0.100-preview.3.21174.8-win-x86.exe",
+            "osx": "https://dotnetcli.azureedge.net/dotnet/Sdk/6.0.100-preview.3.21174.8/dotnet-sdk-6.0.100-preview.3.21174.8-osx-x64.pkg"
           },
           "packageSources": [
             "https://pkgs.dev.azure.com/azure-public/vside/_packaging/xamarin-impl/nuget/v3/index.json"
