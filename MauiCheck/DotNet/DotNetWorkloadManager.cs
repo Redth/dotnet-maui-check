@@ -401,13 +401,15 @@ namespace DotNetCheck.DotNet
 			var nugetCache = NullSourceCacheContext.Instance;
 			var nugetLogger = NullLogger.Instance;
 
+			var ok = false;
+
 			foreach (var pkgSrc in NuGetPackageSources)
 			{
 				var nugetSource = Repository.Factory.GetCoreV3(pkgSrc);
 
 				try
 				{
-					await Policy
+					var result = await Policy
 						.Handle<ObjectDisposedException>()
 						.Or<OperationCanceledException>()
 						.Or<IOException>()
@@ -441,6 +443,15 @@ namespace DotNetCheck.DotNet
 										cancelToken));
 							}
 						});
+
+					// We just need one success from any of the package sources
+					if (result)
+					{
+						ok = true;
+
+						// If we installed from this package source, no need to try any others
+						break;
+					}
 				}
 				catch (Exception ex)
 				{
@@ -449,7 +460,7 @@ namespace DotNetCheck.DotNet
 				}
 			}
 
-			return false;
+			return ok;
 		}
 	}
 }
