@@ -68,12 +68,12 @@
     "dotnet": {
       "sdks": [
         {
-          "version": "6.0.100-preview.3.21168.18",
+          "version": "6.0.100-preview.3.21174.8",
           "enableWorkloadResolver": true,
           "urls": {
-            "win64": "https://dotnetcli.azureedge.net/dotnet/Sdk/6.0.100-preview.3.21168.18/dotnet-sdk-6.0.100-preview.3.21168.18-win-x64.exe",
-            "win": "https://dotnetcli.azureedge.net/dotnet/Sdk/6.0.100-preview.3.21168.18/dotnet-sdk-6.0.100-preview.3.21168.18-win-x86.exe",
-            "osx": "https://dotnetcli.azureedge.net/dotnet/Sdk/6.0.100-preview.3.21168.18/dotnet-sdk-6.0.100-preview.3.21168.18-osx-x64.pkg"
+            "win64": "https://dotnetcli.azureedge.net/dotnet/Sdk/__VERSION__/dotnet-sdk-__VERSION__-win-x64.exe",
+            "win": "https://dotnetcli.azureedge.net/dotnet/Sdk/__VERSION__/dotnet-sdk-__VERSION__-win-x86.exe",
+            "osx": "https://dotnetcli.azureedge.net/dotnet/Sdk/__VERSION__/dotnet-sdk-__VERSION__-osx-x64.pkg"
           },
           "packageSources": [
             "https://pkgs.dev.azure.com/azure-public/vside/_packaging/xamarin-impl/nuget/v3/index.json"
@@ -82,17 +82,17 @@
             {
               "workloadId": "microsoft-android-sdk-full",
               "packageId": "Microsoft.NET.Workload.Android",
-              "version": "11.0.200-ci.main.175"
+              "version": "11.0.200-preview.3.189"
             },
             {
               "workloadId": "microsoft-ios-sdk-full",
               "packageId": "Microsoft.NET.Workload.iOS",
-              "version": "14.4.100-ci.main.1271"
+              "version": "14.4.100-ci.main.1293"
             },
             {
               "workloadId": "microsoft-maccatalyst-sdk-full",
               "packageId": "Microsoft.NET.Workload.MacCatalyst",
-              "version": "14.3.100-ci.main.416",
+              "version": "14.3.100-ci.main.438",
               "ignoredPackIds": [
                 "Microsoft.MacCatalyst.Templates"
               ]
@@ -101,9 +101,15 @@
           "packs": [
             {
               "id": "Microsoft.Maui.Templates",
-              "version": "6.0.100-preview.3.255",
+              "version": "6.0.100-preview.3.269",
               "skipManifestCheck": true,
               "packKind": "template"
+            },
+            {
+              "id": "Microsoft.iOS.Windows.Sdk",
+              "version": "14.4.100-ci.main.1293",
+              "skipManifestCheck": true,
+              "packKind": "sdk"
             }
           ]
         }
