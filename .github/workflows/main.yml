@@ -77,7 +77,7 @@ jobs:
             dotnet-version: 3.1.100
         - name: Install and Run Tool
           run: |
-            dotnet tool install --global --add-source NuGet\ redth.net.maui.check
+            dotnet tool install --global --add-source ./NuGet/ redth.net.maui.check
             maui-check --dev --fix --non-interactive --verbose
 
     publish:
