@@ -18,8 +18,14 @@ namespace DotNetCheck.Cli
 		public override async Task<int> ExecuteAsync(CommandContext context, CheckSettings settings)
 		{
 			Util.Verbose = settings.Verbose;
+			Util.CI = settings.CI;
+			if (settings.CI)
+				settings.NonInteractive = true;
 
 			Console.Title = ToolInfo.ToolName;
+
+			AnsiConsole.Render(
+				new FigletText(".NET MAUI").LeftAligned().Color(Color.Green));
 
 			AnsiConsole.MarkupLine($"[underline bold green]{Icon.Ambulance} {ToolInfo.ToolName} {Icon.Recommend}[/]");
 			AnsiConsole.Render(new Rule());

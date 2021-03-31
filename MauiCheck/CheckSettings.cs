@@ -24,5 +24,8 @@ namespace DotNetCheck.Cli
 
 		[CommandOption("-v|--verbose")]
 		public bool Verbose { get; set; }
+
+		[CommandOption("--ci")]
+		public bool CI { get; set; }
 	}
 }

@@ -23,6 +23,7 @@ namespace DotNetCheck
 		}
 
 		public static bool Verbose { get; set; }
+		public static bool CI { get; set; }
 
 		public static Dictionary<string, string> EnvironmentVariables { get; } = new Dictionary<string, string>();
 
