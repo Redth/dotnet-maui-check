@@ -93,6 +93,8 @@ namespace DotNetCheck.Checkups
 
 			if (missingSdks.Any())
 			{
+				var str = SdkListToString();
+
 				var remedies = new List<Solution>();
 
 				if (Util.CI)
@@ -102,8 +104,6 @@ namespace DotNetCheck.Checkups
 				}
 				else
 				{
-					var str = SdkListToString();
-
 					remedies.AddRange(missingSdks
 						.Where(ms => !ms.Url.AbsolutePath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
 						.Select(ms => new BootsSolution(ms.Url, ".NET SDK " + ms.Version) as Solution));
