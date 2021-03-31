@@ -70,9 +70,12 @@ jobs:
         - name: Install and Run Tool
           shell: pwsh
           run: |
+            $dotnetVersion=${{needs.build.outputs.dotnetver}}
+            $dotnetDevVersion=${{needs.build.outputs.dotnetdevver}}
             $ProgressPreference = 'SilentlyContinue'
             Invoke-WebRequest -Uri "https://dot.net/v1/dotnet-install.ps1" -OutFile dotnet-install.ps1
-            & .\dotnet-install.ps1 -Version $env:DotNetVersion -InstallDir "$env:ProgramFiles\dotnet\" -Verbose
+            & .\dotnet-install.ps1 -Version $dotnetVersion -InstallDir "$env:ProgramFiles\dotnet\" -Verbose
+            & .\dotnet-install.ps1 -Version $dotnetDevVersion -InstallDir "$env:ProgramFiles\dotnet\" -Verbose
             & dotnet --list-sdks
             & dotnet tool install --global --add-source NuGet\ redth.net.maui.check
             & maui-check --fix --non-interactive --verbose
