@@ -93,23 +93,29 @@ namespace DotNetCheck.Checkups
 
 			if (missingSdks.Any())
 			{
-				var str = SdkListToString();
+				var remedies = new List<Solution>();
 
-				var msExeUrls = missingSdks
-					.Where(ms => ms.Url.AbsolutePath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase));
+				if (Util.CI)
+				{
+					remedies.AddRange(missingSdks
+						.Select(ms => new DotNetSdkScriptInstallSolution(ms.Version)));
+				}
+				else
+				{
+					var str = SdkListToString();
 
-				var bootsUrls = missingSdks
-					.Where(ms => !ms.Url.AbsolutePath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase));
+					remedies.AddRange(missingSdks
+						.Where(ms => !ms.Url.AbsolutePath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
+						.Select(ms => new BootsSolution(ms.Url, ".NET SDK " + ms.Version) as Solution));
 
-
-				var remedies = bootsUrls
-					.Select(ms => new BootsSolution(ms.Url, ".NET SDK " + ms.Version) as Solution)
-					.Concat(msExeUrls
+					remedies.AddRange(missingSdks
+						.Where(ms => ms.Url.AbsolutePath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
 						.Select(ms => new MsInstallerSolution(ms.Url, ".NET SDK " + ms.Version)));
+				}
 
 				return new DiagnosticResult(Status.Error, this, $".NET SDK {str} not installed.",
-						new Suggestion($"Download .NET SDK {str}",
-						remedies.ToArray()));
+							new Suggestion($"Download .NET SDK {str}",
+							remedies.ToArray()));
 			}
 
 			return new DiagnosticResult(Status.Ok, this);
