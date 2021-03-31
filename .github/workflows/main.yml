@@ -14,6 +14,9 @@ jobs:
       env:
         NUPKG_MAJOR: 0.1
       runs-on: macos-latest
+      outputs:
+        manifest_json: ${{ steps.manifests.outputs.manifest_json }}
+        manifest_dev_json: ${{ steps.manifests.outputs.manifest_dev_json }}
       steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -30,6 +33,13 @@ jobs:
           mkdir ./artifacts
           dotnet build --configuration Release ./MauiCheck.sln
           dotnet pack --output ./artifacts -p:PackageVersion=$VERSION --configuration Release ./MauiCheck/MauiCheck.csproj
+      - name: Load Check Manifests
+        id: manifests
+        run: |
+          manifestjson=`cat ./manifests/maui.manifest.json`
+          devmanifestjson=`cat ./manifests/maui-dev.manifest.json`
+          echo "::set-output name=manifest_json::$manifestjson"
+          echo "::set-output name=manifest_dev_json::$devmanifestjson"
       - name: Build and Pack - CI
         if: github.event_name != 'release'
         run: |
@@ -82,16 +92,21 @@ jobs:
             dotnet-version: 3.1.100
         - name: Install and Run Tool
           run: |
+            dotnetVersion=${{fromJson(needs.build.outputs.manifest_json).check.dotnet.sdks[0].version}}
+            dotnetDevVersion=${{fromJson(needs.build.outputs.manifest_dev_json).check.dotnet.sdks[0].version}}
             export PATH="/usr/local/share/dotnet/:~/.dotnet/tools:$PATH"
             curl -L https://raw.githubusercontent.com/dotnet/install-scripts/7a9d5dcab92cf131fc2d8977052f8c2c2d540e22/src/dotnet-install.sh > dotnet-install.sh
-            sh dotnet-install.sh --version $DotNetVersion --install-dir $DOTNET_ROOT --verbose
+            sh dotnet-install.sh --version $dotnetVersion --install-dir $DOTNET_ROOT --verbose
+            sh dotnet-install.sh --version $dotnetDevVersion --install-dir $DOTNET_ROOT --verbose
             dotnet --list-sdks
             dotnet tool install --global --add-source ./NuGet/ redth.net.maui.check
             maui-check --fix --non-interactive --verbose
 
     publish:
       name: Publish
-      needs: build
+      needs:
+        - testmac
+        - testwin
       runs-on: windows-latest
       steps:
         - name: Download Artifacts
