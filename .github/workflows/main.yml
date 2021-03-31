@@ -37,7 +37,13 @@ jobs:
         id: manifests
         run: |
           manifestjson=`cat ./manifests/maui.manifest.json`
+          manifestjson="${manifestjson//'%'/'%25'}"
+          manifestjson="${manifestjson//$'\n'/'%0A'}"
+          manifestjson="${manifestjson//$'\r'/'%0D'}"
           devmanifestjson=`cat ./manifests/maui-dev.manifest.json`
+          devmanifestjson="${devmanifestjson//'%'/'%25'}"
+          devmanifestjson="${devmanifestjson//$'\n'/'%0A'}"
+          devmanifestjson="${devmanifestjson//$'\r'/'%0D'}"
           echo "::set-output name=manifest_json::$manifestjson"
           echo "::set-output name=manifest_dev_json::$devmanifestjson"
       - name: Build and Pack - CI
