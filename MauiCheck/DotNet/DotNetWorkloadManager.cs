@@ -157,7 +157,7 @@ namespace DotNetCheck.DotNet
 			return false;
 		}
 
-		public bool TemplateExistsOnDisk(string sdkRoot, string packId, string packVersion, string packKind, string templateShortName = null)
+		public bool TemplateExistsOnDisk(string packId, string packVersion, string packKind, string templateShortName = null)
 		{
 			var sdkTemplatePacksFolder = Path.Combine(SdkRoot, "template-packs");
 
@@ -198,7 +198,7 @@ namespace DotNetCheck.DotNet
 			if (!string.IsNullOrEmpty(templateShortName) && (packKind?.Equals("template", StringComparison.OrdinalIgnoreCase) ?? false))
 			{
 				// dotnet new --list and search output for shortname
-				var dotnetExe = Path.Combine(sdkRoot, DotNetSdk.DotNetExeName);
+				var dotnetExe = Path.Combine(SdkRoot, DotNetSdk.DotNetExeName);
 
 				var p = new ShellProcessRunner(new ShellProcessRunnerOptions(dotnetExe, $"new --list"));
 				var r = p.WaitForExit();
