@@ -58,9 +58,14 @@ jobs:
           with:
             dotnet-version: 3.1.100
         - name: Install and Run Tool
+          shell: pwsh
           run: |
-            dotnet tool install --global --add-source NuGet\ redth.net.maui.check
-            maui-check --fix --non-interactive --verbose
+            $ProgressPreference = 'SilentlyContinue'
+            Invoke-WebRequest -Uri "https://dot.net/v1/dotnet-install.ps1" -OutFile dotnet-install.ps1
+            & .\dotnet-install.ps1 -Version $env:DotNetVersion -InstallDir "$env:ProgramFiles\dotnet\" -Verbose
+            & dotnet --list-sdks
+            & dotnet tool install --global --add-source NuGet\ redth.net.maui.check
+            & maui-check --fix --non-interactive --verbose
 
     testmac:
       name: Use Tool - MacOS
@@ -77,6 +82,10 @@ jobs:
             dotnet-version: 3.1.100
         - name: Install and Run Tool
           run: |
+            export PATH="/usr/local/share/dotnet/:~/.dotnet/tools:$PATH"
+            curl -L https://raw.githubusercontent.com/dotnet/install-scripts/7a9d5dcab92cf131fc2d8977052f8c2c2d540e22/src/dotnet-install.sh > dotnet-install.sh
+            sh dotnet-install.sh --version $DotNetVersion --install-dir $DOTNET_ROOT --verbose
+            dotnet --list-sdks
             dotnet tool install --global --add-source ./NuGet/ redth.net.maui.check
             maui-check --fix --non-interactive --verbose
 
