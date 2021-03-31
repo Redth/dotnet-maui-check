@@ -54,6 +54,8 @@ namespace DotNetCheck
 			}
 		}
 
+		public static bool IsArm64
+			=> RuntimeInformation.OSArchitecture == Architecture.Arm64;
 
 		public static bool IsWindows
 			=> Platform == Platform.Windows;

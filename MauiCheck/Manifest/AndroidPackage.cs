@@ -16,8 +16,5 @@ namespace DotNetCheck.Manifest
 
 		[JsonProperty("arch")]
 		public string Arch { get; set; }
-
-		public bool IsArchCompatible()
-			=> string.IsNullOrEmpty(Arch) || (Arch.Equals("x86") && !Util.Is64) || (!Arch.Equals("x86") && Util.Is64);
 	}
 }

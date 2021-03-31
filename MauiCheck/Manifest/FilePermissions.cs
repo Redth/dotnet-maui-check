@@ -25,7 +25,9 @@ namespace DotNetCheck.Manifest
 			return arch switch
 			{
 				"osx" => platform == Platform.OSX,
+				"osxArm64" => platform == Platform.OSX && Util.IsArm64,
 				"win" => platform == Platform.Windows,
+				"winArm64" => platform == Platform.Windows && Util.IsArm64,
 				"win64" => platform == Platform.Windows && Util.Is64,
 				"linux" => platform == Platform.Linux,
 				_ => false
