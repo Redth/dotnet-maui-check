@@ -98,8 +98,8 @@ jobs:
             dotnet-version: 3.1.100
         - name: Install and Run Tool
           run: |
-            dotnetVersion=${{fromJson(needs.build.outputs.manifest_json).check.dotnet.sdks[0].version}}
-            dotnetDevVersion=${{fromJson(needs.build.outputs.manifest_dev_json).check.dotnet.sdks[0].version}}
+            dotnetVersion=${{fromJson(needs.build.outputs.manifest_json).check.dotnet.sdks.[0].version}}
+            dotnetDevVersion=${{fromJson(needs.build.outputs.manifest_dev_json).check.dotnet.sdks.[0].version}}
             export PATH="/usr/local/share/dotnet/:~/.dotnet/tools:$PATH"
             curl -L https://raw.githubusercontent.com/dotnet/install-scripts/7a9d5dcab92cf131fc2d8977052f8c2c2d540e22/src/dotnet-install.sh > dotnet-install.sh
             sh dotnet-install.sh --version $dotnetVersion --install-dir $DOTNET_ROOT --verbose
@@ -107,7 +107,6 @@ jobs:
             dotnet --list-sdks
             dotnet tool install --global --add-source ./NuGet/ redth.net.maui.check
             maui-check --fix --non-interactive --verbose
-
     publish:
       name: Publish
       needs:
