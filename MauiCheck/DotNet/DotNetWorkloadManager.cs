@@ -139,6 +139,17 @@ namespace DotNetCheck.DotNet
 			return AcquireNuGet(packageId, manifestPackageVersion, manifestRoot, false, cancelToken, true);
 		}
 
+		public bool PackExistsOnDisk(string packId, string packVersion)
+		{
+			var packFolder = Path.Combine(SdkRoot, "packs", packId, packVersion);
+
+			if (Directory.Exists(packFolder)
+				&& (Directory.EnumerateFiles(packFolder, $"{packId}*.nuspec", SearchOption.AllDirectories).Any()))
+				return true;
+
+			return false;
+		}
+
 		public bool TemplateExistsOnDisk(string packId, string packVersion)
 		{
 			var sdkTemplatePacksFolder = Path.Combine(SdkRoot, "template-packs");
