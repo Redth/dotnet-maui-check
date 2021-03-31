@@ -157,14 +157,21 @@ namespace DotNetCheck.DotNet
 			return false;
 		}
 
-		public bool TemplateExistsOnDisk(string packId, string packVersion)
+		public bool TemplateExistsOnDisk(string sdkRoot, string packId, string packVersion, string packKind, string templateShortName = null)
 		{
 			var sdkTemplatePacksFolder = Path.Combine(SdkRoot, "template-packs");
 
-			if (Directory.Exists(sdkTemplatePacksFolder)
-				&& (Directory.EnumerateFiles(sdkTemplatePacksFolder, $"{packId}.{packVersion}*.nupkg", SearchOption.AllDirectories).Any()
-				|| Directory.EnumerateFiles(sdkTemplatePacksFolder, $"{packId}.{packVersion.ToLowerInvariant()}*.nupkg", SearchOption.AllDirectories).Any()))
-				return true;
+			try
+			{
+				if (Directory.Exists(sdkTemplatePacksFolder)
+					&& (Directory.EnumerateFiles(sdkTemplatePacksFolder, $"{packId}.{packVersion}*.nupkg", SearchOption.AllDirectories).Any()
+					|| Directory.EnumerateFiles(sdkTemplatePacksFolder, $"{packId}.{packVersion.ToLowerInvariant()}*.nupkg", SearchOption.AllDirectories).Any()))
+					return true;
+			}
+			catch (Exception ex)
+			{
+				Util.Exception(ex);
+			}
 
 			var userTemplateEngineDir = Path.Combine(
 				Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
@@ -173,10 +180,31 @@ namespace DotNetCheck.DotNet
 				$"v{SdkVersion}",
 				"packages");
 
-			if (Directory.Exists(userTemplateEngineDir)
-				&& (Directory.EnumerateFiles(userTemplateEngineDir, $"{packId}.{packVersion}*.nupkg", SearchOption.AllDirectories).Any()
-				|| Directory.EnumerateFiles(userTemplateEngineDir, $"{packId}.{packVersion.ToLowerInvariant()}*.nupkg", SearchOption.AllDirectories).Any()))
-				return true;
+			try
+			{
+				if (Directory.Exists(userTemplateEngineDir)
+					&& (Directory.EnumerateFiles(userTemplateEngineDir, $"{packId}.{packVersion}*.nupkg", SearchOption.AllDirectories).Any()
+					|| Directory.EnumerateFiles(userTemplateEngineDir, $"{packId}.{packVersion.ToLowerInvariant()}*.nupkg", SearchOption.AllDirectories).Any()))
+					return true;
+			}
+			catch (Exception ex)
+			{
+				Util.Exception(ex);
+			}
+
+			// If we're sure it's a template and the manifest knows its short name, search the `dotnet new --list`
+			// output for the short name.
+			// Unfortunately --search package.id does not seem to work for these template packs :(
+			if (!string.IsNullOrEmpty(templateShortName) && (packKind?.Equals("template", StringComparison.OrdinalIgnoreCase) ?? false))
+			{
+				// dotnet new --list and search output for shortname
+				var dotnetExe = Path.Combine(sdkRoot, DotNetSdk.DotNetExeName);
+
+				var p = new ShellProcessRunner(new ShellProcessRunnerOptions(dotnetExe, $"new --list"));
+				var r = p.WaitForExit();
+
+				return r?.GetOutput()?.Contains(templateShortName) ?? false;
+			}
 
 			return false;
 		}

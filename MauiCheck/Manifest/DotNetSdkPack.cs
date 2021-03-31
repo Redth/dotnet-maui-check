@@ -9,5 +9,8 @@ namespace DotNetCheck.Manifest
 
 		[JsonProperty("packKind")]
 		public string PackKind { get; set; }
+
+		[JsonProperty("templateShortName")]
+		public string TemplateShortName { get; set; }
 	}
 }
