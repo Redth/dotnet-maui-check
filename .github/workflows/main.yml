@@ -44,6 +44,42 @@ jobs:
           name: NuGet
           path: ./artifacts
 
+    testwin:
+      name: Use Tool - Windows
+      needs: build
+      runs-on: windows-latest
+      steps:
+        - name: Download Artifacts
+          uses: actions/download-artifact@v1
+          with:
+            name: NuGet
+        - name: Setup .NET Core
+          uses: actions/setup-dotnet@v1
+          with:
+            dotnet-version: 3.1.100
+        - name: Install and Run Tool
+          run: |
+            dotnet tool install --global --add-source NuGet\ redth.net.maui.check
+            maui-check --dev --fix --non-interactive --verbose
+
+    testmac:
+      name: Use Tool - MacOS
+      needs: build
+      runs-on: macos-latest
+      steps:
+        - name: Download Artifacts
+          uses: actions/download-artifact@v1
+          with:
+            name: NuGet
+        - name: Setup .NET Core
+          uses: actions/setup-dotnet@v1
+          with:
+            dotnet-version: 3.1.100
+        - name: Install and Run Tool
+          run: |
+            dotnet tool install --global --add-source NuGet\ redth.net.maui.check
+            maui-check --dev --fix --non-interactive --verbose
+
     publish:
       name: Publish
       needs: build
