@@ -166,7 +166,10 @@ namespace DotNetCheck.DotNet
 				if (Directory.Exists(sdkTemplatePacksFolder)
 					&& (Directory.EnumerateFiles(sdkTemplatePacksFolder, $"{packId}.{packVersion}*.nupkg", SearchOption.AllDirectories).Any()
 					|| Directory.EnumerateFiles(sdkTemplatePacksFolder, $"{packId}.{packVersion.ToLowerInvariant()}*.nupkg", SearchOption.AllDirectories).Any()))
+				{
+					Util.Log($"Found pack on disk: {sdkTemplatePacksFolder}");
 					return true;
+				}
 			}
 			catch (Exception ex)
 			{
@@ -185,7 +188,10 @@ namespace DotNetCheck.DotNet
 				if (Directory.Exists(userTemplateEngineDir)
 					&& (Directory.EnumerateFiles(userTemplateEngineDir, $"{packId}.{packVersion}*.nupkg", SearchOption.AllDirectories).Any()
 					|| Directory.EnumerateFiles(userTemplateEngineDir, $"{packId}.{packVersion.ToLowerInvariant()}*.nupkg", SearchOption.AllDirectories).Any()))
+				{
+					Util.Log($"Found pack on disk: {userTemplateEngineDir}");
 					return true;
+				}
 			}
 			catch (Exception ex)
 			{
@@ -197,6 +203,7 @@ namespace DotNetCheck.DotNet
 			// Unfortunately --search package.id does not seem to work for these template packs :(
 			if (!string.IsNullOrEmpty(templateShortName) && (packKind?.Equals("template", StringComparison.OrdinalIgnoreCase) ?? false))
 			{
+				Util.Log($"Checking dotnet templates list for: {templateShortName}");
 				// dotnet new --list and search output for shortname
 				var dotnetExe = Path.Combine(SdkRoot, DotNetSdk.DotNetExeName);
 
