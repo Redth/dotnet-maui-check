@@ -19,8 +19,10 @@ namespace DotNetCheck.Solutions
 
 		public readonly string Filename;
 
-		public override async Task Implement(CancellationToken cancellationToken)
+		public override async Task Implement(SharedState sharedState, CancellationToken cancellationToken)
 		{
+			await base.Implement(sharedState, cancellationToken);
+			
 			if (!File.Exists(Filename))
 			{
 				await Util.WrapWithShellCopy(Filename, true, f =>
@@ -31,8 +33,6 @@ namespace DotNetCheck.Solutions
 
 				ReportStatus("Created: " + Filename);
 			}
-
-			await base.Implement(cancellationToken);
 		}
 	}
 }

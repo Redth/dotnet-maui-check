@@ -14,9 +14,9 @@ namespace DotNetCheck.Solutions
 
 		public Func<CancellationToken, Task> Curer { get; private set; }
 
-		public override async Task Implement(CancellationToken cancellationToken)
+		public override async Task Implement(SharedState sharedState, CancellationToken cancellationToken)
 		{
-			await base.Implement(cancellationToken);
+			await base.Implement(sharedState, cancellationToken);
 
 			await Curer?.Invoke(cancellationToken);
 		}

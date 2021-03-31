@@ -9,7 +9,7 @@ namespace DotNetCheck.Models
 		public Solution()
 		{ }
 
-		public virtual Task Implement(System.Threading.CancellationToken cancellationToken)
+		public virtual Task Implement(SharedState sharedState, System.Threading.CancellationToken cancellationToken)
 			=> Task.CompletedTask;
 
 		public void ReportStatus(string message)

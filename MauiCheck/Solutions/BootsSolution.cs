@@ -15,9 +15,9 @@ namespace DotNetCheck.Solutions
 		public Uri Url { get; set; }
 		public string Title { get; set; }
 
-		public override async Task Implement(System.Threading.CancellationToken cancellationToken)
+		public override async Task Implement(SharedState sharedState, System.Threading.CancellationToken cancellationToken)
 		{
-			await base.Implement(cancellationToken);
+			await base.Implement(sharedState, cancellationToken);
 
 			ReportStatus($"Installing {Title ?? Url.ToString()}...");
 

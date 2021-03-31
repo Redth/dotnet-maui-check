@@ -19,9 +19,9 @@ namespace DotNetCheck.Solutions
 		public Uri Url { get; set; }
 		public string Title { get; set; }
 
-		public override async Task Implement(CancellationToken cancelToken)
+		public override async Task Implement(SharedState sharedState, CancellationToken cancelToken)
 		{
-			await base.Implement(cancelToken);
+			await base.Implement(sharedState, cancelToken);
 
 			var filename = Path.GetFileName(Url.AbsolutePath);
 			string tmpExe = null;

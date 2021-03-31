@@ -23,9 +23,9 @@ namespace DotNetCheck.Solutions
 
 		public readonly DotNetWorkload Workload;
 
-		public override async Task Implement(CancellationToken cancellationToken)
+		public override async Task Implement(SharedState sharedState, CancellationToken cancellationToken)
 		{
-			await base.Implement(cancellationToken);
+			await base.Implement(sharedState, cancellationToken);
 
 			ReportStatus($"Installing Workload: {Workload.Id}...");
 

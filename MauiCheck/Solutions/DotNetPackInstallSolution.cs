@@ -21,9 +21,9 @@ namespace DotNetCheck.Solutions
 		public readonly string SdkVersion;
 		public readonly string[] NuGetPackageSources;
 
-		public override async Task Implement(CancellationToken cancellationToken)
+		public override async Task Implement(SharedState sharedState, CancellationToken cancellationToken)
 		{
-			await base.Implement(cancellationToken);
+			await base.Implement(sharedState,cancellationToken);
 
 			ReportStatus($"Installing Pack: {Package.Id}...");
 
