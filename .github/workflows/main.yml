@@ -14,6 +14,9 @@ jobs:
       env:
         NUPKG_MAJOR: 0.1
       runs-on: macos-latest
+      outputs:
+        dotnetver: ${{ steps.manifests.outputs.dotnetver }}
+        dotnetdevver: ${{ steps.manifests.outputs.dotnetdevver }}
       steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -30,6 +33,13 @@ jobs:
           mkdir ./artifacts
           dotnet build --configuration Release ./MauiCheck.sln
           dotnet pack --output ./artifacts -p:PackageVersion=$VERSION --configuration Release ./MauiCheck/MauiCheck.csproj
+      - name: Parse DotNet Versions from Manifest
+        id: manifests
+        run: |
+          dotnetver=`cat ./manifests/maui.manifest.json | jq -r '.check.dotnet.sdks[0].version'`
+          dotnetdevver=`cat ./manifests/maui-dev.manifest.json | jq -r '.check.dotnet.sdks[0].version'`
+          echo "::set-output name=dotnetver::$dotnetver"
+          echo "::set-output name=dotnetdevver::$dotnetdevver"
       - name: Build and Pack - CI
         if: github.event_name != 'release'
         run: |
@@ -58,9 +68,14 @@ jobs:
           with:
             dotnet-version: 3.1.100
         - name: Install and Run Tool
+          shell: pwsh
           run: |
-            dotnet tool install --global --add-source NuGet\ redth.net.maui.check
-            maui-check --dev --fix --non-interactive --verbose
+            $ProgressPreference = 'SilentlyContinue'
+            Invoke-WebRequest -Uri "https://dot.net/v1/dotnet-install.ps1" -OutFile dotnet-install.ps1
+            & .\dotnet-install.ps1 -Version $env:DotNetVersion -InstallDir "$env:ProgramFiles\dotnet\" -Verbose
+            & dotnet --list-sdks
+            & dotnet tool install --global --add-source NuGet\ redth.net.maui.check
+            & maui-check --fix --non-interactive --verbose
 
     testmac:
       name: Use Tool - MacOS
@@ -77,12 +92,20 @@ jobs:
             dotnet-version: 3.1.100
         - name: Install and Run Tool
           run: |
-            dotnet tool install --global --add-source NuGet\ redth.net.maui.check
-            maui-check --dev --fix --non-interactive --verbose
-
+            dotnetVersion=${{needs.build.outputs.dotnetver}}
+            dotnetDevVersion=${{needs.build.outputs.dotnetdevver}}
+            export PATH="/usr/local/share/dotnet/:~/.dotnet/tools:$PATH"
+            curl -L https://raw.githubusercontent.com/dotnet/install-scripts/7a9d5dcab92cf131fc2d8977052f8c2c2d540e22/src/dotnet-install.sh > dotnet-install.sh
+            sh dotnet-install.sh --version $dotnetVersion --install-dir $DOTNET_ROOT --verbose
+            sh dotnet-install.sh --version $dotnetDevVersion --install-dir $DOTNET_ROOT --verbose
+            dotnet --list-sdks
+            dotnet tool install --global --add-source ./NuGet/ redth.net.maui.check
+            maui-check --fix --non-interactive --verbose
     publish:
       name: Publish
-      needs: build
+      needs:
+        - testmac
+        - testwin
       runs-on: windows-latest
       steps:
         - name: Download Artifacts
