@@ -70,8 +70,8 @@ jobs:
         - name: Install and Run Tool
           shell: pwsh
           run: |
-            $dotnetVersion=${{needs.build.outputs.dotnetver}}
-            $dotnetDevVersion=${{needs.build.outputs.dotnetdevver}}
+            $dotnetVersion="${{needs.build.outputs.dotnetver}}"
+            $dotnetDevVersion="${{needs.build.outputs.dotnetdevver}}"
             $ProgressPreference = 'SilentlyContinue'
             Invoke-WebRequest -Uri "https://dot.net/v1/dotnet-install.ps1" -OutFile dotnet-install.ps1
             & .\dotnet-install.ps1 -Version "$dotnetVersion" -InstallDir "$env:ProgramFiles\dotnet\" -Verbose
