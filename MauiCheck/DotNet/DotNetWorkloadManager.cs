@@ -143,9 +143,16 @@ namespace DotNetCheck.DotNet
 		{
 			var packFolder = Path.Combine(SdkRoot, "packs", packId, packVersion);
 
-			if (Directory.Exists(packFolder)
-				&& (Directory.EnumerateFiles(packFolder, $"{packId}*.nuspec", SearchOption.AllDirectories).Any()))
-				return true;
+			try
+			{
+				if (Directory.Exists(packFolder)
+					&& (Directory.EnumerateFiles(packFolder, $"{packId}*.nuspec", SearchOption.AllDirectories).Any()))
+					return true;
+			}
+			catch (Exception ex)
+			{
+				Util.Exception(ex);
+			}
 
 			return false;
 		}
