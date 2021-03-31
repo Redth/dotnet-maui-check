@@ -36,9 +36,8 @@ namespace DotNetCheck.Solutions
 
 			if (string.IsNullOrEmpty(sdkRoot))
 				sdkRoot = Util.IsWindows
-					? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "dotnet");
+					? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "dotnet")
 					: Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".dotnet");
-
 
 			var scriptUrl = Util.IsWindows ? installScriptPwsh : installScriptBash;
 			var scriptPath = Path.Combine(Path.GetTempPath(), Util.IsWindows ? "dotnet-install.ps1" : "dotnet-install.sh");

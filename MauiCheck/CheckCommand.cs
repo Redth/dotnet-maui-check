@@ -208,7 +208,7 @@ namespace DotNetCheck.Cli
 
 								AnsiConsole.MarkupLine($"{Icon.Thinking} Attempting to fix: " + checkup.Title);
 									
-								await remedy.Implement(cts.Token);
+								await remedy.Implement(sharedState, cts.Token);
 
 								didFix = true;
 								AnsiConsole.MarkupLine($"[bold]Fix applied.  Checking again...[/]");
