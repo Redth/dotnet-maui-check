@@ -110,7 +110,15 @@
               "id": "Microsoft.iOS.Windows.Sdk",
               "version": "14.4.100-ci.main.1293",
               "skipManifestCheck": true,
-              "packKind": "sdk"
+              "packKind": "sdk",
+              "arch": "win64"
+            },
+            {
+              "id": "Microsoft.iOS.Windows.Sdk",
+              "version": "14.4.100-ci.main.1293",
+              "skipManifestCheck": true,
+              "packKind": "sdk",
+              "arch": "win"
             }
           ]
         }
