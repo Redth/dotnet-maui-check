@@ -25,7 +25,7 @@ namespace DotNetCheck.Solutions
 			
 			if (!File.Exists(Filename))
 			{
-				await Util.WrapWithShellCopy(Filename, true, f =>
+				await Util.WrapCopyWithShellSudo(Filename, true, f =>
 				{
 					File.Create(f);
 					return Task.FromResult(true);

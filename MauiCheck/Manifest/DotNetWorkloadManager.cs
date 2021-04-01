@@ -165,7 +165,7 @@ namespace DotNetCheck.DotNet
 			{
 				if (Directory.Exists(sdkTemplatePacksFolder)
 					&& (Directory.EnumerateFiles(sdkTemplatePacksFolder, $"{packId}.{packVersion}*.nupkg", SearchOption.AllDirectories).Any()
-					|| Directory.EnumerateFiles(sdkTemplatePacksFolder, $"{packId}.{packVersion.ToLowerInvariant()}*.nupkg", SearchOption.AllDirectories).Any()))
+					|| Directory.EnumerateFiles(sdkTemplatePacksFolder, $"{packId}.{packVersion}*.nupkg".ToLowerInvariant(), SearchOption.AllDirectories).Any()))
 				{
 					Util.Log($"Found pack on disk: {sdkTemplatePacksFolder}");
 					return true;
@@ -187,7 +187,7 @@ namespace DotNetCheck.DotNet
 			{
 				if (Directory.Exists(userTemplateEngineDir)
 					&& (Directory.EnumerateFiles(userTemplateEngineDir, $"{packId}.{packVersion}*.nupkg", SearchOption.AllDirectories).Any()
-					|| Directory.EnumerateFiles(userTemplateEngineDir, $"{packId}.{packVersion.ToLowerInvariant()}*.nupkg", SearchOption.AllDirectories).Any()))
+					|| Directory.EnumerateFiles(userTemplateEngineDir, $"{packId}.{packVersion}*.nupkg".ToLowerInvariant(), SearchOption.AllDirectories).Any()))
 				{
 					Util.Log($"Found pack on disk: {userTemplateEngineDir}");
 					return true;
@@ -196,21 +196,6 @@ namespace DotNetCheck.DotNet
 			catch (Exception ex)
 			{
 				Util.Exception(ex);
-			}
-
-			// If we're sure it's a template and the manifest knows its short name, search the `dotnet new --list`
-			// output for the short name.
-			// Unfortunately --search package.id does not seem to work for these template packs :(
-			if (!string.IsNullOrEmpty(templateShortName) && (packKind?.Equals("template", StringComparison.OrdinalIgnoreCase) ?? false))
-			{
-				Util.Log($"Checking dotnet templates list for: {templateShortName}");
-				// dotnet new --list and search output for shortname
-				var dotnetExe = Path.Combine(SdkRoot, DotNetSdk.DotNetExeName);
-
-				var p = new ShellProcessRunner(new ShellProcessRunnerOptions(dotnetExe, $"new --list"));
-				var r = p.WaitForExit();
-
-				return r?.GetOutput()?.Contains(templateShortName) ?? false;
 			}
 
 			return false;
@@ -256,7 +241,13 @@ namespace DotNetCheck.DotNet
 						var dotnetExe = Path.Combine(sdkRoot, DotNetSdk.DotNetExeName);
 
 						var p = new ShellProcessRunner(new ShellProcessRunnerOptions(dotnetExe, $"new -i \"{packInfo.Path}\""));
-						return p.WaitForExit()?.ExitCode == 0;
+						var pr = p.WaitForExit();
+
+						if (pr.GetOutput().Contains("permission denied", StringComparison.InvariantCultureIgnoreCase))
+							throw new ApplicationException($"Your templates cache folder has some invalid permissions.  Please try to delete the folder and try again: "
+								+ Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".templateengine", "dotnetcli"));
+
+						return pr?.ExitCode == 0;
 					}
 
 					return r;
@@ -472,7 +463,7 @@ namespace DotNetCheck.DotNet
 						{
 							if (extract)
 							{
-								return await Util.WrapWithShellCopy(destination, false, d =>
+								return await Util.WrapCopyWithShellSudo(destination, false, d =>
 									DownloadAndExtractNuGet(
 										nugetSource,
 										nugetCache,
@@ -485,7 +476,7 @@ namespace DotNetCheck.DotNet
 							}
 							else
 							{
-								return await Util.WrapWithShellCopy(destination, true, d =>
+								return await Util.WrapCopyWithShellSudo(destination, true, d =>
 									DownloadNuGet(
 										nugetSource,
 										nugetCache,

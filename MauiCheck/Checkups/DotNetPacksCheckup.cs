@@ -47,12 +47,15 @@ namespace DotNetCheck.Checkups
 		IEnumerable<Manifest.DotNetSdkPack> GetAllRequiredPacks(SharedState history)
 		{
 			var requiredPacks = new List<Manifest.DotNetSdkPack>();
-			requiredPacks.AddRange(RequiredPacks);
+			requiredPacks.AddRange(RequiredPacks.Where(rp => rp.IsCompatible()));
 
 			if (history.TryGetStateFromAll<WorkloadResolver.PackInfo[]>("required_packs", out var p) && p.Any())
 			{
 				foreach (var packset in p)
-						requiredPacks.AddRange(packset.Select(pi => new Manifest.DotNetSdkPack { Id = pi.Id, Version = pi.Version }));
+				{
+					requiredPacks.AddRange(packset
+						.Select(pi => new Manifest.DotNetSdkPack { Id = pi.Id, Version = pi.Version }));
+				}
 			}
 
 			return requiredPacks

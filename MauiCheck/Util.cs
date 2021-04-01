@@ -62,7 +62,34 @@ namespace DotNetCheck
 			=> Platform == Platform.Windows;
 
 		public static bool IsMac
-			=> Platform == Platform.OSX;		
+			=> Platform == Platform.OSX;
+
+		public const string ArchWin = "win";
+		public const string ArchWin64 = "win64";
+		public const string ArchWinArm64 = "winArm64";
+		public const string ArchOsx = "osx";
+		public const string ArchOsxArm64 = "osxArm64";
+
+		public static bool IsArchCompatible(string arch)
+        {
+			if (string.IsNullOrEmpty(arch))
+				return true;
+
+			arch = arch.ToLowerInvariant().Trim();
+
+			if (arch == ArchWin)
+				return IsWindows && !Is64 && !IsArm64;
+			else if(arch == ArchWin64)
+				return IsWindows && Is64 && !IsArm64;
+			else if (arch == ArchWinArm64)
+				return IsWindows && IsArm64;
+			else if (arch == ArchOsx)
+				return IsMac && !IsArm64;
+			else if (arch == ArchOsxArm64)
+				return IsMac && IsArm64;
+
+			return false;
+		}
 
 		[DllImport("libc")]
 #pragma warning disable IDE1006 // Naming Styles
@@ -138,7 +165,7 @@ namespace DotNetCheck
 			return false;
 		}
 
-		public static async Task<bool> WrapWithShellCopy(string destination, bool isFile, Func<string, Task<bool>> wrapping)
+		public static async Task<bool> WrapCopyWithShellSudo(string destination, bool isFile, Func<string, Task<bool>> wrapping)
 		{
 			var intermediate = destination;
 

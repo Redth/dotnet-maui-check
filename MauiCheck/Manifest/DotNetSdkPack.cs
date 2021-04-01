@@ -12,5 +12,11 @@ namespace DotNetCheck.Manifest
 
 		[JsonProperty("templateShortName")]
 		public string TemplateShortName { get; set; }
+
+		[JsonProperty("arch")]
+		public string Arch { get; set; }
+
+		public bool IsCompatible()
+			=> Util.IsArchCompatible(Arch);
 	}
 }
