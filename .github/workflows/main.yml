@@ -12,7 +12,7 @@ jobs:
     build:
       name: Build
       env:
-        NUPKG_MAJOR: 0.2
+        NUPKG_MAJOR: 0.3
       runs-on: macos-latest
       outputs:
         dotnetver: ${{ steps.manifests.outputs.dotnetver }}
