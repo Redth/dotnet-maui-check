@@ -50,6 +50,7 @@ jobs:
         run: |
           VERSION=$NUPKG_MAJOR-ci$GITHUB_RUN_ID
           echo "::set-output name=pkgverci::$VERSION"
+          echo "PACKAGE VERSION: $VERSION"
           mkdir ./output
           mkdir ./artifacts
           dotnet build --configuration Release ./MauiCheck.sln
