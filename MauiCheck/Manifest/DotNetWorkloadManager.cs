@@ -161,6 +161,8 @@ namespace DotNetCheck.DotNet
 		{
 			var sdkTemplatePacksFolder = Path.Combine(SdkRoot, "template-packs");
 
+			Util.Log($"Looking for template pack on disk: {sdkTemplatePacksFolder}");
+
 			try
 			{
 				if (Directory.Exists(sdkTemplatePacksFolder)
@@ -182,6 +184,8 @@ namespace DotNetCheck.DotNet
 				"dotnetcli",
 				$"v{SdkVersion}",
 				"packages");
+
+			Util.Log($"Looking for template pack on disk: {userTemplateEngineDir}");
 
 			try
 			{
