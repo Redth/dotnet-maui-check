@@ -103,12 +103,12 @@ jobs:
           run: |
             dotnetVersion=${{needs.build.outputs.dotnetver}}
             dotnetDevVersion=${{needs.build.outputs.dotnetdevver}}
-            pkgVer=${{needs.buildrelease.outputs.pkgverrelease}}
+            pkgVer=${{needs.build.outputs.pkgverrelease}}
             if [ -z "$pkgVer" ]
             then
-              pkgVer=${{needs.buildci.outputs.pkgverci}}
+              pkgVer=${{needs.build.outputs.pkgverci}}
             fi
-            pkgVerCi=${{needs.buildci.outputs.pkgverci}}
+            echo "PACKAGE VERSION: $pkgVer"
             export PATH="/usr/local/share/dotnet/:~/.dotnet/tools:$PATH"
             curl -L https://raw.githubusercontent.com/dotnet/install-scripts/7a9d5dcab92cf131fc2d8977052f8c2c2d540e22/src/dotnet-install.sh > dotnet-install.sh
             sh dotnet-install.sh --version $dotnetVersion --install-dir $DOTNET_ROOT --verbose
