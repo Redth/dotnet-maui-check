@@ -86,9 +86,9 @@ jobs:
             }
             Write-Output "PACKAGE VERSION: $pkgVer"
             $ProgressPreference = 'SilentlyContinue'
-            Invoke-WebRequest -Uri "https://dot.net/v1/dotnet-install.ps1" -OutFile dotnet-install.ps1
-            & .\dotnet-install.ps1 -Version "$dotnetVersion" -InstallDir "$env:ProgramFiles\dotnet\" -Verbose
-            & .\dotnet-install.ps1 -Version "$dotnetDevVersion" -InstallDir "$env:ProgramFiles\dotnet\" -Verbose
+            # Invoke-WebRequest -Uri "https://dot.net/v1/dotnet-install.ps1" -OutFile dotnet-install.ps1
+            # & .\dotnet-install.ps1 -Version "$dotnetVersion" -InstallDir "$env:ProgramFiles\dotnet\" -Verbose
+            # & .\dotnet-install.ps1 -Version "$dotnetDevVersion" -InstallDir "$env:ProgramFiles\dotnet\" -Verbose
             & dotnet --list-sdks
             & dotnet tool install --global --version $pkgVer --add-source NuGet\ redth.net.maui.check
             & maui-check --ci --fix --non-interactive --verbose --skip openjdk
@@ -117,9 +117,9 @@ jobs:
             fi
             echo "PACKAGE VERSION: $pkgVer"
             export PATH="/usr/local/share/dotnet/:~/.dotnet/tools:$PATH"
-            curl -L https://raw.githubusercontent.com/dotnet/install-scripts/7a9d5dcab92cf131fc2d8977052f8c2c2d540e22/src/dotnet-install.sh > dotnet-install.sh
-            sh dotnet-install.sh --version $dotnetVersion --install-dir $DOTNET_ROOT --verbose
-            sh dotnet-install.sh --version $dotnetDevVersion --install-dir $DOTNET_ROOT --verbose
+            # curl -L https://raw.githubusercontent.com/dotnet/install-scripts/7a9d5dcab92cf131fc2d8977052f8c2c2d540e22/src/dotnet-install.sh > dotnet-install.sh
+            # sh dotnet-install.sh --version $dotnetVersion --install-dir $DOTNET_ROOT --verbose
+            # sh dotnet-install.sh --version $dotnetDevVersion --install-dir $DOTNET_ROOT --verbose
             dotnet --list-sdks
             dotnet tool install --global --version $pkgVer --add-source ./NuGet/ redth.net.maui.check
             maui-check --ci --fix --non-interactive --verbose --skip openjdk
