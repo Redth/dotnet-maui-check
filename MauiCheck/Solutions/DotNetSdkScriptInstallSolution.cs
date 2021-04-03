@@ -42,16 +42,22 @@ namespace DotNetCheck.Solutions
 			var scriptUrl = Util.IsWindows ? installScriptPwsh : installScriptBash;
 			var scriptPath = Path.Combine(Path.GetTempPath(), Util.IsWindows ? "dotnet-install.ps1" : "dotnet-install.sh");
 
+			Util.Log($"Downloading dotnet-install script: {scriptUrl}");
+
 			var http = new HttpClient();
 			var data = await http.GetStringAsync(scriptUrl);
 			File.WriteAllText(scriptPath, data);
 
-			// Launch the process
-			var p = new ShellProcessRunner(new ShellProcessRunnerOptions(
-				Util.IsWindows ? "powershell" : ShellProcessRunner.MacOSShell,
-				Util.IsWindows
+			var exe = Util.IsWindows ? "powershell" : ShellProcessRunner.MacOSShell;
+			var args = Util.IsWindows
 					? $"{scriptPath} -InstallDir {sdkRoot} -Version {Version}"
-					: $"{scriptPath} --install-dir {sdkRoot} --version {Version}"));
+					: $"{scriptPath} --install-dir {sdkRoot} --version {Version}";
+
+			Util.Log($"Executing dotnet-install script...");
+			Util.Log($"\t{exe} {args}");
+
+			// Launch the process
+			var p = new ShellProcessRunner(new ShellProcessRunnerOptions(exe, args));
 
 			p.WaitForExit();
 		}
