@@ -64,3 +64,19 @@ maui-check --skip openjdk --skip androidsdk
 
 Lists possible checkups in the format: `checkup_id (checkup_name)`.
 These can be used to specify `--skip checkup_id`, `-s checkup_name` arguments.
+
+
+### `config` Configure global.json and NuGet.config in Working Dir
+
+This allows you to quickly synchronize your `global.json` and/or `NuGet.config` in the current working directory to utilize the values specified in the manifest.
+
+Arguments:
+ - `--dotnet` or `--dotnet-version`: Use the SDK version in the manifest in `global.json`.
+ - `--dotnet-pre true|false`: Change the `allowPrerelease` value in the `global.json`.
+ - `--dotnet-rollForward <OPTION>`: Change the `rollForward` value in `global.json` to one of the allowed values specified.
+ - `--nuget` or `--nuget-sources`: Adds the nuget sources specified in the manifest to the `NuGet.config` and creates the file if needed.
+
+Example:
+
+`maui-check config --dev --nuget-sources --dotnet-version --dotnet-pre true`
+
