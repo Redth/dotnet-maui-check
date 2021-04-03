@@ -68,12 +68,12 @@
     "dotnet": {
       "sdks": [
         {
-          "version": "6.0.100-preview.3.21174.8",
+          "version": "6.0.100-preview.3.21201.23",
           "enableWorkloadResolver": true,
           "urls": {
-            "win64": "https://dotnetcli.azureedge.net/dotnet/Sdk/6.0.100-preview.3.21174.8/dotnet-sdk-6.0.100-preview.3.21174.8-win-x64.exe",
-            "win": "https://dotnetcli.azureedge.net/dotnet/Sdk/6.0.100-preview.3.21174.8/dotnet-sdk-6.0.100-preview.3.21174.8-win-x86.exe",
-            "osx": "https://dotnetcli.azureedge.net/dotnet/Sdk/6.0.100-preview.3.21174.8/dotnet-sdk-6.0.100-preview.3.21174.8-osx-x64.pkg"
+            "win64": "https://dotnetcli.azureedge.net/dotnet/Sdk/6.0.100-preview.3.21201.23/dotnet-sdk-6.0.100-preview.3.21201.23-win-x64.exe",
+            "win": "https://dotnetcli.azureedge.net/dotnet/Sdk/6.0.100-preview.3.21201.23/dotnet-sdk-6.0.100-preview.3.21201.23-win-x86.exe",
+            "osx": "https://dotnetcli.azureedge.net/dotnet/Sdk/6.0.100-preview.3.21201.23/dotnet-sdk-6.0.100-preview.3.21201.23-osx-x64.pkg"
           },
           "packageSources": [
             "https://pkgs.dev.azure.com/azure-public/vside/_packaging/xamarin-impl/nuget/v3/index.json"
@@ -82,17 +82,17 @@
             {
               "workloadId": "microsoft-android-sdk-full",
               "packageId": "Microsoft.NET.Workload.Android",
-              "version": "11.0.200-preview.3.189"
+              "version": "11.0.200-preview.3.195"
             },
             {
               "workloadId": "microsoft-ios-sdk-full",
               "packageId": "Microsoft.NET.Workload.iOS",
-              "version": "14.4.100-ci.main.1293"
+              "version": "14.4.100-ci.main.1320"
             },
             {
               "workloadId": "microsoft-maccatalyst-sdk-full",
               "packageId": "Microsoft.NET.Workload.MacCatalyst",
-              "version": "14.3.100-ci.main.438",
+              "version": "14.3.100-ci.main.465",
               "ignoredPackIds": [
                 "Microsoft.MacCatalyst.Templates"
               ]
@@ -108,14 +108,14 @@
             },
             {
               "id": "Microsoft.iOS.Windows.Sdk",
-              "version": "14.4.100-ci.main.1293",
+              "version": "14.4.100-ci.main.1320",
               "skipManifestCheck": true,
               "packKind": "sdk",
               "arch": "win64"
             },
             {
               "id": "Microsoft.iOS.Windows.Sdk",
-              "version": "14.4.100-ci.main.1293",
+              "version": "14.4.100-ci.main.1320",
               "skipManifestCheck": true,
               "packKind": "sdk",
               "arch": "win"
