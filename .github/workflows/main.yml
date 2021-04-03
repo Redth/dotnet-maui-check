@@ -117,6 +117,7 @@ jobs:
             dotnet --list-sdks
             dotnet tool install --global --version $pkgVer --add-source ./NuGet/ redth.net.maui.check
             maui-check --ci --fix --non-interactive --verbose
+            find ~/.templateengine/dotnetcli
     publish:
       name: Publish
       needs:
