@@ -59,6 +59,8 @@ namespace DotNetCheck.Cli
 			var results = new Dictionary<string, DiagnosticResult>();
 			var consoleStatus = AnsiConsole.Status();
 
+			var skippedChecks = new List<string>();
+
 			AnsiConsole.Markup($"[bold blue]{Icon.Thinking} Synchronizing configuration...[/]");
 
 			var manifest = await ToolInfo.LoadManifest(settings.Manifest, settings.Dev);
@@ -131,6 +133,7 @@ namespace DotNetCheck.Cli
 
 				if (skipCheckup)
 				{
+					skippedChecks.Add(checkup.Id);
 					checkupStatus[checkup.Id] = Models.Status.Error;
 					AnsiConsole.WriteLine();
 					AnsiConsole.MarkupLine($"[bold red]{Icon.Error} Skipped: " + checkup.Title + "[/]");
@@ -241,7 +244,7 @@ namespace DotNetCheck.Cli
 			AnsiConsole.Render(new Rule());
 			AnsiConsole.WriteLine();
 
-			var hasErrors = results.Values.Any(d => d.Status == Models.Status.Error);
+			var hasErrors = results.Values.Any(d => d.Status == Models.Status.Error && !skippedChecks.Contains(d.Checkup.Id));
 
 			if (hasErrors)
 			{
