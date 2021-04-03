@@ -85,7 +85,7 @@ jobs:
             & .\dotnet-install.ps1 -Version "$dotnetDevVersion" -InstallDir "$env:ProgramFiles\dotnet\" -Verbose
             & dotnet --list-sdks
             & dotnet tool install --global --add-source NuGet\ redth.net.maui.check
-            & maui-check --ci --fix --non-interactive --verbose
+            & maui-check --ci --fix --non-interactive --verbose --skip openjdk
 
     testmac:
       name: Use Tool - MacOS
@@ -116,7 +116,7 @@ jobs:
             sh dotnet-install.sh --version $dotnetDevVersion --install-dir $DOTNET_ROOT --verbose
             dotnet --list-sdks
             dotnet tool install --global --version $pkgVer --add-source ./NuGet/ redth.net.maui.check
-            maui-check --ci --fix --non-interactive --verbose
+            maui-check --ci --fix --non-interactive --verbose --skip openjdk
             find ~/.templateengine/dotnetcli
     publish:
       name: Publish
