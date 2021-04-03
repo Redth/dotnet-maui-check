@@ -257,7 +257,13 @@ namespace DotNetCheck.Cli
 
 			ToolInfo.ExitPrompt(settings.NonInteractive);
 
-			return hasErrors ? 1 : 0;
+			Util.Log($"Has Errors? {hasErrors}");
+
+			var exitCode = hasErrors ? 1 : 0;
+
+			Environment.ExitCode = exitCode;
+
+			return exitCode;
 		}
 
 		void checkupStatusUpdated(object sender, CheckupStatusEventArgs e)
