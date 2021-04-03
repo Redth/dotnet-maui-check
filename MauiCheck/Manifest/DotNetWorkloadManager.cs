@@ -185,32 +185,35 @@ namespace DotNetCheck.DotNet
 					".templateengine",
 					"dotnetcli");
 
-				var templateEngineSdkVersionDirs = Directory.EnumerateDirectories(templateEngineSdksDir, "v*", SearchOption.TopDirectoryOnly);
-
-				var versionDirs = new List<string>();
-
-				foreach (var sdkVerDir in templateEngineSdkVersionDirs)
+				if (Directory.Exists(templateEngineSdksDir))
 				{
-					var strVer = new DirectoryInfo(sdkVerDir).Name.Substring(1);
-					if (NuGetVersion.TryParse(strVer, out var v))
-						versionDirs.Add(strVer);
-				}
+					var templateEngineSdkVersionDirs = Directory.EnumerateDirectories(templateEngineSdksDir, "v*", SearchOption.TopDirectoryOnly);
 
-				var newestVersion = versionDirs.OrderByDescending(v => v).FirstOrDefault();
+					var versionDirs = new List<string>();
 
-				var userTemplateEngineDir = Path.Combine(
-					templateEngineSdksDir,
-					$"v{newestVersion}",
-					"packages");
+					foreach (var sdkVerDir in templateEngineSdkVersionDirs)
+					{
+						var strVer = new DirectoryInfo(sdkVerDir).Name.Substring(1);
+						if (NuGetVersion.TryParse(strVer, out var v))
+							versionDirs.Add(strVer);
+					}
 
-				Util.Log($"Newest dotnet sdk version to look for templates in: {userTemplateEngineDir}");
+					var newestVersion = versionDirs.OrderByDescending(v => v).FirstOrDefault();
 
-				if (Directory.Exists(userTemplateEngineDir)
-					&& (Directory.EnumerateFiles(userTemplateEngineDir, $"{packId}.{packVersion}*.nupkg", SearchOption.AllDirectories).Any()
-					|| Directory.EnumerateFiles(userTemplateEngineDir, $"{packId}.{packVersion}*.nupkg".ToLowerInvariant(), SearchOption.AllDirectories).Any()))
-				{
-					Util.Log($"Found pack on disk: {userTemplateEngineDir}");
-					return true;
+					var userTemplateEngineDir = Path.Combine(
+						templateEngineSdksDir,
+						$"v{newestVersion}",
+						"packages");
+
+					Util.Log($"Newest dotnet sdk version to look for templates in: {userTemplateEngineDir}");
+
+					if (Directory.Exists(userTemplateEngineDir)
+						&& (Directory.EnumerateFiles(userTemplateEngineDir, $"{packId}.{packVersion}*.nupkg", SearchOption.AllDirectories).Any()
+						|| Directory.EnumerateFiles(userTemplateEngineDir, $"{packId}.{packVersion}*.nupkg".ToLowerInvariant(), SearchOption.AllDirectories).Any()))
+					{
+						Util.Log($"Found pack on disk: {userTemplateEngineDir}");
+						return true;
+					}
 				}
 
 			}
