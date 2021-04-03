@@ -49,7 +49,9 @@ namespace DotNetCheck.Solutions
 			// Launch the process
 			var p = new ShellProcessRunner(new ShellProcessRunnerOptions(
 				Util.IsWindows ? "powershell" : ShellProcessRunner.MacOSShell,
-				$"{scriptPath} --install-dir {sdkRoot} --version {Version}"));
+				Util.IsWindows
+					? $"{scriptPath} -InstallDir {sdkRoot} -Version {Version}"
+					: $"{scriptPath} --install-dir {sdkRoot} --version {Version}"));
 
 			p.WaitForExit();
 		}

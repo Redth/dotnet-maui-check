@@ -70,6 +70,9 @@
     <Reference Include="Xamarin.AndroidTools">
       <HintPath>..\libs\Xamarin.AndroidTools.dll</HintPath>
     </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\libs\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Remove="..\..\..\.nuget\packages\xamarin.libzipsharp\1.0.24\runtimes\osx\native\libzip.dylib" />
