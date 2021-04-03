@@ -244,7 +244,12 @@ namespace DotNetCheck.Cli
 			AnsiConsole.Render(new Rule());
 			AnsiConsole.WriteLine();
 
-			var hasErrors = results.Values.Any(d => d.Status == Models.Status.Error && !skippedChecks.Contains(d.Checkup.Id));
+			var erroredChecks = results.Values.Where(d => d.Status == Models.Status.Error && !skippedChecks.Contains(d.Checkup.Id));
+
+			foreach (var ec in erroredChecks)
+				Util.Log($"Checkup had Error status: {ec.Checkup.Id}");
+
+			var hasErrors = erroredChecks.Any();
 
 			if (hasErrors)
 			{
