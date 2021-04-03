@@ -12,11 +12,13 @@ jobs:
     build:
       name: Build
       env:
-        NUPKG_MAJOR: 0.1
+        NUPKG_MAJOR: 0.3
       runs-on: macos-latest
       outputs:
         dotnetver: ${{ steps.manifests.outputs.dotnetver }}
         dotnetdevver: ${{ steps.manifests.outputs.dotnetdevver }}
+        pkgverrelease: ${{ steps.buildrelease.outputs.pkgverrelease }}
+        pkgverci: ${{ steps.buildci.outputs.pkgverci }}
       steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -25,10 +27,12 @@ jobs:
         with:
           dotnet-version: 3.1.100
       - name: Build and Pack - Release
+        id: buildrelease
         if: github.event_name == 'release'
         run: |
           arrTag=(${GITHUB_REF//\// })
           VERSION="${arrTag[2]}"
+          echo "::set-output name=pkgverrelease::$VERSION"
           mkdir ./output
           mkdir ./artifacts
           dotnet build --configuration Release ./MauiCheck.sln
@@ -41,9 +45,12 @@ jobs:
           echo "::set-output name=dotnetver::$dotnetver"
           echo "::set-output name=dotnetdevver::$dotnetdevver"
       - name: Build and Pack - CI
+        id: buildci
         if: github.event_name != 'release'
         run: |
           VERSION=$NUPKG_MAJOR-ci$GITHUB_RUN_ID
+          echo "::set-output name=pkgverci::$VERSION"
+          echo "PACKAGE VERSION: $VERSION"
           mkdir ./output
           mkdir ./artifacts
           dotnet build --configuration Release ./MauiCheck.sln
@@ -97,13 +104,20 @@ jobs:
           run: |
             dotnetVersion=${{needs.build.outputs.dotnetver}}
             dotnetDevVersion=${{needs.build.outputs.dotnetdevver}}
+            pkgVer=${{needs.build.outputs.pkgverrelease}}
+            if [ -z "$pkgVer" ]
+            then
+              pkgVer=${{needs.build.outputs.pkgverci}}
+            fi
+            echo "PACKAGE VERSION: $pkgVer"
             export PATH="/usr/local/share/dotnet/:~/.dotnet/tools:$PATH"
             curl -L https://raw.githubusercontent.com/dotnet/install-scripts/7a9d5dcab92cf131fc2d8977052f8c2c2d540e22/src/dotnet-install.sh > dotnet-install.sh
             sh dotnet-install.sh --version $dotnetVersion --install-dir $DOTNET_ROOT --verbose
             sh dotnet-install.sh --version $dotnetDevVersion --install-dir $DOTNET_ROOT --verbose
             dotnet --list-sdks
-            dotnet tool install --global --add-source ./NuGet/ redth.net.maui.check
+            dotnet tool install --global --version $pkgVer --add-source ./NuGet/ redth.net.maui.check
             maui-check --ci --fix --non-interactive --verbose
+            find ~/.templateengine/dotnetcli
     publish:
       name: Publish
       needs:
