@@ -48,7 +48,7 @@ namespace DotNetCheck.Solutions
 			var data = await http.GetStringAsync(scriptUrl);
 			File.WriteAllText(scriptPath, data);
 
-			var exe = Util.IsWindows ? "powershell" : ShellProcessRunner.MacOSShell;
+			var exe = Util.IsWindows ? "powershell" : "sh";
 			var args = Util.IsWindows
 					? $"{scriptPath} -InstallDir {sdkRoot} -Version {Version}"
 					: $"{scriptPath} --install-dir {sdkRoot} --version {Version}";
