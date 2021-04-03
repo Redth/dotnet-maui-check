@@ -81,13 +81,7 @@
             {
               "workloadId": "microsoft-android-sdk-full",
               "packageId": "Microsoft.NET.Workload.Android",
-              "version": "11.0.200-ci.main.148",
-              "exec": [
-                {
-                  "arch": "osx",
-                  "cmd": "chmod +x \"$DOTNET_ROOT\\packs\\Microsoft.Android.Sdk.*\\*\\tools\\Darwin\\**\\*.*"
-                }
-              ]
+              "version": "11.0.200-ci.main.148"
             },
             {
               "workloadId": "microsoft-ios-sdk-full",
@@ -110,6 +104,20 @@
               "skipManifestCheck": true,
               "packKind": "template",
               "templateShortName": "maui"
+            },
+            {
+              "id": "Microsoft.iOS.Windows.Sdk",
+              "version": "14.4.100-ci.main.1293",
+              "skipManifestCheck": true,
+              "packKind": "sdk",
+              "arch": "win64"
+            },
+            {
+              "id": "Microsoft.iOS.Windows.Sdk",
+              "version": "14.4.100-ci.main.1293",
+              "skipManifestCheck": true,
+              "packKind": "sdk",
+              "arch": "win"
             }
           ]
         }
