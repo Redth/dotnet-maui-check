@@ -178,17 +178,33 @@ namespace DotNetCheck.DotNet
 				Util.Exception(ex);
 			}
 
-			var userTemplateEngineDir = Path.Combine(
-				Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-				".templateengine",
-				"dotnetcli",
-				$"v{SdkVersion}",
-				"packages");
-
-			Util.Log($"Looking for template pack on disk: {userTemplateEngineDir}");
-
 			try
 			{
+				var templateEngineSdksDir = Path.Combine(
+					Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+					".templateengine",
+					"dotnetcli");
+
+				var templateEngineSdkVersionDirs = Directory.EnumerateDirectories(templateEngineSdksDir, "v*", SearchOption.TopDirectoryOnly);
+
+				var versionDirs = new List<string>();
+
+				foreach (var sdkVerDir in templateEngineSdkVersionDirs)
+				{
+					var strVer = new DirectoryInfo(sdkVerDir).Name.Substring(1);
+					if (NuGetVersion.TryParse(strVer, out var v))
+						versionDirs.Add(strVer);
+				}
+
+				var newestVersion = versionDirs.OrderByDescending(v => v).FirstOrDefault();
+
+				var userTemplateEngineDir = Path.Combine(
+					templateEngineSdksDir,
+					$"v{newestVersion}",
+					"packages");
+
+				Util.Log($"Newest dotnet sdk version to look for templates in: {userTemplateEngineDir}");
+
 				if (Directory.Exists(userTemplateEngineDir)
 					&& (Directory.EnumerateFiles(userTemplateEngineDir, $"{packId}.{packVersion}*.nupkg", SearchOption.AllDirectories).Any()
 					|| Directory.EnumerateFiles(userTemplateEngineDir, $"{packId}.{packVersion}*.nupkg".ToLowerInvariant(), SearchOption.AllDirectories).Any()))
@@ -196,6 +212,7 @@ namespace DotNetCheck.DotNet
 					Util.Log($"Found pack on disk: {userTemplateEngineDir}");
 					return true;
 				}
+
 			}
 			catch (Exception ex)
 			{
