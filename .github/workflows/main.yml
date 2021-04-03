@@ -79,13 +79,19 @@ jobs:
           run: |
             $dotnetVersion="${{needs.build.outputs.dotnetver}}"
             $dotnetDevVersion="${{needs.build.outputs.dotnetdevver}}"
+            $pkgVer="${{needs.build.outputs.pkgverrelease}}"
+            if (!$pkgVer)
+            {
+              $pkgVer="${{needs.build.outputs.pkgverci}}"
+            }
+            Write-Output "PACKAGE VERSION: $pkgVer"
             $ProgressPreference = 'SilentlyContinue'
-            Invoke-WebRequest -Uri "https://dot.net/v1/dotnet-install.ps1" -OutFile dotnet-install.ps1
-            & .\dotnet-install.ps1 -Version "$dotnetVersion" -InstallDir "$env:ProgramFiles\dotnet\" -Verbose
-            & .\dotnet-install.ps1 -Version "$dotnetDevVersion" -InstallDir "$env:ProgramFiles\dotnet\" -Verbose
+            # Invoke-WebRequest -Uri "https://dot.net/v1/dotnet-install.ps1" -OutFile dotnet-install.ps1
+            # & .\dotnet-install.ps1 -Version "$dotnetVersion" -InstallDir "$env:ProgramFiles\dotnet\" -Verbose
+            # & .\dotnet-install.ps1 -Version "$dotnetDevVersion" -InstallDir "$env:ProgramFiles\dotnet\" -Verbose
             & dotnet --list-sdks
-            & dotnet tool install --global --add-source NuGet\ redth.net.maui.check
-            & maui-check --ci --fix --non-interactive --verbose
+            & dotnet tool install --global --version $pkgVer --add-source NuGet\ redth.net.maui.check
+            & maui-check --ci --fix --non-interactive --verbose --skip openjdk
 
     testmac:
       name: Use Tool - MacOS
@@ -111,12 +117,12 @@ jobs:
             fi
             echo "PACKAGE VERSION: $pkgVer"
             export PATH="/usr/local/share/dotnet/:~/.dotnet/tools:$PATH"
-            curl -L https://raw.githubusercontent.com/dotnet/install-scripts/7a9d5dcab92cf131fc2d8977052f8c2c2d540e22/src/dotnet-install.sh > dotnet-install.sh
-            sh dotnet-install.sh --version $dotnetVersion --install-dir $DOTNET_ROOT --verbose
-            sh dotnet-install.sh --version $dotnetDevVersion --install-dir $DOTNET_ROOT --verbose
+            # curl -L https://raw.githubusercontent.com/dotnet/install-scripts/7a9d5dcab92cf131fc2d8977052f8c2c2d540e22/src/dotnet-install.sh > dotnet-install.sh
+            # sh dotnet-install.sh --version $dotnetVersion --install-dir $DOTNET_ROOT --verbose
+            # sh dotnet-install.sh --version $dotnetDevVersion --install-dir $DOTNET_ROOT --verbose
             dotnet --list-sdks
             dotnet tool install --global --version $pkgVer --add-source ./NuGet/ redth.net.maui.check
-            maui-check --ci --fix --non-interactive --verbose
+            maui-check --ci --fix --non-interactive --verbose --skip openjdk
             find ~/.templateengine/dotnetcli
     publish:
       name: Publish
