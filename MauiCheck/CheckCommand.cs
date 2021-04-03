@@ -266,9 +266,7 @@ namespace DotNetCheck.Cli
 			ToolInfo.ExitPrompt(settings.NonInteractive);
 
 			Util.Log($"Has Errors? {hasErrors}");
-
 			var exitCode = hasErrors ? 1 : 0;
-
 			Environment.ExitCode = exitCode;
 
 			return exitCode;
