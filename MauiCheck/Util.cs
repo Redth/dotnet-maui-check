@@ -10,6 +10,11 @@ namespace DotNetCheck
 {
 	public class Util
 	{
+		public static void LogAlways(string message)
+		{
+			Console.WriteLine(message);
+		}
+
 		public static void Log(string message)
 		{
 			if (Verbose)
