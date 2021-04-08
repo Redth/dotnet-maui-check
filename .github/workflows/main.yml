@@ -62,77 +62,78 @@ jobs:
           name: NuGet
           path: ./artifacts
 
-    testwin:
-      name: Use Tool - Windows
-      needs: build
-      runs-on: windows-latest
-      steps:
-        - name: Download Artifacts
-          uses: actions/download-artifact@v1
-          with:
-            name: NuGet
-        - name: Setup .NET Core
-          uses: actions/setup-dotnet@v1
-          with:
-            dotnet-version: 3.1.100
-        - name: Install and Run Tool
-          shell: pwsh
-          run: |
-            $dotnetVersion="${{needs.build.outputs.dotnetver}}"
-            $dotnetDevVersion="${{needs.build.outputs.dotnetdevver}}"
-            $pkgVer="${{needs.build.outputs.pkgverrelease}}"
-            if (!$pkgVer)
-            {
-              $pkgVer="${{needs.build.outputs.pkgverci}}"
-            }
-            Write-Output "PACKAGE VERSION: $pkgVer"
-            $ProgressPreference = 'SilentlyContinue'
-            # Invoke-WebRequest -Uri "https://dot.net/v1/dotnet-install.ps1" -OutFile dotnet-install.ps1
-            # & .\dotnet-install.ps1 -Version "$dotnetVersion" -InstallDir "$env:ProgramFiles\dotnet\" -Verbose
-            # & .\dotnet-install.ps1 -Version "$dotnetDevVersion" -InstallDir "$env:ProgramFiles\dotnet\" -Verbose
-            & dotnet --list-sdks
-            & dotnet tool install --global --version $pkgVer --add-source NuGet\ redth.net.maui.check
-            & maui-check --ci --fix --non-interactive --verbose --skip openjdk
-            & maui-check --dev --ci --fix --non-interactive --verbose --skip openjdk
-            & maui-check --ci --fix --non-interactive --verbose --skip openjdk
+#     testwin:
+#       name: Use Tool - Windows
+#       needs: build
+#       runs-on: windows-latest
+#       steps:
+#         - name: Download Artifacts
+#           uses: actions/download-artifact@v1
+#           with:
+#             name: NuGet
+#         - name: Setup .NET Core
+#           uses: actions/setup-dotnet@v1
+#           with:
+#             dotnet-version: 3.1.100
+#         - name: Install and Run Tool
+#           shell: pwsh
+#           run: |
+#             $dotnetVersion="${{needs.build.outputs.dotnetver}}"
+#             $dotnetDevVersion="${{needs.build.outputs.dotnetdevver}}"
+#             $pkgVer="${{needs.build.outputs.pkgverrelease}}"
+#             if (!$pkgVer)
+#             {
+#               $pkgVer="${{needs.build.outputs.pkgverci}}"
+#             }
+#             Write-Output "PACKAGE VERSION: $pkgVer"
+#             $ProgressPreference = 'SilentlyContinue'
+#             # Invoke-WebRequest -Uri "https://dot.net/v1/dotnet-install.ps1" -OutFile dotnet-install.ps1
+#             # & .\dotnet-install.ps1 -Version "$dotnetVersion" -InstallDir "$env:ProgramFiles\dotnet\" -Verbose
+#             # & .\dotnet-install.ps1 -Version "$dotnetDevVersion" -InstallDir "$env:ProgramFiles\dotnet\" -Verbose
+#             & dotnet --list-sdks
+#             & dotnet tool install --global --version $pkgVer --add-source NuGet\ redth.net.maui.check
+#             & maui-check --ci --fix --non-interactive --verbose --skip openjdk
+#             & maui-check --dev --ci --fix --non-interactive --verbose --skip openjdk
+#             & maui-check --ci --fix --non-interactive --verbose --skip openjdk
 
-    testmac:
-      name: Use Tool - MacOS
-      needs: build
-      runs-on: macos-latest
-      steps:
-        - name: Download Artifacts
-          uses: actions/download-artifact@v1
-          with:
-            name: NuGet
-        - name: Setup .NET Core
-          uses: actions/setup-dotnet@v1
-          with:
-            dotnet-version: 3.1.100
-        - name: Install and Run Tool
-          run: |
-            dotnetVersion=${{needs.build.outputs.dotnetver}}
-            dotnetDevVersion=${{needs.build.outputs.dotnetdevver}}
-            pkgVer=${{needs.build.outputs.pkgverrelease}}
-            if [ -z "$pkgVer" ]
-            then
-              pkgVer=${{needs.build.outputs.pkgverci}}
-            fi
-            echo "PACKAGE VERSION: $pkgVer"
-            export PATH="/usr/local/share/dotnet/:~/.dotnet/tools:$PATH"
-            # curl -L https://raw.githubusercontent.com/dotnet/install-scripts/7a9d5dcab92cf131fc2d8977052f8c2c2d540e22/src/dotnet-install.sh > dotnet-install.sh
-            # sh dotnet-install.sh --version $dotnetVersion --install-dir $DOTNET_ROOT --verbose
-            # sh dotnet-install.sh --version $dotnetDevVersion --install-dir $DOTNET_ROOT --verbose
-            dotnet --list-sdks
-            dotnet tool install --global --version $pkgVer --add-source ./NuGet/ redth.net.maui.check
-            maui-check --ci --fix --non-interactive --verbose --skip openjdk
-            maui-check --dev --ci --fix --non-interactive --verbose --skip openjdk
-            maui-check --ci --fix --non-interactive --verbose --skip openjdk
+#     testmac:
+#       name: Use Tool - MacOS
+#       needs: build
+#       runs-on: macos-latest
+#       steps:
+#         - name: Download Artifacts
+#           uses: actions/download-artifact@v1
+#           with:
+#             name: NuGet
+#         - name: Setup .NET Core
+#           uses: actions/setup-dotnet@v1
+#           with:
+#             dotnet-version: 3.1.100
+#         - name: Install and Run Tool
+#           run: |
+#             dotnetVersion=${{needs.build.outputs.dotnetver}}
+#             dotnetDevVersion=${{needs.build.outputs.dotnetdevver}}
+#             pkgVer=${{needs.build.outputs.pkgverrelease}}
+#             if [ -z "$pkgVer" ]
+#             then
+#               pkgVer=${{needs.build.outputs.pkgverci}}
+#             fi
+#             echo "PACKAGE VERSION: $pkgVer"
+#             export PATH="/usr/local/share/dotnet/:~/.dotnet/tools:$PATH"
+#             # curl -L https://raw.githubusercontent.com/dotnet/install-scripts/7a9d5dcab92cf131fc2d8977052f8c2c2d540e22/src/dotnet-install.sh > dotnet-install.sh
+#             # sh dotnet-install.sh --version $dotnetVersion --install-dir $DOTNET_ROOT --verbose
+#             # sh dotnet-install.sh --version $dotnetDevVersion --install-dir $DOTNET_ROOT --verbose
+#             dotnet --list-sdks
+#             dotnet tool install --global --version $pkgVer --add-source ./NuGet/ redth.net.maui.check
+#             maui-check --ci --fix --non-interactive --verbose --skip openjdk
+#             maui-check --dev --ci --fix --non-interactive --verbose --skip openjdk
+#             maui-check --ci --fix --non-interactive --verbose --skip openjdk
+
     publish:
       name: Publish
-      needs:
-        - testmac
-        - testwin
+#       needs:
+#         - testmac
+#         - testwin
       runs-on: windows-latest
       steps:
         - name: Download Artifacts
