@@ -68,7 +68,7 @@
     "dotnet": {
       "sdks": [
         {
-          "version": "6.0.100-preview.3.21202.5",
+          "version": "6.0.100-preview.3.21207.34",
           "enableWorkloadResolver": true,
           "urls": {
             "win64": "https://dotnetcli.azureedge.net/dotnet/Sdk/__VERSION__/dotnet-sdk-__VERSION__-win-x64.exe",
@@ -108,7 +108,7 @@
           "packs": [
             {
               "id": "Microsoft.Maui.Templates",
-              "version": "6.0.100-preview.3.315",
+              "version": "6.0.100-preview.3.322",
               "skipManifestCheck": true,
               "packKind": "template",
               "templateShortName": "maui"
