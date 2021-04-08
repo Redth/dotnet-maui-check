@@ -44,15 +44,26 @@ namespace DotNetCheck.Checkups
 
 		public override Task<DiagnosticResult> Examine(SharedState history)
 		{
-			// Set the logger to override the default one that is set in this library
-			// So we can catch output from failed path lookups that are otherwise swallowed
-			var _ = new AndroidSdkInfo((traceLevel, msg) => {
-				
-				if (Util.Verbose || traceLevel == System.Diagnostics.TraceLevel.Error)
-					Util.LogAlways(msg);
+			var jdkPath = history.GetEnvironmentVariable("JAVA_HOME") ?? Environment.GetEnvironmentVariable("JAVA_HOME");
 
-			}, null, null, null);
-			
+			try
+			{
+				// Set the logger to override the default one that is set in this library
+				// So we can catch output from failed path lookups that are otherwise swallowed
+				var _ = new AndroidSdkInfo((traceLevel, msg) =>
+				{
+
+					if (Util.Verbose || traceLevel == System.Diagnostics.TraceLevel.Error)
+						Util.LogAlways(msg);
+
+				}, null, null, jdkPath);
+
+			}
+			catch (Exception ex)
+			{
+				Util.Exception(ex);
+			}
+
 			var missingPackages = new List<IAndroidComponent>();
 
 			var installer = new AndroidSDKInstaller(new Helper(), AndroidManifestType.GoogleV2);
