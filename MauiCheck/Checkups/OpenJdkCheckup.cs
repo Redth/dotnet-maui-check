@@ -98,11 +98,49 @@ namespace DotNetCheck.Checkups
 
 			if (Util.IsWindows)
 			{
-				SearchDirectoryForJdks(paths, "C:\\Program Files\\Android\\Jdk\\", true);
+				SearchDirectoryForJdks(paths,
+					Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Android", "Jdk"), true);
+
+				var pfmsDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Microsoft");
+
+				try
+				{
+					if (Directory.Exists(pfmsDir))
+					{
+						var msJdkDirs = Directory.EnumerateDirectories(pfmsDir, "jdk-*", SearchOption.TopDirectoryOnly);
+						foreach (var msJdkDir in msJdkDirs)
+							SearchDirectoryForJdks(paths, msJdkDir, false);
+					}
+				}
+				catch (Exception ex)
+				{
+					Util.Exception(ex);
+				}
+
+				SearchDirectoryForJdks(paths,
+					Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Microsoft", "Jdk"), true);
 			} else if (Util.IsMac)
 			{
 				var msDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Library", "Developer", "Xamarin", "jdk");
 				SearchDirectoryForJdks(paths, msDir, true);
+
+				// /Library/Java/JavaVirtualMachines/
+
+				try
+				{
+					var javaVmDir = Path.Combine("Library", "Java", "JavaVirtualMachines");
+
+					if (Directory.Exists(javaVmDir))
+					{
+						var javaVmJdkDirs = Directory.EnumerateDirectories(javaVmDir, "jdk-*", SearchOption.TopDirectoryOnly);
+						foreach (var javaVmJdkDir in javaVmJdkDirs)
+							SearchDirectoryForJdks(paths, javaVmDir, false);
+					}
+				}
+				catch (Exception ex)
+				{
+					Util.Exception(ex);
+				}
 			}
 
 			SearchDirectoryForJdks(paths, Environment.GetEnvironmentVariable("JAVA_HOME") ?? string.Empty, true);
