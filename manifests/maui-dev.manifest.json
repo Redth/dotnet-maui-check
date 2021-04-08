@@ -103,7 +103,7 @@
               "workloadId": "microsoft-macos-sdk-full",
               "packageId": "Microsoft.NET.Workload.macOS",
               "version": "11.1.100-preview.3.1379"
-            },
+            }
           ],
           "packs": [
             {
