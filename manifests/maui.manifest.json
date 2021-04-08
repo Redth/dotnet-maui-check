@@ -1,6 +1,6 @@
 {
   "check": {
-    "toolVersion": "0.2.11",
+    "toolVersion": "0.3.1",
     "openjdk": {
       "minimumVersion": "1.8.0-1"
     },
@@ -58,8 +58,9 @@
             "system-images;android-30;google_apis;x86_64",
             "system-images;android-30;google_apis_playstore;x86_64"
           ],
-          "desc": "Android Emulator - API30 - Google APIs",
+          "desc": "Android Emulator - x86 - API30 - Google API's",
           "apiLevel": 30,
+          "tag": "google_apis",
           "device": "pixel"
         }
       ]
@@ -67,12 +68,12 @@
     "dotnet": {
       "sdks": [
         {
-          "version": "6.0.100-preview.2.21155.3",
+          "version": "6.0.100-preview.3.21202.5",
           "enableWorkloadResolver": true,
           "urls": {
-            "win64": "https://dotnetcli.azureedge.net/dotnet/Sdk/6.0.100-preview.2.21155.3/dotnet-sdk-6.0.100-preview.2.21155.3-win-x64.exe",
-            "win": "https://dotnetcli.azureedge.net/dotnet/Sdk/6.0.100-preview.2.21155.3/dotnet-sdk-6.0.100-preview.2.21155.3-win-x86.exe",
-            "osx": "https://dotnetcli.azureedge.net/dotnet/Sdk/6.0.100-preview.2.21155.3/dotnet-sdk-6.0.100-preview.2.21155.3-osx-x64.pkg"
+            "win64": "https://dotnetcli.azureedge.net/dotnet/Sdk/__VERSION__/dotnet-sdk-__VERSION__-win-x64.exe",
+            "win": "https://dotnetcli.azureedge.net/dotnet/Sdk/__VERSION__/dotnet-sdk-__VERSION__-win-x86.exe",
+            "osx": "https://dotnetcli.azureedge.net/dotnet/Sdk/__VERSION__/dotnet-sdk-__VERSION__-osx-x64.pkg"
           },
           "packageSources": [
             "https://pkgs.dev.azure.com/azure-public/vside/_packaging/xamarin-impl/nuget/v3/index.json"
@@ -81,40 +82,47 @@
             {
               "workloadId": "microsoft-android-sdk-full",
               "packageId": "Microsoft.NET.Workload.Android",
-              "version": "11.0.200-ci.main.148"
+              "version": "11.0.200-preview.3.196"
             },
             {
               "workloadId": "microsoft-ios-sdk-full",
               "packageId": "Microsoft.NET.Workload.iOS",
-              "version": "14.4.100-ci.main.1192"
+              "version": "14.4.100-preview.3.1326"
             },
             {
               "workloadId": "microsoft-maccatalyst-sdk-full",
               "packageId": "Microsoft.NET.Workload.MacCatalyst",
-              "version": "14.3.100-ci.main.337",
-              "ignoredPackIds": [
-                "Microsoft.MacCatalyst.Templates"
-              ]
-            }
+              "version": "14.3.100-preview.3.471"
+            },
+            {
+              "workloadId": "microsoft-tvos-sdk-full",
+              "packageId": "Microsoft.NET.Workload.tvOS",
+              "version": "14.3.100-preview.3.1379"
+            },
+            {
+              "workloadId": "microsoft-macos-sdk-full",
+              "packageId": "Microsoft.NET.Workload.macOS",
+              "version": "11.1.100-preview.3.1379"
+            },
           ],
           "packs": [
             {
               "id": "Microsoft.Maui.Templates",
-              "version": "6.0.100-preview.3.255",
+              "version": "6.0.100-preview.3.322",
               "skipManifestCheck": true,
               "packKind": "template",
               "templateShortName": "maui"
             },
             {
               "id": "Microsoft.iOS.Windows.Sdk",
-              "version": "14.4.100-ci.main.1293",
+              "version": "14.4.100-preview.3.1326",
               "skipManifestCheck": true,
               "packKind": "sdk",
               "arch": "win64"
             },
             {
               "id": "Microsoft.iOS.Windows.Sdk",
-              "version": "14.4.100-ci.main.1293",
+              "version": "14.4.100-preview.3.1326",
               "skipManifestCheck": true,
               "packKind": "sdk",
               "arch": "win"
