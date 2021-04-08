@@ -126,8 +126,14 @@ namespace DotNetCheck.DotNet
 							var loc = Path.Combine(locStr, versionStr);
 							if (Directory.Exists(loc))
 							{
-								if (NuGetVersion.TryParse(versionStr, out var version))
-									sdks.Add(new DotNetSdkInfo(version, new DirectoryInfo(loc)));
+								// If only 1 file it's probably the
+								// EnableWorkloadResolver.sentinel file that was 
+								// never uninstalled with the rest of the sdk
+								if (Directory.GetFiles(loc)?.Length > 1)
+								{
+									if (NuGetVersion.TryParse(versionStr, out var version))
+										sdks.Add(new DotNetSdkInfo(version, new DirectoryInfo(loc)));
+								}
 							}
 							else
 								Util.Log($"Directory does not exist: {loc}");
