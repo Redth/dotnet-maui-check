@@ -71,6 +71,16 @@ namespace DotNetCheck.Checkups
 					ok = true;
 					ReportStatus($"{jdk.Version} ({jdk.Directory})", Status.Ok);
 					history.SetEnvironmentVariable("JAVA_HOME", jdk.Directory.FullName);
+
+					// Try and set the global env var on windows if it's not set
+					if (Util.IsWindows && string.IsNullOrEmpty(Environment.GetEnvironmentVariable("JAVA_HOME")))
+					{
+						try
+						{
+							Environment.SetEnvironmentVariable("JAVA_HOME", jdk.Directory.FullName, EnvironmentVariableTarget.Machine);
+							ReportStatus($"Set Environemnt Variable: JAVA_HOME={jdk.Directory.FullName}", Status.Ok);
+						} catch { }
+					}
 				}
 				else
 					ReportStatus($"{jdk.Version} ({jdk.Directory})", null);
