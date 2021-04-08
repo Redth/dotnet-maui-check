@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Xamarin.Android.Tools;
 
 namespace DotNetCheck.Checkups
 {
@@ -45,7 +46,20 @@ namespace DotNetCheck.Checkups
 
 		public override Task<DiagnosticResult> Examine(SharedState history)
 		{
-			var jdks = FindJdks();
+			var xamJdks = new List<OpenJdkInfo>();
+			try
+			{
+				var xamSdkInfo = new AndroidSdkInfo((traceLevel, msg) => Util.Log(msg), null, null, null);
+
+				if (!string.IsNullOrEmpty(xamSdkInfo.JavaSdkPath))
+					SearchDirectoryForJdks(xamJdks, xamSdkInfo.JavaSdkPath);
+			}
+			catch (Exception ex)
+			{
+				Util.Exception(ex);
+			}
+
+			var jdks = xamJdks.Concat(FindJdks());
 
 			var ok = false;
 
