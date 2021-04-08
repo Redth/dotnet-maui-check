@@ -343,7 +343,18 @@ namespace DotNetCheck.DotNet
 
 		static async Task<bool> DownloadAndExtractNuGet(SourceRepository nugetSource, SourceCacheContext cache, ILogger logger, string packageId, NuGetVersion packageVersion, string destination, bool appendVersionToExtractPath, CancellationToken cancelToken)
 		{
-			var tmpPath = Path.GetTempPath();
+			var deleteAfter = false;
+			var tmpPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+
+			try
+			{
+				Directory.CreateDirectory(tmpPath);
+				deleteAfter = true;
+			}
+			catch
+			{
+				tmpPath = Path.GetTempPath();
+			}
 
 			var packageIdentity = new PackageIdentity(packageId, packageVersion);
 
@@ -401,6 +412,14 @@ namespace DotNetCheck.DotNet
 					packagePathResolver,
 					packageExtractionContext,
 					cancelToken);
+
+
+				try
+				{
+					if (deleteAfter)
+						Directory.Delete(tmpPath, true);
+				}
+				catch { }
 
 				return true;
 			}
