@@ -75,39 +75,39 @@ namespace DotNetCheck.DotNet
 			}
 		}
 
-		public IEnumerable<(string id, Int64 version)> GetInstalledWorkloads()
-		{
-			var workloadManifestReaderType = typeof(WorkloadResolver).Assembly.GetType("Microsoft.NET.Sdk.WorkloadManifestReader.WorkloadManifestReader");
+		//public IEnumerable<(string id, Int64 version)> GetInstalledWorkloads()
+		//{
+		//	var workloadManifestReaderType = typeof(WorkloadResolver).Assembly.GetType("Microsoft.NET.Sdk.WorkloadManifestReader.WorkloadManifestReader");
 
-			var themethod = workloadManifestReaderType.GetMethod("ReadWorkloadManifest", BindingFlags.Public | BindingFlags.Static, Type.DefaultBinder, new Type[] { typeof(Stream) }, null);
+		//	var themethod = workloadManifestReaderType.GetMethod("ReadWorkloadManifest", BindingFlags.Public | BindingFlags.Static, Type.DefaultBinder, new Type[] { typeof(Stream) }, null);
 
-			var readWorkloadManifestMethods = workloadManifestReaderType.GetMethods(BindingFlags.Static | BindingFlags.Public)
+		//	var readWorkloadManifestMethods = workloadManifestReaderType.GetMethods(BindingFlags.Static | BindingFlags.Public)
 
-				.FirstOrDefault(m => m.Name == "ReadWorkloadManifest" && (m.GetParameters()?.FirstOrDefault()?.Equals(typeof(Stream)) ?? false) && (m.GetParameters()?.Length ?? 0) == 1);
+		//		.FirstOrDefault(m => m.Name == "ReadWorkloadManifest" && (m.GetParameters()?.FirstOrDefault()?.Equals(typeof(Stream)) ?? false) && (m.GetParameters()?.Length ?? 0) == 1);
 
-			var list = new List<object>(); // WorkloadManifest
-			foreach (Stream manifest in manifestProvider.GetManifests())
-			{
-				using (manifest)
-				{
-					var workloadManifest = themethod.Invoke(null, new object[] { manifest });
+		//	var list = new List<object>(); // WorkloadManifest
+		//	foreach (Stream manifest in manifestProvider.GetManifests())
+		//	{
+		//		using (manifest)
+		//		{
+		//			var workloadManifest = themethod.Invoke(null, new object[] { manifest });
 
-					var workloadsDict = workloadManifest.GetType().GetProperty("Workloads").GetValue(workloadManifest);
+		//			var workloadsDict = workloadManifest.GetType().GetProperty("Workloads").GetValue(workloadManifest);
 
-					var workloadVersion = (Int64)workloadManifest.GetType().GetProperty("Version").GetValue(workloadManifest);
+		//			var workloadVersion = (Int64)workloadManifest.GetType().GetProperty("Version").GetValue(workloadManifest);
 
 
-					var workloadsDictKeys = workloadsDict.GetType().GetProperty("Keys").GetValue(workloadsDict) as System.Collections.ICollection;
+		//			var workloadsDictKeys = workloadsDict.GetType().GetProperty("Keys").GetValue(workloadsDict) as System.Collections.ICollection;
 
-					foreach (var key in workloadsDictKeys)
-					{
-						var workloadId = key.ToString();
+		//			foreach (var key in workloadsDictKeys)
+		//			{
+		//				var workloadId = key.ToString();
 
-						yield return (workloadId, workloadVersion);
-					}
-				}
-			}
-		}
+		//				yield return (workloadId, workloadVersion);
+		//			}
+		//		}
+		//	}
+		//}
 
 		public IEnumerable<WorkloadResolver.PackInfo> GetPacksInWorkload(string workloadId)
 		{
@@ -136,7 +136,7 @@ namespace DotNetCheck.DotNet
 		{
 			var manifestRoot = GetSdkManifestRoot();
 
-			return AcquireNuGet(packageId, manifestPackageVersion, manifestRoot, false, cancelToken, true);
+			return AcquireNuGet(packageId, manifestPackageVersion, manifestRoot, false, cancelToken, true, isWorkload: true);
 		}
 
 		public bool PackExistsOnDisk(string packId, string packVersion)
@@ -256,7 +256,7 @@ namespace DotNetCheck.DotNet
 			{
 				if (packInfo.Kind == WorkloadPackKind.Template)
 				{
-					var r = await AcquireNuGet(packInfo.Id, version, packInfo.Path, false, cancelToken, false);
+					var r = await AcquireNuGet(packInfo.Id, version, packInfo.Path, false, cancelToken, false, false);
 
 					// Short circuit the installation into the template-packs dir since this one might not
 					// be a part of any workload manifest, so we need to install with dotnet new -i
@@ -283,7 +283,7 @@ namespace DotNetCheck.DotNet
 				{
 					var packsRoot = Path.Combine(SdkRoot, "packs");
 
-					return await AcquireNuGet(actualPackId, version, packsRoot, true, cancelToken, true);
+					return await AcquireNuGet(actualPackId, version, packsRoot, true, cancelToken, true, false);
 				}
 			}
 
@@ -341,7 +341,7 @@ namespace DotNetCheck.DotNet
 			return packId;
 		}
 
-		static async Task<bool> DownloadAndExtractNuGet(SourceRepository nugetSource, SourceCacheContext cache, ILogger logger, string packageId, NuGetVersion packageVersion, string destination, bool appendVersionToExtractPath, CancellationToken cancelToken)
+		static async Task<bool> DownloadAndExtractNuGet(SourceRepository nugetSource, SourceCacheContext cache, ILogger logger, string packageId, NuGetVersion packageVersion, string destination, bool appendVersionToExtractPath, CancellationToken cancelToken, bool isWorkload)
 		{
 			var deleteAfter = false;
 			var tmpPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
@@ -414,12 +414,27 @@ namespace DotNetCheck.DotNet
 					cancelToken);
 
 
+				// Check for data/WorkloadManifest.json and data/WorkloadManifest.targets
+				if (isWorkload)
+				{
+					var dataDir = Path.Combine(fullDestinationDir, "data");
+
+					if (Directory.Exists(dataDir))
+					{
+						try { Util.DirectoryCopy(dataDir, fullDestinationDir, true); }
+						catch (Exception ex) { Util.Exception(ex); }
+					}
+
+					try { Directory.Delete(dataDir, true); }
+					catch (Exception ex) { Util.Exception(ex); }
+				}
+
 				try
 				{
 					if (deleteAfter)
 						Directory.Delete(tmpPath, true);
 				}
-				catch { }
+				catch (Exception ex) { Util.Exception(ex); }
 
 				return true;
 			}
@@ -483,7 +498,7 @@ namespace DotNetCheck.DotNet
 			return false;
 		}
 
-		async Task<bool> AcquireNuGet(string packageId, NuGetVersion packageVersion, string destination, bool appendVersionToExtractPath, CancellationToken cancelToken, bool extract)
+		async Task<bool> AcquireNuGet(string packageId, NuGetVersion packageVersion, string destination, bool appendVersionToExtractPath, CancellationToken cancelToken, bool extract, bool isWorkload)
 		{
 			var nugetCache = NullSourceCacheContext.Instance;
 			var nugetLogger = NullLogger.Instance;
@@ -515,7 +530,8 @@ namespace DotNetCheck.DotNet
 										packageVersion,
 										d,
 										appendVersionToExtractPath,
-										cancelToken));
+										cancelToken,
+										isWorkload));
 							}
 							else
 							{
