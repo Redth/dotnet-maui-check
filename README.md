@@ -51,6 +51,15 @@ The manifest is hosted by default at: https://aka.ms/dotnet-maui-check-manifest-
 maui-check --dev
 ```
 
+### `--ci` Continuous Integration
+
+Uses the dotnet-install powershell / bash scripts for installing the dotnet SDK version from the manifest instead of the global installer.
+
+```
+maui-check --ci
+```
+
+
 ### `-s <ID_OR_NAME>`, `--skip <ID_OR_NAME>` Skip Checkup
 
 Skips a checkup by name or id as listed in `maui-check list`.
