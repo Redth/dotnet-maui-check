@@ -1,4 +1,5 @@
 ﻿using DotNetCheck.Models;
+using DotNetCheck.Solutions;
 using NuGet.Versioning;
 using System;
 using System.Collections.Generic;
@@ -29,15 +30,15 @@ namespace DotNetCheck.Checkups
 
 	public class OpenJdkCheckup : Models.Checkup
 	{
-		public NuGetVersion MinimumVersion
-			=> Extensions.ParseVersion(Manifest?.Check?.OpenJdk?.MinimumVersion, new NuGetVersion("1.8.0-1"));
+		public NuGetVersion Version
+			=> Extensions.ParseVersion(Manifest?.Check?.OpenJdk?.Version, new NuGetVersion("11.0.10.9"));
 
-		public NuGetVersion ExactVersion
-			=> Extensions.ParseVersion(Manifest?.Check?.OpenJdk?.ExactVersion);
+		public bool RequireExact
+			=> Manifest?.Check?.OpenJdk?.RequireExact ?? false;
 
 		public override string Id => "openjdk";
 
-		public override string Title => $"OpenJDK {MinimumVersion.ThisOrExact(ExactVersion)}";
+		public override string Title => $"OpenJDK {Version}";
 
 		static string PlatformJavaCExtension => Util.IsWindows ? ".exe" : string.Empty;
 
@@ -59,14 +60,16 @@ namespace DotNetCheck.Checkups
 				Util.Exception(ex);
 			}
 
-			var jdks = xamJdks.Concat(FindJdks());
+			var jdks = xamJdks.Concat(FindJdks())
+				.GroupBy(j => j.Directory.FullName)
+				.Select(g => g.First());
 
 			var ok = false;
 
 			foreach (var jdk in jdks)
 			{
 				if ((jdk.JavaC.FullName.Contains("microsoft") || jdk.JavaC.FullName.Contains("openjdk"))
-					&& jdk.Version.IsCompatible(MinimumVersion, ExactVersion))
+					&& jdk.Version.IsCompatible(Version, RequireExact ? Version : null))
 				{
 					ok = true;
 					ReportStatus($"{jdk.Version} ({jdk.Directory})", Status.Ok);
@@ -83,13 +86,15 @@ namespace DotNetCheck.Checkups
 					}
 				}
 				else
-					ReportStatus($"{jdk.Version} ({jdk.Directory})", null);
+					ReportStatus($"{jdk.Version} ({jdk.Directory.FullName})", null);
 			}
 
 			if (ok)
 				return Task.FromResult(DiagnosticResult.Ok(this));
 
-			return Task.FromResult(new DiagnosticResult(Status.Error, this));
+			return Task.FromResult(new DiagnosticResult(Status.Error, this,
+				new Suggestion("Install OpenJDK11",
+					new BootsSolution(Manifest?.Check?.OpenJdk?.Url, "Download and Install Microsoft OpenJDK 11"))));
 		}
 
 		IEnumerable<OpenJdkInfo> FindJdks()
@@ -121,20 +126,26 @@ namespace DotNetCheck.Checkups
 					Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Microsoft", "Jdk"), true);
 			} else if (Util.IsMac)
 			{
+				var ms11Dir = Path.Combine("/Library", "Java", "JavaVirtualMachines", "microsoft-11.jdk", "Contents", "Home");
+				SearchDirectoryForJdks(paths, ms11Dir, true);
+
 				var msDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Library", "Developer", "Xamarin", "jdk");
 				SearchDirectoryForJdks(paths, msDir, true);
 
 				// /Library/Java/JavaVirtualMachines/
-
 				try
 				{
 					var javaVmDir = Path.Combine("Library", "Java", "JavaVirtualMachines");
 
 					if (Directory.Exists(javaVmDir))
 					{
-						var javaVmJdkDirs = Directory.EnumerateDirectories(javaVmDir, "jdk-*", SearchOption.TopDirectoryOnly);
+						var javaVmJdkDirs = Directory.EnumerateDirectories(javaVmDir, "*.jdk", SearchOption.TopDirectoryOnly);
 						foreach (var javaVmJdkDir in javaVmJdkDirs)
-							SearchDirectoryForJdks(paths, javaVmDir, false);
+							SearchDirectoryForJdks(paths, javaVmDir, true);
+
+						javaVmJdkDirs = Directory.EnumerateDirectories(javaVmDir, "jdk-*", SearchOption.TopDirectoryOnly);
+						foreach (var javaVmJdkDir in javaVmJdkDirs)
+							SearchDirectoryForJdks(paths, javaVmDir, true);
 					}
 				}
 				catch (Exception ex)
@@ -172,7 +183,7 @@ namespace DotNetCheck.Checkups
 
 				foreach (var file in files)
 				{
-					if (TryGetJavaJdkInfo(file.FullName, out var jdkInfo))
+					if (!found.Any(f => f.JavaC.FullName.Equals(file.FullName)) && TryGetJavaJdkInfo(file.FullName, out var jdkInfo))
 						found.Add(jdkInfo);
 				}
 			}
