@@ -40,6 +40,12 @@ namespace DotNetCheck
 				AnsiConsole.MarkupLine($"[bold red]{Icon.Error} Updating to version {toolVersion} or newer is required:[/]");
 				AnsiConsole.MarkupLine($"[blue]  dotnet tool update --global {ToolPackageId}[/]");
 
+				if (System.Diagnostics.Debugger.IsAttached)
+				{
+					if (AnsiConsole.Confirm("Mismatched version, continue debugging anyway?"))
+						return true;
+				}
+
 				return false;
 			}
 
