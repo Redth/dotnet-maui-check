@@ -1,11 +1,15 @@
 {
   "check": {
-    "toolVersion": "0.3.2",
+    "toolVersion": "0.4.0",
     "openjdk": {
-      "minimumVersion": "1.8.0-1"
+        "version": "11.0",
+        "urls": {
+            "win64": "https://aka.ms/download-jdk/microsoft-jdk-11.0.10.9-windows-x64.msi",
+            "osx": "https://aka.ms/download-jdk/microsoft-jdk-11.0.10.9-macos-x64.pkg"
+        }
     },
     "xcode": {
-      "minimumVersion": "12.4"
+      "minimumVersion": "12.5"
     },
     "vswin": {
       "minimumVersion": "16.9.0"
