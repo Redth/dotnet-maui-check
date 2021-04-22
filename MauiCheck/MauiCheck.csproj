@@ -74,9 +74,4 @@
       <HintPath>..\libs\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup>
-    <None Remove="..\..\..\.nuget\packages\xamarin.libzipsharp\1.0.24\runtimes\osx\native\libzip.dylib" />
-    <None Remove="..\..\..\.nuget\packages\xamarin.libzipsharp\1.0.24\runtimes\linux-x64\native\libzip.so" />
-    <None Remove="..\..\..\.nuget\packages\xamarin.libzipsharp\1.0.24\runtimes\linux-x86\native\libzip.so" />
-  </ItemGroup>
 </Project>
