@@ -214,6 +214,20 @@ namespace DotNetCheck.DotNet
 						Util.Log($"Found pack on disk: {userTemplateEngineDir}");
 						return true;
 					}
+
+
+					var templateEnginePkgsDir = Path.Combine(
+						Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+						".templateengine",
+						"packages");
+
+					if (Directory.Exists(templateEnginePkgsDir)
+						&& (Directory.EnumerateFiles(templateEnginePkgsDir, $"{packId}.{packVersion}*.nupkg", SearchOption.AllDirectories).Any()
+						|| Directory.EnumerateFiles(templateEnginePkgsDir, $"{packId}.{packVersion}*.nupkg".ToLowerInvariant(), SearchOption.AllDirectories).Any()))
+					{
+						Util.Log($"Found pack on disk: {templateEnginePkgsDir}");
+						return true;
+					}
 				}
 
 			}
