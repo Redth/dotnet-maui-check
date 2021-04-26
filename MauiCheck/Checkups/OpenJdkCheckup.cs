@@ -31,7 +31,7 @@ namespace DotNetCheck.Checkups
 	public class OpenJdkCheckup : Models.Checkup
 	{
 		public NuGetVersion Version
-			=> Extensions.ParseVersion(Manifest?.Check?.OpenJdk?.Version, new NuGetVersion("11.0.10.9"));
+			=> Extensions.ParseVersion(Manifest?.Check?.OpenJdk?.CompatVersion, new NuGetVersion("1.8.0-25"));
 
 		public bool RequireExact
 			=> Manifest?.Check?.OpenJdk?.RequireExact ?? false;
@@ -68,7 +68,7 @@ namespace DotNetCheck.Checkups
 
 			foreach (var jdk in jdks)
 			{
-				if ((jdk.JavaC.FullName.Contains("microsoft") || jdk.JavaC.FullName.Contains("openjdk"))
+				if ((jdk.JavaC.FullName.Contains("microsoft", StringComparison.OrdinalIgnoreCase) || jdk.JavaC.FullName.Contains("openjdk", StringComparison.OrdinalIgnoreCase))
 					&& jdk.Version.IsCompatible(Version, RequireExact ? Version : null))
 				{
 					ok = true;

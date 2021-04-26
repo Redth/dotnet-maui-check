@@ -9,10 +9,17 @@ namespace DotNetCheck.Manifest
 
 		[JsonIgnore]
 		public System.Uri Url
-			=> Urls?.Get(Version);
+			=> Urls?.Get(CompatVersion);
 
 		[JsonProperty("version")]
 		public string Version { get; set; }
+
+		[JsonProperty("minimumVersion")]
+		public string MinimumVersion { get; set; }
+
+		[JsonIgnore]
+		public string CompatVersion
+			=> Version ?? MinimumVersion;
 
 		[JsonProperty("requireExact")]
 		public bool RequireExact { get; set; }
