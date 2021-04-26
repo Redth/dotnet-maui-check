@@ -29,6 +29,11 @@ namespace DotNetCheck.Checkups
 		public override bool ShouldExamine(SharedState history)
 			=> RequiredPackages?.Any() ?? false;
 
+		public string DefaultSdkLocation
+			=> Util.IsWindows
+				? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Android", "android-sdk")
+				: Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Library", "Android", "sdk");
+
 		class AndroidComponentWrapper
 		{
 			public IAndroidComponent Component
@@ -46,6 +51,8 @@ namespace DotNetCheck.Checkups
 		{
 			var jdkPath = history.GetEnvironmentVariable("JAVA_HOME") ?? Environment.GetEnvironmentVariable("JAVA_HOME");
 
+			string androidSdkPath = null;
+
 			try
 			{
 				// Set the logger to override the default one that is set in this library
@@ -56,13 +63,15 @@ namespace DotNetCheck.Checkups
 					if (Util.Verbose || traceLevel == System.Diagnostics.TraceLevel.Error)
 						Util.LogAlways(msg);
 
-				}, null, null, jdkPath);
-
+				}, androidSdkPath, null, jdkPath);
 			}
 			catch (Exception ex)
 			{
 				Util.Exception(ex);
 			}
+
+			if (string.IsNullOrEmpty(androidSdkPath))
+				androidSdkPath = DefaultSdkLocation;
 
 			var missingPackages = new List<IAndroidComponent>();
 
@@ -70,7 +79,7 @@ namespace DotNetCheck.Checkups
 
 			installer.Discover();
 
-			var sdkInstance = installer.FindInstance(null);
+			var sdkInstance = installer.FindInstance(androidSdkPath);
 
 			if (string.IsNullOrEmpty(sdkInstance?.Path))
 			{
