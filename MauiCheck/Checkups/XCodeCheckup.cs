@@ -37,7 +37,7 @@ namespace DotNetCheck.Checkups
 				}
 			}
 
-			ReportStatus($"XCode.app ({info.Version}) not installed.", Status.Error);
+			ReportStatus($"XCode.app ({MinimumVersion}) not installed.", Status.Error);
 
 			return new DiagnosticResult(Status.Error, this, new Suggestion($"Download XCode {MinimumVersion.ThisOrExact(ExactVersion)}"));
 		}

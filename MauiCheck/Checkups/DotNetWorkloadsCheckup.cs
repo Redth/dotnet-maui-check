@@ -47,7 +47,14 @@ namespace DotNetCheck.Checkups
 
 			var workloadManager = new DotNetWorkloadManager(SdkRoot, sdkVersion, NuGetPackageSources);
 
-			var installedWorkloads = workloadManager.GetInstalledWorkloads();
+			//var installedWorkloads = workloadManager.GetInstalledWorkloads();
+
+			// This is a bit of a hack where we manually check the sdk-manifests/{SDK_VERSION}/* folders
+			// for installed workloads, and then go manually parse the manifest json
+			// as well as look for a .nuspec file from the extracted nupkg when it was installed
+			// the nuspec file contains the version we actually care about for now since the manifest json
+			// has a long number which is meaningless right now and will eventually be changed to a string
+			// when that happens we can use the actual resolver's method to get installed workload info
 			var installedPackageWorkloads = workloadManager.GetInstalledWorkloadNuGetPackages();
 
 			var missingWorkloads = new List<Manifest.DotNetWorkload>();
@@ -60,8 +67,9 @@ namespace DotNetCheck.Checkups
 				if (!NuGetVersion.TryParse(rp.Version, out rpVersion))
 					rpVersion = new NuGetVersion(0, 0, 0);
 
-				if (!installedPackageWorkloads.Any(sp => sp.packageId.Equals(rp.PackageId, StringComparison.OrdinalIgnoreCase) && sp.packageVersion == rpVersion)
-					|| !installedWorkloads.Any(sp => sp.id.Equals(rp.Id, StringComparison.OrdinalIgnoreCase)))
+				// TODO: Eventually check actual workload resolver api for installed workloads and
+				// compare the manifest version once it has a string in it
+				if (!installedPackageWorkloads.Any(sp => sp.packageId.Equals(rp.PackageId, StringComparison.OrdinalIgnoreCase) && sp.packageVersion == rpVersion))
 				{
 					ReportStatus($"{rp.Id} ({rp.PackageId} : {rp.Version}) not installed.", Status.Error);
 					missingWorkloads.Add(rp);
