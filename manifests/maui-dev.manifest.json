@@ -1,6 +1,6 @@
 {
   "check": {
-    "toolVersion": "0.4.0",
+    "toolVersion": "0.4.1",
     "openjdk": {
       "version": "11.0",
       "urls": {
