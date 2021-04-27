@@ -253,6 +253,9 @@ namespace DotNetCheck.Cli
 
 			if (hasErrors)
 			{
+				foreach (var ec in erroredChecks)
+					Util.Log($"{ec.Checkup.Id}: {ec.Message}");
+
 				AnsiConsole.MarkupLine($"[bold red]{Icon.Bell} There were one or more problems detected.[/]");
 				AnsiConsole.MarkupLine($"[bold red]Please review the errors and correct them and run {ToolInfo.ToolCommand} again.[/]");
 			}
