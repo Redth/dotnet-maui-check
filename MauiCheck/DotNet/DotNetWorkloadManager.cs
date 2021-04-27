@@ -136,7 +136,7 @@ namespace DotNetCheck.DotNet
 		{
 			var manifestRoot = GetSdkManifestRoot();
 
-			return AcquireNuGet(packageId, manifestPackageVersion, manifestRoot, false, cancelToken, true, isNotTemplatePack: true);
+			return AcquireNuGet(packageId, manifestPackageVersion, manifestRoot, false, cancelToken, true, isWorkload: true);
 		}
 
 		public bool PackExistsOnDisk(string packId, string packVersion)
@@ -297,7 +297,7 @@ namespace DotNetCheck.DotNet
 				{
 					var packsRoot = Path.Combine(SdkRoot, "packs");
 
-					return await AcquireNuGet(actualPackId, version, packsRoot, true, cancelToken, true, true);
+					return await AcquireNuGet(actualPackId, version, packsRoot, true, cancelToken, true, false);
 				}
 			}
 
@@ -355,7 +355,7 @@ namespace DotNetCheck.DotNet
 			return packId;
 		}
 
-		static async Task<bool> DownloadAndExtractNuGet(SourceRepository nugetSource, SourceCacheContext cache, ILogger logger, string packageId, NuGetVersion packageVersion, string destination, bool appendVersionToExtractPath, CancellationToken cancelToken, bool isNotTemplatePack)
+		static async Task<bool> DownloadAndExtractNuGet(SourceRepository nugetSource, SourceCacheContext cache, ILogger logger, string packageId, NuGetVersion packageVersion, string destination, bool appendVersionToExtractPath, CancellationToken cancelToken, bool isWorkload)
 		{
 			var deleteAfter = false;
 			var tmpPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
@@ -429,7 +429,7 @@ namespace DotNetCheck.DotNet
 
 
 				// Check for data/WorkloadManifest.json and data/WorkloadManifest.targets
-				if (isNotTemplatePack)
+				if (isWorkload)
 				{
 					var dataDir = Path.Combine(fullDestinationDir, "data");
 
@@ -512,7 +512,7 @@ namespace DotNetCheck.DotNet
 			return false;
 		}
 
-		async Task<bool> AcquireNuGet(string packageId, NuGetVersion packageVersion, string destination, bool appendVersionToExtractPath, CancellationToken cancelToken, bool extract, bool isNotTemplatePack)
+		async Task<bool> AcquireNuGet(string packageId, NuGetVersion packageVersion, string destination, bool appendVersionToExtractPath, CancellationToken cancelToken, bool extract, bool isWorkload)
 		{
 			var nugetCache = NullSourceCacheContext.Instance;
 			var nugetLogger = NullLogger.Instance;
@@ -545,7 +545,7 @@ namespace DotNetCheck.DotNet
 										d,
 										appendVersionToExtractPath,
 										cancelToken,
-										isNotTemplatePack));
+										isWorkload));
 							}
 							else
 							{
