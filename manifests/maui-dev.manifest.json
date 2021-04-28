@@ -72,7 +72,7 @@
     "dotnet": {
       "sdks": [
         {
-          "version": "6.0.100-preview.4.21215.1",
+          "version": "6.0.100-preview.4.21225.7",
           "enableWorkloadResolver": true,
           "urls": {
             "win64": "https://dotnetcli.azureedge.net/dotnet/Sdk/__VERSION__/dotnet-sdk-__VERSION__-win-x64.exe",
