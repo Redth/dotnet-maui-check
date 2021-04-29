@@ -105,7 +105,7 @@ namespace DotNetCheck.Checkups
 
 			var installer = new AndroidSDKInstaller(new Helper(), AndroidManifestType.GoogleV2);
 
-			installer.Discover();
+			installer.Discover(new List<string> { androidSdkPath });
 
 			var sdkInstance = installer.FindInstance(androidSdkPath);
 
