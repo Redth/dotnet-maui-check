@@ -2,7 +2,7 @@
   "profiles": {
     "MauiCheck": {
       "commandName": "Project",
-      "commandLineArgs": "--dev"
+      "commandLineArgs": "--verbose --dev"
     }
   }
 }
