@@ -29,6 +29,34 @@ namespace DotNetCheck.Checkups
 		public override bool ShouldExamine(SharedState history)
 			=> RequiredPackages?.Any() ?? false;
 
+		string[] macSdkLocations = new string[]
+		{
+			Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Library", "Android", "sdk"),
+			Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Library", "Android", "android-sdk-macosx"),
+			Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Library", "Developer", "Xamarin", "Android", "sdk"),
+			Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Library", "Developer", "Xamarin", "android-sdk-macosx"),
+		};
+
+		string[] unixSdkLocations = new string[] { };
+
+		string[] winSdkLocations = new string[]
+		{
+			Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Android", "android-sdk")
+		};
+
+		public string FindBestSdkLocation()
+        {
+			var possibleLocations = Util.IsWindows ? winSdkLocations : (Util.IsMac ? macSdkLocations : unixSdkLocations);
+
+			foreach (var p in possibleLocations)
+            {
+				if (Directory.Exists(p) && (Directory.GetFileSystemEntries(p)?.Any() ?? false))
+					return p;
+            }
+
+			return DefaultSdkLocation;
+        }
+
 		public string DefaultSdkLocation
 			=> Util.IsWindows
 				? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Android", "android-sdk")
@@ -71,7 +99,7 @@ namespace DotNetCheck.Checkups
 			}
 
 			if (string.IsNullOrEmpty(androidSdkPath))
-				androidSdkPath = DefaultSdkLocation;
+				androidSdkPath = FindBestSdkLocation();
 
 			var missingPackages = new List<IAndroidComponent>();
 
