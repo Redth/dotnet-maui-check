@@ -92,22 +92,22 @@
             {
                 "workloadId": "microsoft-ios-sdk-full",
                 "packageId": "Microsoft.NET.Workload.iOS",
-                "version": "14.5.100-preview.4.624"
+                "version": "14.5.100-preview.4.626"
             },
             {
                 "workloadId": "microsoft-maccatalyst-sdk-full",
                 "packageId": "Microsoft.NET.Workload.MacCatalyst",
-                "version": "14.5.100-preview.4.624"
+                "version": "14.5.100-preview.4.626"
             },
             {
                 "workloadId": "microsoft-tvos-sdk-full",
                 "packageId": "Microsoft.NET.Workload.tvOS",
-                "version": "14.5.100-preview.4.624"
+                "version": "14.5.100-preview.4.626"
             },
             {
                 "workloadId": "microsoft-macos-sdk-full",
                 "packageId": "Microsoft.NET.Workload.macOS",
-                "version": "11.3.100-preview.4.624"
+                "version": "11.3.100-preview.4.626"
             }
           ],
           "packs": [
