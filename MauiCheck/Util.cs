@@ -18,16 +18,31 @@ namespace DotNetCheck
 		public static void Log(string message)
 		{
 			if (Verbose)
+			{
 				Console.WriteLine(message);
+
+				if (!string.IsNullOrEmpty(LogFile))
+				{
+					File.AppendAllText(LogFile, $"{message}{Environment.NewLine}");
+				}
+			}
 		}
 
 		public static void Exception(Exception ex)
 		{
 			if (Verbose)
+			{
 				AnsiConsole.WriteException(ex);
+
+				if (!string.IsNullOrEmpty(LogFile))
+				{
+					File.AppendAllText(LogFile, $"{ex}{Environment.NewLine}");
+				}
+			}
 		}
 
 		public static bool Verbose { get; set; }
+		public static string LogFile { get; set; }
 		public static bool CI { get; set; }
 
 		public static Dictionary<string, string> EnvironmentVariables { get; } = new Dictionary<string, string>();
@@ -36,7 +51,6 @@ namespace DotNetCheck
 		{
 			get
 			{
-
 				if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 					return Platform.Windows;
 

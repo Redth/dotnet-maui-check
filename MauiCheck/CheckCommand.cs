@@ -18,6 +18,7 @@ namespace DotNetCheck.Cli
 		public override async Task<int> ExecuteAsync(CommandContext context, CheckSettings settings)
 		{
 			Util.Verbose = settings.Verbose;
+			Util.LogFile = settings.LogFile;
 			Util.CI = settings.CI;
 			if (settings.CI)
 				settings.NonInteractive = true;
