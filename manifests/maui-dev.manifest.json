@@ -72,7 +72,7 @@
     "dotnet": {
       "sdks": [
         {
-          "version": "6.0.100-preview.4.21226.14",
+          "version": "6.0.100-preview.4.21255.9",
           "requireExact": true,
           "enableWorkloadResolver": true,
           "urls": {
@@ -87,27 +87,27 @@
             {
                 "workloadId": "microsoft-android-sdk-full",
                 "packageId": "Microsoft.NET.Workload.Android",
-                "version": "11.0.200-preview.4.237"
+                "version": "11.0.200-preview.4.245"
             },
             {
                 "workloadId": "microsoft-ios-sdk-full",
                 "packageId": "Microsoft.NET.Workload.iOS",
-                "version": "14.5.100-preview.4.626"
+                "version": "14.5.100-preview.4.638"
             },
             {
                 "workloadId": "microsoft-maccatalyst-sdk-full",
                 "packageId": "Microsoft.NET.Workload.MacCatalyst",
-                "version": "14.5.100-preview.4.626"
+                "version": "14.5.100-preview.4.638"
             },
             {
                 "workloadId": "microsoft-tvos-sdk-full",
                 "packageId": "Microsoft.NET.Workload.tvOS",
-                "version": "14.5.100-preview.4.626"
+                "version": "14.5.100-preview.4.638"
             },
             {
                 "workloadId": "microsoft-macos-sdk-full",
                 "packageId": "Microsoft.NET.Workload.macOS",
-                "version": "11.3.100-preview.4.626"
+                "version": "11.3.100-preview.4.638"
             }
           ],
           "packs": [
@@ -120,14 +120,14 @@
             },
             {
                 "id": "Microsoft.iOS.Windows.Sdk",
-                "version": "14.5.100-preview.4.623",
+                "version": "14.5.100-preview.4.638",
                 "skipManifestCheck": true,
                 "packKind": "sdk",
                 "arch": "win64"
             },
             {
                 "id": "Microsoft.iOS.Windows.Sdk",
-                "version": "14.5.100-preview.4.623",
+                "version": "14.5.100-preview.4.638",
                 "skipManifestCheck": true,
                 "packKind": "sdk",
                 "arch": "win"
