@@ -1,0 +1,141 @@
+{
+  "check": {
+    "toolVersion": "0.4.1",
+    "openjdk": {
+      "version": "11.0",
+      "urls": {
+        "win64": "https://aka.ms/download-jdk/microsoft-jdk-11.0.10.9-windows-x64.msi",
+        "osx": "https://aka.ms/download-jdk/microsoft-jdk-11.0.10.9-macos-x64.pkg"
+      }
+    },
+    "xcode": {
+      "minimumVersion": "12.5"
+    },
+    "vswin": {
+      "minimumVersion": "16.10.0-pre.2.1"
+    },
+    "vsmac": {
+      "minimumVersion": "8.9.0",
+      "optional": "true"
+    },
+    "android": {
+      "packages": [
+        {
+          "path": "emulator",
+          "version": "30.4.5"
+        },
+        {
+          "path": "build-tools;30.0.2",
+          "version": "30.0.2"
+        },
+        {
+          "path": "platforms;android-30",
+          "version": "3"
+        },
+        {
+          "path": "system-images;android-30;google_apis;x86",
+          "version": "9",
+          "alternatives": [
+            {
+              "path": "system-images;android-30;google_apis_playstore;x86",
+              "version": "9"
+            },
+            {
+              "path": "system-images;android-30;google_apis;x86_64",
+              "version": "10"
+            },
+            {
+              "path": "system-images;android-30;google_apis_playstore;x86_64",
+              "version": "10"
+            }
+          ]
+        },
+        {
+          "path": "platform-tools",
+          "version": "31.0.0"
+        }
+      ],
+      "emulators": [
+        {
+          "sdkId": "system-images;android-30;google_apis;x86",
+          "alternateSdkIds": [
+            "system-images;android-30;google_apis_playstore;x86",
+            "system-images;android-30;google_apis;x86_64",
+            "system-images;android-30;google_apis_playstore;x86_64"
+          ],
+          "desc": "Android Emulator - x86 - API30 - Google API's",
+          "apiLevel": 30,
+          "tag": "google_apis",
+          "device": "pixel"
+        }
+      ]
+    },
+    "dotnet": {
+      "sdks": [
+        {
+          "version": "6.0.100-preview.4.21255.9",
+          "requireExact": true,
+          "enableWorkloadResolver": true,
+          "urls": {
+            "win64": "https://dotnetcli.azureedge.net/dotnet/Sdk/__VERSION__/dotnet-sdk-__VERSION__-win-x64.exe",
+            "win": "https://dotnetcli.azureedge.net/dotnet/Sdk/__VERSION__/dotnet-sdk-__VERSION__-win-x86.exe",
+            "osx": "https://dotnetcli.azureedge.net/dotnet/Sdk/__VERSION__/dotnet-sdk-__VERSION__-osx-x64.pkg"
+          },
+          "packageSources": [
+            "https://pkgs.dev.azure.com/azure-public/vside/_packaging/xamarin-impl/nuget/v3/index.json"
+          ],
+          "workloads": [
+            {
+                "workloadId": "microsoft-android-sdk-full",
+                "packageId": "Microsoft.NET.Workload.Android",
+                "version": "11.0.200-preview.4.245"
+            },
+            {
+                "workloadId": "microsoft-ios-sdk-full",
+                "packageId": "Microsoft.NET.Workload.iOS",
+                "version": "14.5.100-preview.4.638"
+            },
+            {
+                "workloadId": "microsoft-maccatalyst-sdk-full",
+                "packageId": "Microsoft.NET.Workload.MacCatalyst",
+                "version": "14.5.100-preview.4.638"
+            },
+            {
+                "workloadId": "microsoft-tvos-sdk-full",
+                "packageId": "Microsoft.NET.Workload.tvOS",
+                "version": "14.5.100-preview.4.638"
+            },
+            {
+                "workloadId": "microsoft-macos-sdk-full",
+                "packageId": "Microsoft.NET.Workload.macOS",
+                "version": "11.3.100-preview.4.638"
+            }
+          ],
+          "packs": [
+            {
+              "id": "Microsoft.Maui.Templates",
+              "version": "6.0.100-preview.4.631",
+              "skipManifestCheck": true,
+              "packKind": "template",
+              "templateShortName": "maui"
+            },
+            {
+                "id": "Microsoft.iOS.Windows.Sdk",
+                "version": "14.5.100-preview.4.638",
+                "skipManifestCheck": true,
+                "packKind": "sdk",
+                "arch": "win64"
+            },
+            {
+                "id": "Microsoft.iOS.Windows.Sdk",
+                "version": "14.5.100-preview.4.638",
+                "skipManifestCheck": true,
+                "packKind": "sdk",
+                "arch": "win"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
