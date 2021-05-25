@@ -1,14 +1,18 @@
 {
   "check": {
-    "toolVersion": "0.3.2",
+    "toolVersion": "0.4.1",
     "openjdk": {
-      "minimumVersion": "1.8.0-1"
+      "version": "11.0",
+      "urls": {
+        "win64": "https://aka.ms/download-jdk/microsoft-jdk-11.0.10.9-windows-x64.msi",
+        "osx": "https://aka.ms/download-jdk/microsoft-jdk-11.0.10.9-macos-x64.pkg"
+      }
     },
     "xcode": {
-      "minimumVersion": "12.4"
+      "minimumVersion": "12.5"
     },
     "vswin": {
-      "minimumVersion": "16.9.0"
+      "minimumVersion": "16.10.0-pre.2.1"
     },
     "vsmac": {
       "minimumVersion": "8.9.0"
@@ -68,7 +72,8 @@
     "dotnet": {
       "sdks": [
         {
-          "version": "6.0.100-preview.3.21202.5",
+          "version": "6.0.100-preview.4.21255.9",
+          "requireExact": true,
           "enableWorkloadResolver": true,
           "urls": {
             "win64": "https://dotnetcli.azureedge.net/dotnet/Sdk/__VERSION__/dotnet-sdk-__VERSION__-win-x64.exe",
@@ -80,52 +85,52 @@
           ],
           "workloads": [
             {
-              "workloadId": "microsoft-android-sdk-full",
-              "packageId": "Microsoft.NET.Workload.Android",
-              "version": "11.0.200-preview.3.196"
+                "workloadId": "microsoft-android-sdk-full",
+                "packageId": "Microsoft.NET.Workload.Android",
+                "version": "11.0.200-preview.4.245"
             },
             {
-              "workloadId": "microsoft-ios-sdk-full",
-              "packageId": "Microsoft.NET.Workload.iOS",
-              "version": "14.4.100-preview.3.1326"
+                "workloadId": "microsoft-ios-sdk-full",
+                "packageId": "Microsoft.NET.Workload.iOS",
+                "version": "14.5.100-preview.4.638"
             },
             {
-              "workloadId": "microsoft-maccatalyst-sdk-full",
-              "packageId": "Microsoft.NET.Workload.MacCatalyst",
-              "version": "14.3.100-preview.3.471"
+                "workloadId": "microsoft-maccatalyst-sdk-full",
+                "packageId": "Microsoft.NET.Workload.MacCatalyst",
+                "version": "14.5.100-preview.4.638"
             },
             {
-              "workloadId": "microsoft-tvos-sdk-full",
-              "packageId": "Microsoft.NET.Workload.tvOS",
-              "version": "14.3.100-preview.3.1379"
+                "workloadId": "microsoft-tvos-sdk-full",
+                "packageId": "Microsoft.NET.Workload.tvOS",
+                "version": "14.5.100-preview.4.638"
             },
             {
-              "workloadId": "microsoft-macos-sdk-full",
-              "packageId": "Microsoft.NET.Workload.macOS",
-              "version": "11.1.100-preview.3.1379"
+                "workloadId": "microsoft-macos-sdk-full",
+                "packageId": "Microsoft.NET.Workload.macOS",
+                "version": "11.3.100-preview.4.638"
             }
           ],
           "packs": [
             {
               "id": "Microsoft.Maui.Templates",
-              "version": "6.0.100-preview.3.322",
+              "version": "6.0.100-preview.4.628",
               "skipManifestCheck": true,
               "packKind": "template",
               "templateShortName": "maui"
             },
             {
-              "id": "Microsoft.iOS.Windows.Sdk",
-              "version": "14.4.100-preview.3.1326",
-              "skipManifestCheck": true,
-              "packKind": "sdk",
-              "arch": "win64"
+                "id": "Microsoft.iOS.Windows.Sdk",
+                "version": "14.5.100-preview.4.638",
+                "skipManifestCheck": true,
+                "packKind": "sdk",
+                "arch": "win64"
             },
             {
-              "id": "Microsoft.iOS.Windows.Sdk",
-              "version": "14.4.100-preview.3.1326",
-              "skipManifestCheck": true,
-              "packKind": "sdk",
-              "arch": "win"
+                "id": "Microsoft.iOS.Windows.Sdk",
+                "version": "14.5.100-preview.4.638",
+                "skipManifestCheck": true,
+                "packKind": "sdk",
+                "arch": "win"
             }
           ]
         }
