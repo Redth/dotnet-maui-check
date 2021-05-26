@@ -113,7 +113,7 @@
           "packs": [
             {
               "id": "Microsoft.Maui.Templates",
-              "version": "6.0.100-preview.4.631",
+              "version": "6.0.100-preview.4.634",
               "skipManifestCheck": true,
               "packKind": "template",
               "templateShortName": "maui"
