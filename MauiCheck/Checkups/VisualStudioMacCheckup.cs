@@ -20,6 +20,9 @@ namespace DotNetCheck.Checkups
 		public NuGetVersion ExactVersion
 			=> Extensions.ParseVersion(Manifest?.Check?.VSMac?.ExactVersion);
 
+		public bool Optional
+			=> Manifest?.Check?.VSMac?.Optional ?? false;
+
 		public override string Id => "vsmac";
 
 		public override string Title => $"Visual Studio {MinimumVersion.ThisOrExact(ExactVersion)}";
@@ -79,7 +82,7 @@ namespace DotNetCheck.Checkups
 			if (sentinelFiles.Any())
 				history.ContributeState(this, "sentinel_files", sentinelFiles.ToArray());
 
-			if (ok)
+			if (ok || Optional)
 				return DiagnosticResult.Ok(this);
 
 			return new DiagnosticResult(Status.Error, this);
