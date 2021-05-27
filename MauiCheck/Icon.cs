@@ -8,7 +8,7 @@
 		public static string Error
 			=> PrettyBoring(":cross_mark:", "×");
 		public static string Warning
-			=> PrettyBoring(":warning:", "¡");
+			=> PrettyBoring(":dragon:", "¡");
 
 		public static string ListItem
 			=> "–";
