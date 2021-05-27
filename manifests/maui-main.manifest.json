@@ -1,6 +1,23 @@
 {
   "check": {
-    "toolVersion": "0.4.1",
+		"toolVersion": "0.4.1",
+		"variables": {
+			"MAUI_VERSION": "6.0.100-preview.4.631"
+		},
+		"variableMappers":[
+      {
+        "$type" : "DotNetCheck.Manifest.XmlVariableMapper, MauiCheck",
+        "sourceUri" : "https://raw.githubusercontent.com/dotnet/maui/main/eng/Versions.props",
+        "mappings": [
+          { "name": "DOTNET_SDK_VERSION", "xpath": "//Project/PropertyGroup/MicrosoftDotnetSdkInternalPackageVersion/text()" },
+          { "name": "MACCATALYST_SDK_VERSION", "xpath": "//Project/PropertyGroup/MicrosoftMacCatalystSdkPackageVersion/text()" },
+          { "name": "IOS_SDK_VERSION", "xpath": "//Project/PropertyGroup/MicrosoftiOSSdkPackageVersion/text()" },
+          { "name": "TVOS_SDK_VERSION", "xpath": "//Project/PropertyGroup/MicrosofttvOSSdkPackageVersion/text()" },
+          { "name": "MACOS_SDK_VERSION", "xpath": "//Project/PropertyGroup/MicrosoftmacOSSdkPackageVersion/text()" },
+          { "name": "ANDROID_SDK_VERSION", "xpath": "//Project/PropertyGroup/MicrosoftAndroidSdkWindowsPackageVersion/text()" }
+        ]
+      }
+    ],
     "openjdk": {
       "version": "11.0",
       "urls": {
@@ -73,13 +90,13 @@
     "dotnet": {
       "sdks": [
         {
-          "version": "6.0.100-preview.4.21255.9",
+          "version": "$(DOTNET_SDK_VERSION)",
           "requireExact": true,
           "enableWorkloadResolver": true,
           "urls": {
-            "win64": "https://dotnetcli.azureedge.net/dotnet/Sdk/__VERSION__/dotnet-sdk-__VERSION__-win-x64.exe",
-            "win": "https://dotnetcli.azureedge.net/dotnet/Sdk/__VERSION__/dotnet-sdk-__VERSION__-win-x86.exe",
-            "osx": "https://dotnetcli.azureedge.net/dotnet/Sdk/__VERSION__/dotnet-sdk-__VERSION__-osx-x64.pkg"
+            "win64": "https://dotnetcli.azureedge.net/dotnet/Sdk/$(DOTNET_SDK_VERSION)/dotnet-sdk-$(DOTNET_SDK_VERSION)-win-x64.exe",
+            "win": "https://dotnetcli.azureedge.net/dotnet/Sdk/$(DOTNET_SDK_VERSION)/dotnet-sdk-$(DOTNET_SDK_VERSION)-win-x86.exe",
+            "osx": "https://dotnetcli.azureedge.net/dotnet/Sdk/$(DOTNET_SDK_VERSION)/dotnet-sdk-$(DOTNET_SDK_VERSION)-osx-x64.pkg"
           },
           "packageSources": [
             "https://pkgs.dev.azure.com/azure-public/vside/_packaging/xamarin-impl/nuget/v3/index.json"
@@ -88,47 +105,47 @@
             {
                 "workloadId": "microsoft-android-sdk-full",
                 "packageId": "Microsoft.NET.Workload.Android",
-                "version": "11.0.200-preview.4.245"
+                "version": "$(ANDROID_SDK_VERSION)"
             },
             {
                 "workloadId": "microsoft-ios-sdk-full",
                 "packageId": "Microsoft.NET.Workload.iOS",
-                "version": "14.5.100-preview.4.638"
+                "version": "$(IOS_SDK_VERSION)"
             },
             {
                 "workloadId": "microsoft-maccatalyst-sdk-full",
                 "packageId": "Microsoft.NET.Workload.MacCatalyst",
-                "version": "14.5.100-preview.4.638"
+                "version": "$(MACCATALYST_SDK_VERSION)"
             },
             {
                 "workloadId": "microsoft-tvos-sdk-full",
                 "packageId": "Microsoft.NET.Workload.tvOS",
-                "version": "14.5.100-preview.4.638"
+                "version": "$(TVOS_SDK_VERSION)"
             },
             {
                 "workloadId": "microsoft-macos-sdk-full",
                 "packageId": "Microsoft.NET.Workload.macOS",
-                "version": "11.3.100-preview.4.638"
+                "version": "$(MACOS_SDK_VERSION)"
             }
           ],
           "packs": [
             {
               "id": "Microsoft.Maui.Templates",
-              "version": "6.0.100-preview.4.634",
+              "version": "$(MAUI_VERSION)",
               "skipManifestCheck": true,
               "packKind": "template",
               "templateShortName": "maui"
             },
             {
                 "id": "Microsoft.iOS.Windows.Sdk",
-                "version": "14.5.100-preview.4.638",
+                "version": "$(IOS_SDK_VERSION)",
                 "skipManifestCheck": true,
                 "packKind": "sdk",
                 "arch": "win64"
             },
             {
                 "id": "Microsoft.iOS.Windows.Sdk",
-                "version": "14.5.100-preview.4.638",
+                "version": "$(IOS_SDK_VERSION)",
                 "skipManifestCheck": true,
                 "packKind": "sdk",
                 "arch": "win"
