@@ -10,6 +10,8 @@ namespace DotNetCheck.Checkups
 {
 	public class XCodeCheckup : Checkup
 	{
+		const string BugCommandLineToolsPath = "/Library/Developer/CommandLineTools";
+
 		public override bool IsPlatformSupported(Platform platform)
 			=> platform == Platform.OSX;
 
@@ -30,7 +32,36 @@ namespace DotNetCheck.Checkups
 
 		public override Task<DiagnosticResult> Examine(SharedState history)
 		{
-			var xcode = GetSelectedXCode();
+			FileInfo xcode = null;
+
+			try
+			{
+				xcode = GetSelectedXCode();
+			}
+			catch (ArgumentException)
+			{
+				// If this is the case, they need to run xcode-select -s
+				ReportStatus($"Invalid xcode-select path found ({BugCommandLineToolsPath})", Status.Error);
+
+				return Task.FromResult(new DiagnosticResult(
+					Status.Error,
+					this,
+					new Suggestion("Run `sudo xcode-select --reset`",
+						new Solutions.ActionSolution(cancelToken =>
+						{
+							var args = $"-c 'sudo xcode-select --reset'";
+							Util.Log($"{ShellProcessRunner.MacOSShell} {args}");
+
+							var p = new ShellProcessRunner(new ShellProcessRunnerOptions(ShellProcessRunner.MacOSShell, args)
+							{
+								RedirectOutput = Util.Verbose
+							});
+
+							p.WaitForExit();
+
+							return Task.CompletedTask;
+						}))));
+			}
 
 			if (xcode == null)
 			{
@@ -85,6 +116,9 @@ namespace DotNetCheck.Checkups
 
 			if (!string.IsNullOrEmpty(path))
 			{
+				if (path.Equals(BugCommandLineToolsPath))
+					throw new ArgumentException();
+
 				var dir = new DirectoryInfo(path);
 
 				if (dir.Exists)
