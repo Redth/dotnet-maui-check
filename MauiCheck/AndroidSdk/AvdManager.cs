@@ -292,6 +292,9 @@ namespace DotNetCheck.AndroidSdk
 
 			var r = p.WaitForExit();
 
+			if (r.StandardOutput.Concat(r.StandardError).Any(s => s.Contains("Exception")))
+				throw new Exception("Failed to create android avd");
+
 			return r.StandardOutput;
 		}
 	}
