@@ -8,16 +8,29 @@ using System.Threading.Tasks;
 
 namespace DotNetCheck
 {
+	public enum ManifestChannel
+	{
+		Default,
+		Preview,
+		Main
+	}
+
 	public class ToolInfo
 	{
 		public const string ToolName = ".NET MAUI Check";
 		public const string ToolPackageId = "Redth.Net.Maui.Check";
 		public const string ToolCommand = "maui-check";
 
-		public static async Task<Manifest.Manifest> LoadManifest(string fileOrUrl, bool dev)
+		public static async Task<Manifest.Manifest> LoadManifest(string fileOrUrl, ManifestChannel channel)
 		{
 			var f = fileOrUrl ??
-				(dev ? Manifest.Manifest.DevManifestUrl : Manifest.Manifest.DefaultManifestUrl);
+				channel switch
+				{
+					ManifestChannel.Preview => Manifest.Manifest.PreviewManifestUrl,
+					ManifestChannel.Main => Manifest.Manifest.MainManifestUrl,
+					ManifestChannel.Default => Manifest.Manifest.DefaultManifestUrl,
+					_ => Manifest.Manifest.DefaultManifestUrl
+				};
 
 			Util.Log($"Loading Manifest from: {f}");
 

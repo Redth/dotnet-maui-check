@@ -1,4 +1,5 @@
 ﻿using System;
+using DotNetCheck.Cli;
 using NuGet.Versioning;
 
 namespace DotNetCheck
@@ -25,6 +26,17 @@ namespace DotNetCheck
 				return nv;
 
 			return defaultVersion;
+		}
+
+		public static ManifestChannel GetManifestChannel(this IManifestChannelSettings settings)
+		{
+			var channel = ManifestChannel.Default;
+			if (settings.Preview)
+				channel = ManifestChannel.Preview;
+			if (settings.Main)
+				channel = ManifestChannel.Main;
+
+			return channel;
 		}
 	}
 }

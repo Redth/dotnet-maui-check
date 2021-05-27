@@ -12,7 +12,7 @@ namespace DotNetCheck
 	{
 		public override async Task<int> ExecuteAsync(CommandContext context, ListCheckupSettings settings)
 		{
-			var manifest = await ToolInfo.LoadManifest(settings.Manifest, settings.Dev);
+			var manifest = await ToolInfo.LoadManifest(settings.Manifest, settings.GetManifestChannel());
 
 			if (!ToolInfo.Validate(manifest))
 			{

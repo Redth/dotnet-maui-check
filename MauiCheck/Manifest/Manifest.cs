@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -8,7 +9,8 @@ namespace DotNetCheck.Manifest
 	public partial class Manifest
 	{
 		public const string DefaultManifestUrl = "https://aka.ms/dotnet-maui-check-manifest";
-		public const string DevManifestUrl = "https://aka.ms/dotnet-maui-check-manifest-dev";
+		public const string PreviewManifestUrl = "https://aka.ms/dotnet-maui-check-manifest-preview";
+		public const string MainManifestUrl = "https://aka.ms/dotnet-maui-check-manifest-main";
 
 		public static Task<Manifest> FromFileOrUrl(string fileOrUrl)
 		{
@@ -32,7 +34,16 @@ namespace DotNetCheck.Manifest
 			return FromJson(json);
 		}
 
-		public static Manifest FromJson(string json) => JsonConvert.DeserializeObject<Manifest>(json);
+		public static Manifest FromJson(string json)
+		{
+			var m = JsonConvert.DeserializeObject<Manifest>(json, new JsonSerializerSettings {
+				TypeNameHandling = TypeNameHandling.Auto
+			});
+
+			m?.Check?.MapVariables();
+
+			return m;
+		}
 
 		[JsonProperty("check")]
 		public Check Check { get; set; }

@@ -1,8 +1,8 @@
 ﻿using Spectre.Console.Cli;
 
-namespace DotNetCheck.Cli
+namespace DotNetCheck
 {
-	public class CheckSettings : CommandSettings
+	public class CheckSettings : CommandSettings, IManifestChannelSettings
 	{
 		[CommandOption("-m|--manifest <FILE_OR_URL>")]
 		public string Manifest { get; set; }
@@ -16,8 +16,11 @@ namespace DotNetCheck.Cli
 		[CommandOption("-s|--skip <CHECKUP_ID>")]
 		public string[] Skip { get; set; }
 
-		[CommandOption("-d|--dev")]
-		public bool Dev { get; set; }
+		[CommandOption("--pre|--preview|-d|--dev")]
+		public bool Preview { get; set; }
+
+		[CommandOption("--main")]
+		public bool Main { get; set; }
 
 		[CommandOption("--dotnet <SDK_ROOT>")]
 		public string DotNetSdkRoot { get; set; }
