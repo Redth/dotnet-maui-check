@@ -42,13 +42,13 @@ If you're running on CI you may want to run without any required input with the 
 maui-check --non-interactive
 ```
 
-### `-d`, `--dev` Dev Manifest feed
+### `--preview` Preview Manifest feed
 
 This uses a more frequently updated manifest with newer versions of things more often.
 The manifest is hosted by default at: https://aka.ms/dotnet-maui-check-manifest-dev
 
 ```
-maui-check --dev
+maui-check --preview
 ```
 
 ### `--ci` Continuous Integration
