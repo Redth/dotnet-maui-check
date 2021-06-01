@@ -75,6 +75,10 @@ namespace DotNetCheck.Manifest
 					strVal = SubstituteVariableValue(strVal, variables);
 					prop.SetValue(instance, strVal);
 				}
+				else if (pval is Uri uriVal)
+				{
+					prop.SetValue(instance, new Uri(SubstituteVariableValue(uriVal.OriginalString, variables)));
+				}
 				else if (pval is IList pinstList)
 				{
 					foreach (var item in pinstList)
