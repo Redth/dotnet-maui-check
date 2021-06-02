@@ -1,10 +1,11 @@
 {
   "check": {
-		"toolVersion": "0.4.1",
-		"variables": {
-			"MAUI_VERSION": "6.0.100-preview.4.631"
-		},
-		"variableMappers":[
+    "toolVersion": "0.4.1",
+    "variables": {
+      "MAUI_VERSION": "6.0.100-preview.4.631",
+      "OPENJDK_VERSION": "11.0.10.9"
+    },
+    "variableMappers":[
       {
         "$type" : "DotNetCheck.Manifest.XmlVariableMapper, MauiCheck",
         "sourceUri" : "https://raw.githubusercontent.com/dotnet/maui/main/eng/Versions.props",
@@ -21,8 +22,8 @@
     "openjdk": {
       "version": "11.0",
       "urls": {
-        "win64": "https://aka.ms/download-jdk/microsoft-jdk-11.0.10.9-windows-x64.msi",
-        "osx": "https://aka.ms/download-jdk/microsoft-jdk-11.0.10.9-macos-x64.pkg"
+        "win64": "https://aka.ms/download-jdk/microsoft-jdk-$(OPENJDK_VERSION)-windows-x64.msi",
+        "osx": "https://aka.ms/download-jdk/microsoft-jdk-$(OPENJDK_VERSION)-macos-x64.pkg"
       }
     },
     "xcode": {
@@ -104,27 +105,27 @@
           "workloads": [
             {
                 "workloadId": "microsoft-android-sdk-full",
-                "packageId": "Microsoft.NET.Workload.Android",
+                "packageId": "Microsoft.NET.Sdk.Android.Manifest-6.0.100",
                 "version": "$(ANDROID_SDK_VERSION)"
             },
             {
                 "workloadId": "microsoft-ios-sdk-full",
-                "packageId": "Microsoft.NET.Workload.iOS",
+                "packageId": "Microsoft.NET.Sdk.iOS.Manifest-6.0.100",
                 "version": "$(IOS_SDK_VERSION)"
             },
             {
                 "workloadId": "microsoft-maccatalyst-sdk-full",
-                "packageId": "Microsoft.NET.Workload.MacCatalyst",
+                "packageId": "Microsoft.NET.Sdk.MacCatalyst.Manifest-6.0.100",
                 "version": "$(MACCATALYST_SDK_VERSION)"
             },
             {
                 "workloadId": "microsoft-tvos-sdk-full",
-                "packageId": "Microsoft.NET.Workload.tvOS",
+                "packageId": "Microsoft.NET.Sdk.tvOS.Manifest-6.0.100",
                 "version": "$(TVOS_SDK_VERSION)"
             },
             {
                 "workloadId": "microsoft-macos-sdk-full",
-                "packageId": "Microsoft.NET.Workload.macOS",
+                "packageId": "Microsoft.NET.Sdk.macOS.Manifest-6.0.100",
                 "version": "$(MACOS_SDK_VERSION)"
             }
           ],
@@ -135,20 +136,6 @@
               "skipManifestCheck": true,
               "packKind": "template",
               "templateShortName": "maui"
-            },
-            {
-                "id": "Microsoft.iOS.Windows.Sdk",
-                "version": "$(IOS_SDK_VERSION)",
-                "skipManifestCheck": true,
-                "packKind": "sdk",
-                "arch": "win64"
-            },
-            {
-                "id": "Microsoft.iOS.Windows.Sdk",
-                "version": "$(IOS_SDK_VERSION)",
-                "skipManifestCheck": true,
-                "packKind": "sdk",
-                "arch": "win"
             }
           ]
         }
