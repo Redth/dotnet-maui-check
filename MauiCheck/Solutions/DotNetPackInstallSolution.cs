@@ -1,6 +1,7 @@
 ﻿using DotNetCheck.DotNet;
 using DotNetCheck.Manifest;
 using DotNetCheck.Models;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -32,7 +33,13 @@ namespace DotNetCheck.Solutions
 			if (await workloadManager.InstallWorkloadPack(SdkRoot, Package, cancellationToken))
 				ReportStatus($"Installed Pack: {Package.Id}.");
 			else
-				ReportStatus($"Failed to install Pack: {Package.Id}.");
+			{
+				var msg = $"Failed to install Pack: {Package.Id}.";
+
+				ReportStatus(msg);
+
+				throw new Exception(msg);
+			}
 		}
 	}
 }
