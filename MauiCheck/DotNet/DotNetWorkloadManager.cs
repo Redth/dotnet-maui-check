@@ -15,6 +15,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
@@ -398,7 +399,7 @@ namespace DotNetCheck.DotNet
 
 				var clientPolicy = ClientPolicyContext.GetClientPolicy(nugetSettings, logger);
 
-				var packagePathResolver = new DotNetSdkPackPackagePathResolver(destination, appendVersionToExtractPath);
+				var packagePathResolver = new DotNetSdkPackPackagePathResolver(destination, appendVersionToExtractPath, isWorkload);
 
 				var fullDestinationDir = packagePathResolver.GetInstallPath(packageIdentity);
 
@@ -458,13 +459,15 @@ namespace DotNetCheck.DotNet
 
 		class DotNetSdkPackPackagePathResolver : PackagePathResolver
 		{
-			public DotNetSdkPackPackagePathResolver(string rootDirectory, bool appendVersionToPath)
+			public DotNetSdkPackPackagePathResolver(string rootDirectory, bool appendVersionToPath, bool isWorkload)
 				: base(rootDirectory, false)
 			{
 				AppendVersionToPath = appendVersionToPath;
+				IsWorkload = isWorkload;
 			}
 
 			public readonly bool AppendVersionToPath;
+			public readonly bool IsWorkload;
 
 			public override string GetPackageDirectoryName(PackageIdentity packageIdentity)
 				=> GetPathBase(packageIdentity).ToString();
@@ -473,9 +476,20 @@ namespace DotNetCheck.DotNet
 				=> GetPathBase(packageIdentity) + PackagingCoreConstants.NupkgExtension;
 
 			string GetPathBase(PackageIdentity packageIdentity)
-				=> AppendVersionToPath
-					? Path.Combine(packageIdentity.Id, packageIdentity.Version.ToString())
-					: packageIdentity.Id;
+			{
+				if (AppendVersionToPath)
+					return Path.Combine(packageIdentity.Id, packageIdentity.Version.ToString());
+
+				// Workloads have a package id that ends with .Manifest-x.y.z but we don't actually
+				// want that part in the path we install the workload to
+				// Let's replace
+				if (IsWorkload)
+				{
+					return Regex.Replace(packageIdentity.Id, @"\.Manifest-\d+\.\d+\.\d+$", string.Empty, RegexOptions.Singleline);
+				}
+
+				return packageIdentity.Id;
+			}
 		}
 
 		async Task<bool> DownloadNuGet(SourceRepository nugetSource, SourceCacheContext cache, ILogger logger, string packageId, NuGetVersion packageVersion, string destination, CancellationToken cancelToken)
