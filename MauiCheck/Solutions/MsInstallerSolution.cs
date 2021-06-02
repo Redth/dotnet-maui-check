@@ -95,9 +95,27 @@ namespace DotNetCheck.Solutions
 			}
 			else
 			{
-				ReportStatus($"Installation failed for {Title ?? Url.ToString()}.  See log file for more details: {logFile}");				
+				if (File.Exists(logFile))
+				{
+					var logText = File.ReadAllText(logFile);
+
+					// Newer version already installed
+					if (logText.Contains("0x80070666"))
+					{
+						var existsMsg = $"Installation failed for {Title ?? Url.ToString()}."
+							+ Environment.NewLine + "A newer version of dotnet SDK is already installed"
+							+ Environment.NewLine + $"See log file for more details: {logFile}";
+
+						ReportStatus(existsMsg);
+
+						throw new Exception(existsMsg);
+					}
+				}
+
+				var msg = $"Installation failed for {Title ?? Url.ToString()}.  See log file for more details: {logFile}";
+				ReportStatus(msg);
+				throw new Exception(msg);
 			}
 		}
-		
 	}
 }
