@@ -19,6 +19,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
+using Newtonsoft.Json.Linq;
 
 namespace DotNetCheck.DotNet
 {
@@ -63,6 +64,50 @@ namespace DotNetCheck.DotNet
 						{
 							try { Util.Delete(dir, false); }
 							catch { }
+						}
+					}
+				}
+			}
+		}
+
+		void DeleteExistingWorkloads(string sdkRoot, string sdkVersion, string workloadIdentifier)
+		{
+			if (NuGetVersion.TryParse(sdkVersion, out var v))
+			{
+				var sdkBand = $"{v.Major}.{v.Minor}.{v.Patch}";
+
+				var manifestsDir = Path.Combine(sdkRoot, "sdk-manifests", sdkBand);
+
+				if (Directory.Exists(manifestsDir))
+				{
+					foreach (var dir in Directory.GetDirectories(manifestsDir))
+					{
+						var delete = false;
+						var manifestFile = Path.Combine(dir, "WorkloadManifest.json");
+
+						if (File.Exists(manifestFile))
+						{
+							var json = JObject.Parse(File.ReadAllText(manifestFile));
+							var workloadsJson = json["workloads"];
+
+							foreach (var wj in workloadsJson.Children())
+							{
+								var wid = (wj as JProperty)?.Name;
+
+								if (wid == workloadIdentifier)
+								{
+									delete = true;
+									break;
+								}
+							}
+		
+							if (delete)
+							{
+								Util.Log($"Existing workload with id: {workloadIdentifier} found, deleting...");
+
+								try { Util.Delete(dir, false); }
+								catch { }
+							}
 						}
 					}
 				}
@@ -159,8 +204,10 @@ namespace DotNetCheck.DotNet
 		public IEnumerable<WorkloadResolver.PackInfo> GetInstalledWorkloadPacks(WorkloadPackKind kind)
 			=> workloadResolver.GetInstalledWorkloadPacksOfKind(kind);
 
-		public Task<bool> InstallWorkloadManifest(string packageId, NuGetVersion manifestPackageVersion, CancellationToken cancelToken)
+		public Task<bool> InstallWorkloadManifest(string packageId, string workloadId, NuGetVersion manifestPackageVersion, CancellationToken cancelToken)
 		{
+			DeleteExistingWorkloads(SdkRoot, SdkVersion, workloadId);
+
 			var manifestRoot = GetSdkManifestRoot();
 
 			return AcquireNuGet(packageId, manifestPackageVersion, manifestRoot, false, cancelToken, true, isWorkload: true);
