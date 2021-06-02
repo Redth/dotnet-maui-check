@@ -157,9 +157,9 @@ jobs:
           if: github.event_name == 'release'
           run: |
             nuget push NuGet\*.nupkg -Source https://api.nuget.org/v3/index.json -ApiKey ${{ secrets.NUGET_ORG_API_KEY }} -SkipDuplicate
-        - name: Push GPR
-          if: github.event_name != 'release'
-          run: |
-            nuget sources add -Name "GPR" -Source "https://nuget.pkg.github.com/Redth/index.json" -UserName Redth -Password ${{ secrets.GITHUB_TOKEN }}
-            nuget setApiKey ${{ secrets.NUGET_API_KEY }} -Source "GPR"
-            nuget push NuGet\*.nupkg -Source "GPR" -SkipDuplicate
+        #- name: Push GPR
+        #  if: github.event_name != 'release'
+        #  run: |
+        #    nuget sources add -Name "GPR" -Source "https://nuget.pkg.github.com/Redth/index.json" -UserName Redth -Password ${{ secrets.GITHUB_TOKEN }}
+        #    nuget setApiKey ${{ secrets.NUGET_API_KEY }} -Source "GPR"
+        #    nuget push NuGet\*.nupkg -Source "GPR" -SkipDuplicate
