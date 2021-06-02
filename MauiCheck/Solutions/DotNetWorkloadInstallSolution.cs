@@ -32,12 +32,16 @@ namespace DotNetCheck.Solutions
 			var workloadManager = new DotNetWorkloadManager(SdkRoot, SdkVersion, NuGetPackageSources);
 
 			if (NuGetVersion.TryParse(Workload.Version, out var version)
-				&& await workloadManager.InstallWorkloadManifest(Workload.PackageId, version, cancellationToken))
+				&& await workloadManager.InstallWorkloadManifest(Workload.PackageId, Workload.Id, version, cancellationToken))
 			{
 				ReportStatus($"Installed Workload: {Workload.Id}.");
 			}
 			else
-				ReportStatus($"Failed to install workload: {Workload.Id}.");
+			{
+				var msg = $"Failed to install workload: {Workload.Id}.";
+				ReportStatus(msg);
+				throw new System.Exception(msg);
+			}
 		}
 	}
 }
