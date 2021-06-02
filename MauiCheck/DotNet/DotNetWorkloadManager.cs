@@ -30,6 +30,8 @@ namespace DotNetCheck.DotNet
 			SdkVersion = sdkVersion;
 			NuGetPackageSources = nugetPackageSources;
 
+			CleanEmptyWorkloadDirectories(sdkRoot, sdkVersion);
+
 			manifestProvider = new SdkDirectoryWorkloadManifestProvider(SdkRoot, SdkVersion);
 			workloadResolver = WorkloadResolver.Create(manifestProvider, SdkRoot, SdkVersion);
 		}
@@ -42,6 +44,30 @@ namespace DotNetCheck.DotNet
 
 		public readonly string[] NuGetPackageSources;
 
+
+		void CleanEmptyWorkloadDirectories(string sdkRoot, string sdkVersion)
+		{
+			if (NuGetVersion.TryParse(sdkVersion, out var v))
+			{
+				var sdkBand = $"{v.Major}.{v.Minor}.{v.Patch}";
+
+				var manifestsDir = Path.Combine(sdkRoot, "sdk-manifests", sdkBand);
+
+				if (Directory.Exists(manifestsDir))
+				{
+					foreach (var dir in Directory.GetDirectories(manifestsDir))
+					{
+						var manifestFile = Path.Combine(dir, "WorkloadManifest.json");
+
+						if (!File.Exists(manifestFile))
+						{
+							try { Util.Delete(dir, false); }
+							catch { }
+						}
+					}
+				}
+			}
+		}
 
 		public IEnumerable<(string packageId, NuGetVersion packageVersion)> GetInstalledWorkloadNuGetPackages()
 		{
