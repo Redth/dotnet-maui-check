@@ -45,7 +45,6 @@ namespace DotNetCheck.DotNet
 
 		public readonly string[] NuGetPackageSources;
 
-
 		void CleanEmptyWorkloadDirectories(string sdkRoot, string sdkVersion)
 		{
 			if (NuGetVersion.TryParse(sdkVersion, out var v))
@@ -515,6 +514,18 @@ namespace DotNetCheck.DotNet
 
 					try { Directory.Delete(dataDir, true); }
 					catch (Exception ex) { Util.Exception(ex); }
+
+					// Try deleting files that need not be kept after extracting
+					try
+					{
+						var files = Directory.GetFiles(fullDestinationDir);
+
+						foreach (var f in files)
+						{
+							if (Path.HasExtension(".nuspec") || Path.GetFileName(f).Equals("LICENSE", StringComparison.OrdinalIgnoreCase))
+								Util.Delete(f, true);
+						}
+					} catch { }
 				}
 
 				try
