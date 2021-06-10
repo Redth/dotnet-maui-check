@@ -522,10 +522,15 @@ namespace DotNetCheck.DotNet
 
 						foreach (var f in files)
 						{
-							if (Path.HasExtension(".nuspec") || Path.GetFileName(f).Equals("LICENSE", StringComparison.OrdinalIgnoreCase))
+							var ext = Path.GetExtension(f) ?? string.Empty;
+							if (ext.Equals(".nuspec", StringComparison.OrdinalIgnoreCase)
+								|| Path.GetFileName(f).Equals("LICENSE", StringComparison.OrdinalIgnoreCase))
+							{
 								Util.Delete(f, true);
+							}
 						}
-					} catch { }
+					}
+					catch { }
 				}
 
 				try
