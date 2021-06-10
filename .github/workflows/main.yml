@@ -135,9 +135,9 @@ jobs:
 
     publish:
       name: Publish
-      needs:
-        - testmac
-        - testwin
+#       needs:
+#         - testmac
+#         - testwin
       runs-on: windows-latest
       steps:
         - name: Download Artifacts
