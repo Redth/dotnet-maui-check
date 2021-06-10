@@ -27,7 +27,7 @@ namespace DotNetCheck.Cli
 			AnsiConsole.Render(
 				new FigletText(".NET MAUI").LeftAligned().Color(Color.Green));
 
-			AnsiConsole.MarkupLine($"[underline bold green]{Icon.Ambulance} {ToolInfo.ToolName} {Icon.Recommend}[/]");
+			AnsiConsole.MarkupLine($"[underline bold green]{Icon.Ambulance} {ToolInfo.ToolName} v{ToolInfo.CurrentVersion} {Icon.Recommend}[/]");
 			AnsiConsole.Render(new Rule());
 
 			AnsiConsole.MarkupLine("This tool will attempt to evaluate your .NET MAUI development environment.");

@@ -37,6 +37,9 @@ namespace DotNetCheck
 			return await Manifest.Manifest.FromFileOrUrl(f);
 		}
 
+		public static string CurrentVersion
+			=> NuGetVersion.Parse(FileVersionInfo.GetVersionInfo(typeof(ToolInfo).Assembly.Location).FileVersion).ToString();
+
 		public static bool Validate(Manifest.Manifest manifest)
 		{
 			var toolVersion = manifest?.Check?.ToolVersion ?? "0.1.0";
