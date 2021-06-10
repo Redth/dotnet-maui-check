@@ -135,7 +135,8 @@ jobs:
 
     publish:
       name: Publish
-#       needs:
+      needs:
+        - build
 #         - testmac
 #         - testwin
       runs-on: windows-latest
