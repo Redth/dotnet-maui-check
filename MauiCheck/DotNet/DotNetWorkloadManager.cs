@@ -523,8 +523,7 @@ namespace DotNetCheck.DotNet
 						foreach (var f in files)
 						{
 							var ext = Path.GetExtension(f) ?? string.Empty;
-							if (ext.Equals(".nuspec", StringComparison.OrdinalIgnoreCase)
-								|| Path.GetFileName(f).Equals("LICENSE", StringComparison.OrdinalIgnoreCase))
+							if (Path.GetFileName(f).Equals("LICENSE", StringComparison.OrdinalIgnoreCase))
 							{
 								Util.Delete(f, true);
 							}
