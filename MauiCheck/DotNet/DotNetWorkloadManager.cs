@@ -351,6 +351,19 @@ namespace DotNetCheck.DotNet
 					{
 						var dotnetExe = Path.Combine(sdkRoot, DotNetSdk.DotNetExeName);
 
+						// First try to uninstall the templates if they might exist at all
+						// This should help cases where install works but then the templates show duplicate id's
+						// which seems to be caused by earlier net6 previews not handling templates correctly
+						try
+						{
+							var up = new ShellProcessRunner(new ShellProcessRunnerOptions(dotnetExe, $"new -u \"{packInfo.Id}\""));
+							var upr = up.WaitForExit();
+						}
+						catch (Exception ex)
+						{
+							Util.Exception(ex);
+						}
+
 						var p = new ShellProcessRunner(new ShellProcessRunnerOptions(dotnetExe, $"new -i \"{packInfo.Path}\""));
 						var pr = p.WaitForExit();
 
