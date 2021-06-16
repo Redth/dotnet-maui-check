@@ -586,7 +586,12 @@ namespace DotNetCheck.DotNet
 				// Let's replace
 				if (IsWorkload)
 				{
-					return Regex.Replace(packageIdentity.Id, @"\.Manifest-\d+\.\d+\.\d+$", string.Empty, RegexOptions.Singleline);
+					return Regex.Replace(
+						packageIdentity.Id,
+						@"\.Manifest-\d+\.\d+\.\d+$",
+						string.Empty,
+						RegexOptions.Singleline | RegexOptions.IgnoreCase)
+							?.ToLowerInvariant();
 				}
 
 				return packageIdentity.Id;
