@@ -2,7 +2,7 @@
   "check": {
     "toolVersion": "0.5.6",
     "variables": {
-      "MAUI_VERSION": "6.0.100-preview.5.794",
+      "MAUI_VERSION": "6.0.100-nightly.856",
       "OPENJDK_VERSION": "11.0.10.9"
     },
     "variableMappers":[
@@ -100,7 +100,8 @@
             "osx": "https://dotnetcli.azureedge.net/dotnet/Sdk/$(DOTNET_SDK_VERSION)/dotnet-sdk-$(DOTNET_SDK_VERSION)-osx-x64.pkg"
           },
           "packageSources": [
-            "https://pkgs.dev.azure.com/azure-public/vside/_packaging/xamarin-impl/nuget/v3/index.json"
+            "https://pkgs.dev.azure.com/azure-public/vside/_packaging/xamarin-impl/nuget/v3/index.json",
+            "https://api.nuget.org/v3/index.json"
           ],
           "workloads": [
             {
@@ -127,17 +128,14 @@
                 "workloadId": "microsoft-macos-sdk-full",
                 "packageId": "Microsoft.NET.Sdk.macOS.Manifest-6.0.100",
                 "version": "$(MACOS_SDK_VERSION)"
+            },
+            {
+                "workloadId": "maui",
+                "packageId": "Microsoft.NET.Sdk.Maui.Manifest-6.0.100",
+                "version": "$(MAUI_VERSION)"
             }
           ],
-          "packs": [
-            {
-              "id": "Microsoft.Maui.Templates",
-              "version": "$(MAUI_VERSION)",
-              "skipManifestCheck": true,
-              "packKind": "template",
-              "templateShortName": "maui"
-            }
-          ]
+          "packs": []
         }
       ]
     }
