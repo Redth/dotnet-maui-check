@@ -94,6 +94,25 @@ namespace DotNetCheck.Checkups
 			if (!missingPacks.Any())
 				return Task.FromResult(DiagnosticResult.Ok(this));
 
+			// In .NET 6 preview.6+ we no longer want to manually evaluate and install manually, but use the workload cli to do this instead:
+			if (NuGetVersion.TryParse(SdkVersion, out var nugetSdkVersion) && nugetSdkVersion >= DotNetCheck.Manifest.DotNetSdk.Version6Preview6)
+			{
+				var workloadSuggestions = workloadManager.GetWorkloadSuggestions(missingPacks.Select(mp => mp.Id).ToArray());
+
+				var workloadRemedies = workloadSuggestions
+					.Select(ws => new ActionSolution(t =>
+					{
+						return workloadManager.CliInstall(ws.Id);
+					}));
+
+				return Task.FromResult(new DiagnosticResult(
+					Status.Error,
+					this,
+					new Suggestion("Install Missing SDK Packs",
+					workloadRemedies.ToArray())));
+			}
+
+
 			var remedies = missingPacks
 				.Select(ms => new DotNetPackInstallSolution(SdkRoot, sdkVersion, ms, NuGetPackageSources));
 

@@ -180,6 +180,18 @@ namespace DotNetCheck.DotNet
 		//	}
 		//}
 
+		public Task CliInstall(string workloadId)
+		{
+			// dotnet workload install id --skip-manifest-update --add-source x
+			var dotnetExe = Path.Combine(SdkRoot, DotNetSdk.DotNetExeName);
+
+			var pkgSrcArgs = NuGetPackageSources.Select(ps => $"--add-source \"{ps}\"");
+
+			var args = new[] { "workload", "install", workloadId, "--skip-manifest-update" }.Concat(pkgSrcArgs);
+
+			return Util.WrapShellCommandWithSudo(dotnetExe, args.ToArray());
+		}
+
 		public IEnumerable<WorkloadResolver.PackInfo> GetPacksInWorkload(string workloadId)
 		{
 			foreach (var packId in workloadResolver.GetPacksInWorkload(workloadId))

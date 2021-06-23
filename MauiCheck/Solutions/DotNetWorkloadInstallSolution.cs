@@ -34,6 +34,11 @@ namespace DotNetCheck.Solutions
 			if (NuGetVersion.TryParse(Workload.Version, out var version)
 				&& await workloadManager.InstallWorkloadManifest(Workload.PackageId, Workload.Id, version, cancellationToken))
 			{
+				// In 6.0-preview.6 or newer, we should use the dotnet cli to acquire the packs for the workload we are installing
+				if (NuGetVersion.TryParse(SdkVersion, out var nugetSdkVersion) && nugetSdkVersion >= DotNetCheck.Manifest.DotNetSdk.Version6Preview6)
+					await workloadManager.CliInstall(Workload.Id);
+
+				// Install: dotnet workload install id --
 				ReportStatus($"Installed Workload: {Workload.Id}.");
 			}
 			else
