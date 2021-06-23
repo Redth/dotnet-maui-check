@@ -67,8 +67,7 @@ namespace DotNetCheck.DotNet
 
 			if (string.IsNullOrEmpty(sdkRoot) || !Directory.Exists(sdkRoot))
 			{
-				var r = new Microsoft.DotNet.DotNetSdkResolver.NETCoreSdkResolver();
-				sdkRoot = r.GetDotnetExeDirectory();
+				sdkRoot = Microsoft.DotNet.NativeWrapper.EnvironmentProvider.GetDotnetExeDirectory();
 			}
 
 			if (string.IsNullOrEmpty(sdkRoot) || !Directory.Exists(sdkRoot))
