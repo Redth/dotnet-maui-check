@@ -332,7 +332,7 @@ namespace DotNetCheck.DotNet
 					Path.Combine(Path.GetTempPath(), $"{sdkPack.Id}.{sdkPack.Version}.nupkg")
 					: Path.Combine(sdkRoot, "sdk", $"{sdkPack.Id}", sdkPack.Version);
 
-				packInfo = new WorkloadResolver.PackInfo(sdkPack.Id, sdkPack.Version, kind, path);
+				packInfo = new WorkloadResolver.PackInfo(sdkPack.Id, sdkPack.Version, kind, path, sdkPack.Id);
 			}
 			else
 			{
