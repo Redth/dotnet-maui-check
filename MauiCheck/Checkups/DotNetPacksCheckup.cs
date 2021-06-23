@@ -97,19 +97,41 @@ namespace DotNetCheck.Checkups
 			// In .NET 6 preview.6+ we no longer want to manually evaluate and install manually, but use the workload cli to do this instead:
 			if (NuGetVersion.TryParse(SdkVersion, out var nugetSdkVersion) && nugetSdkVersion >= DotNetCheck.Manifest.DotNetSdk.Version6Preview6)
 			{
-				var workloadSuggestions = workloadManager.GetWorkloadSuggestions(missingPacks.Select(mp => mp.Id).ToArray());
+				try
+				{
+					var allWorkloads = new List<Manifest.DotNetWorkload>();
 
-				var workloadRemedies = workloadSuggestions
-					.Select(ws => new ActionSolution(t =>
+					foreach (var sdk in Manifest.Check.DotNet.Sdks)
 					{
-						return workloadManager.CliInstall(ws.Id);
-					}));
+						if (NuGetVersion.TryParse(sdk.Version, out var nsdkv) && nsdkv >= DotNetCheck.Manifest.DotNetSdk.Version6Preview6)
+							allWorkloads.AddRange(sdk.Workloads);
+					}
 
-				return Task.FromResult(new DiagnosticResult(
-					Status.Error,
-					this,
-					new Suggestion("Install Missing SDK Packs",
-					workloadRemedies.ToArray())));
+					return Task.FromResult(new DiagnosticResult(
+						Status.Error,
+						this,
+						new Suggestion("Install Missing Workload SDK Packs",
+						new ActionSolution(async _ =>
+						{
+							foreach (var wl in allWorkloads)
+							{
+								ReportStatus($"Installing Workload packs for {wl.Id}", null);
+								try
+								{
+									await workloadManager.CliInstall(wl.Id);
+									ReportStatus($"Installed Workload packs for {wl.Id}", Status.Ok);
+								}
+								catch (Exception ex)
+								{
+									ReportStatus("Failed: " + ex.Message, Status.Error);
+								}
+							}
+						}))));
+				}
+				catch (Exception ex)
+				{
+					Util.Exception(ex);
+				}
 			}
 
 
