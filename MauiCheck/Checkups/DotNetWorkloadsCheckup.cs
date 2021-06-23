@@ -41,8 +41,7 @@ namespace DotNetCheck.Checkups
 
 		public override Task<DiagnosticResult> Examine(SharedState history)
 		{
-			string sdkVersion;
-			if (!history.TryGetEnvironmentVariable("DOTNET_SDK_VERSION", out sdkVersion))
+			if (!history.TryGetEnvironmentVariable("DOTNET_SDK_VERSION", out var sdkVersion))
 				sdkVersion = SdkVersion;
 
 			var workloadManager = new DotNetWorkloadManager(SdkRoot, sdkVersion, NuGetPackageSources);
@@ -63,8 +62,7 @@ namespace DotNetCheck.Checkups
 
 			foreach (var rp in RequiredWorkloads)
 			{
-				NuGetVersion rpVersion;
-				if (!NuGetVersion.TryParse(rp.Version, out rpVersion))
+				if (!NuGetVersion.TryParse(rp.Version, out var rpVersion))
 					rpVersion = new NuGetVersion(0, 0, 0);
 
 				// TODO: Eventually check actual workload resolver api for installed workloads and

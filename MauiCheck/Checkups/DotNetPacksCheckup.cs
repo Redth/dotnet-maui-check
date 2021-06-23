@@ -65,8 +65,7 @@ namespace DotNetCheck.Checkups
 
 		public override Task<DiagnosticResult> Examine(SharedState history)
 		{
-			string sdkVersion;
-			if (!history.TryGetEnvironmentVariable("DOTNET_SDK_VERSION", out sdkVersion))
+			if (!history.TryGetEnvironmentVariable("DOTNET_SDK_VERSION", out var sdkVersion))
 				sdkVersion = SdkVersion;
 
 			var workloadManager = new DotNetWorkloadManager(SdkRoot, sdkVersion, NuGetPackageSources);
