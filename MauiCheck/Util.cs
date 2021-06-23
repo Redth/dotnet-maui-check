@@ -178,7 +178,7 @@ namespace DotNetCheck
 			if (!Util.IsWindows)
 			{
 				actualCmd = ShellProcessRunner.MacOSShell;
-				actualArgs = $"-c '{cmd} {actualArgs}'"; 
+				actualArgs = $"-c 'sudo {cmd} {actualArgs}'"; 
 			}
 
 			var cli = new ShellProcessRunner(new ShellProcessRunnerOptions(actualCmd, actualArgs));
