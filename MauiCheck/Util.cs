@@ -170,6 +170,21 @@ namespace DotNetCheck
 			return false;
 		}
 
+		public static Task<ShellProcessRunner.ShellProcessResult> WrapShellCommandWithSudo(string cmd, string[] args)
+		{
+			var actualCmd = cmd;
+			var actualArgs = string.Join(" ", args);
+
+			if (!Util.IsWindows)
+			{
+				actualCmd = ShellProcessRunner.MacOSShell;
+				actualArgs = $"-c '{cmd} {actualArgs}'"; 
+			}
+
+			var cli = new ShellProcessRunner(new ShellProcessRunnerOptions(actualCmd, actualArgs));
+			return Task.FromResult(cli.WaitForExit());
+		}
+
 		public static async Task<bool> WrapCopyWithShellSudo(string destination, bool isFile, Func<string, Task<bool>> wrapping)
 		{
 			var intermediate = destination;
