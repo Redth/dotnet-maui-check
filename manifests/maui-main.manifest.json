@@ -3,7 +3,8 @@
     "toolVersion": "0.6.0-pre01",
     "variables": {
       "MAUI_VERSION": "6.0.100-preview.6.959",
-      "OPENJDK_VERSION": "11.0.10.9"
+      "OPENJDK_VERSION": "11.0.10.9",
+      "MONOTOOLCHAIN_VERSION": "6.0.0-preview.6.21352.12"
     },
     "variableMappers":[
       {
@@ -134,6 +135,11 @@
                 "workloadId": "maui",
                 "packageId": "Microsoft.NET.Sdk.Maui.Manifest-6.0.100",
                 "version": "$(MAUI_VERSION)"
+            },
+            {
+                "workloadId": "microsoft-net-runtime-android",
+                "packageId": "microsoft.net.workload.mono.toolchain.manifest-6.0.100",
+                "version": "$(MONOTOOLCHAIN_VERSION)"
             }
           ],
           "packs": []
