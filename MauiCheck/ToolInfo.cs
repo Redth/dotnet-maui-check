@@ -3,6 +3,7 @@ using Spectre.Console;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -56,12 +57,23 @@ namespace DotNetCheck
 				AnsiConsole.MarkupLine($"[bold red]{Icon.Error} Updating to version {toolVersion} or newer is required:[/]");
 				AnsiConsole.MarkupLine($"[blue]  dotnet tool update --global {ToolPackageId}[/]");
 
-				if (System.Diagnostics.Debugger.IsAttached)
+				if (Debugger.IsAttached)
 				{
 					if (AnsiConsole.Confirm("Mismatched version, continue debugging anyway?"))
 						return true;
 				}
 
+				return false;
+			}
+
+			var minSupportedDotNetSdkVersion = NuGetVersion.Parse("6.0.100-preview.5");
+
+			// Check that we aren't on a manifest that wants too old of dotnet6
+			if (manifest?.Check?.DotNet?.Sdks?.Any(dnsdk =>
+				NuGetVersion.TryParse(dnsdk.Version, out var dnsdkVersion) && dnsdkVersion < minSupportedDotNetSdkVersion) ?? false)
+			{
+				Console.WriteLine();
+				AnsiConsole.MarkupLine($"[bold red]{Icon.Error} This version of the tool is incompatible with installing an older version of .NET 6[/]");
 				return false;
 			}
 
