@@ -9,7 +9,7 @@
     "variableMappers":[
       {
         "$type" : "DotNetCheck.Manifest.XmlVariableMapper, MauiCheck",
-        "sourceUri" : "https://github.com/dotnet/maui/blob/main/eng/Versions.props",
+        "sourceUri" : "https://raw.githubusercontent.com/dotnet/maui/main/eng/Versions.props",
         "mappings": [
           { "name": "DOTNET_SDK_VERSION", "xpath": "//Project/PropertyGroup/MicrosoftDotnetSdkInternalPackageVersion/text()" },
           { "name": "MACCATALYST_SDK_VERSION", "xpath": "//Project/PropertyGroup/MicrosoftMacCatalystSdkPackageVersion/text()" },
