@@ -15,7 +15,7 @@ namespace DotNetCheck.Checkups
 			=> platform == Platform.Windows;
 
 		public NuGetVersion MinimumVersion
-			=> Extensions.ParseVersion(Manifest?.Check?.VSWin?.MinimumVersion, new NuGetVersion("16.9.0"));
+			=> Extensions.ParseVersion(Manifest?.Check?.VSWin?.MinimumVersion, new NuGetVersion("16.11.0"));
 
 		public NuGetVersion ExactVersion
 			=> Extensions.ParseVersion(Manifest?.Check?.VSWin?.ExactVersion);
@@ -31,23 +31,13 @@ namespace DotNetCheck.Checkups
 		{
 			var vsinfo = await GetWindowsInfo();
 
-			var sentinelFiles = new List<string>();
-
 			foreach (var vi in vsinfo)
 			{
 				if (vi.Version.IsCompatible(MinimumVersion, ExactVersion))
-				{
 					ReportStatus($"{vi.Version} - {vi.Path}", Status.Ok);
-
-					var sentinel = Path.Combine(vi.Path, "MSBuild\\Current\\Bin\\SdkResolvers\\Microsoft.DotNet.MSBuildSdkResolver\\EnableWorkloadResolver.sentinel");
-					sentinelFiles.Add(sentinel);
-				}
 				else
 					ReportStatus($"{vi.Version}", null);
 			}
-
-			if (sentinelFiles.Any())
-				history.ContributeState(this, "sentinel_files", sentinelFiles.ToArray());
 
 			if (vsinfo.Any(vs => vs.Version.IsCompatible(MinimumVersion, ExactVersion)))
 				return DiagnosticResult.Ok(this);
