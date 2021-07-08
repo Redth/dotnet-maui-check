@@ -1,14 +1,15 @@
 {
   "check": {
-    "toolVersion": "0.5.6",
+    "toolVersion": "0.6.0",
     "variables": {
-      "MAUI_VERSION": "6.0.100-preview.5.794",
-      "OPENJDK_VERSION": "11.0.10.9"
+      "MAUI_VERSION": "6.0.100-preview.6.976",
+      "OPENJDK_VERSION": "11.0.10.9",
+      "MONOTOOLCHAIN_VERSION": "6.0.0-preview.6.21352.12"
     },
     "variableMappers":[
       {
         "$type" : "DotNetCheck.Manifest.XmlVariableMapper, MauiCheck",
-        "sourceUri" : "https://raw.githubusercontent.com/dotnet/maui/release/6.0.1xx-preview5/eng/Versions.props",
+        "sourceUri" : "https://github.com/dotnet/maui/blob/release/6.0.1xx-preview6/eng/Versions.props",
         "mappings": [
           { "name": "DOTNET_SDK_VERSION", "xpath": "//Project/PropertyGroup/MicrosoftDotnetSdkInternalPackageVersion/text()" },
           { "name": "MACCATALYST_SDK_VERSION", "xpath": "//Project/PropertyGroup/MicrosoftMacCatalystSdkPackageVersion/text()" },
@@ -27,10 +28,10 @@
       }
     },
     "xcode": {
-      "minimumVersion": "12.5"
+      "minimumVersion": "13.2"
     },
     "vswin": {
-      "minimumVersion": "16.10.0"
+      "minimumVersion": "16.11.0"
     },
     "vsmac": {
       "minimumVersion": "8.10.0",
@@ -100,7 +101,9 @@
             "osx": "https://dotnetcli.azureedge.net/dotnet/Sdk/$(DOTNET_SDK_VERSION)/dotnet-sdk-$(DOTNET_SDK_VERSION)-osx-x64.pkg"
           },
           "packageSources": [
-            "https://pkgs.dev.azure.com/azure-public/vside/_packaging/xamarin-impl/nuget/v3/index.json"
+            "https://pkgs.dev.azure.com/azure-public/vside/_packaging/xamarin-impl/nuget/v3/index.json",
+            "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet6/nuget/v3/index.json",
+            "https://api.nuget.org/v3/index.json"
           ],
           "workloads": [
             {
@@ -127,17 +130,19 @@
                 "workloadId": "microsoft-macos-sdk-full",
                 "packageId": "Microsoft.NET.Sdk.macOS.Manifest-6.0.100",
                 "version": "$(MACOS_SDK_VERSION)"
+            },
+            {
+                "workloadId": "maui",
+                "packageId": "Microsoft.NET.Sdk.Maui.Manifest-6.0.100",
+                "version": "$(MAUI_VERSION)"
+            },
+            {
+                "workloadId": "microsoft-net-runtime-android",
+                "packageId": "microsoft.net.workload.mono.toolchain.manifest-6.0.100",
+                "version": "$(MONOTOOLCHAIN_VERSION)"
             }
           ],
-          "packs": [
-            {
-              "id": "Microsoft.Maui.Templates",
-              "version": "$(MAUI_VERSION)",
-              "skipManifestCheck": true,
-              "packKind": "template",
-              "templateShortName": "maui"
-            }
-          ]
+          "packs": []
         }
       ]
     }
