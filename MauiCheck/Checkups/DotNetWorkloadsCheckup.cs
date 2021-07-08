@@ -54,7 +54,7 @@ namespace DotNetCheck.Checkups
 			// the nuspec file contains the version we actually care about for now since the manifest json
 			// has a long number which is meaningless right now and will eventually be changed to a string
 			// when that happens we can use the actual resolver's method to get installed workload info
-			var installedPackageWorkloads = workloadManager.GetInstalledWorkloadNuGetPackages();
+			var installedPackageWorkloads = workloadManager.GetInstalledWorkloads();
 
 			var missingWorkloads = new List<Manifest.DotNetWorkload>();
 
@@ -65,7 +65,7 @@ namespace DotNetCheck.Checkups
 
 				// TODO: Eventually check actual workload resolver api for installed workloads and
 				// compare the manifest version once it has a string in it
-				if (!installedPackageWorkloads.Any(sp => sp.packageId.Equals(rp.PackageId, StringComparison.OrdinalIgnoreCase) && sp.packageVersion == rpVersion))
+				if (!installedPackageWorkloads.Any(ip => ip.id.Equals(rp.Id, StringComparison.OrdinalIgnoreCase) && NuGetVersion.TryParse(ip.version, out var ipVersion) && ipVersion == rpVersion))
 				{
 					ReportStatus($"{rp.Id} ({rp.PackageId} : {rp.Version}) not installed.", Status.Error);
 					missingWorkloads.Add(rp);
