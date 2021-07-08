@@ -58,8 +58,6 @@ namespace DotNetCheck.Checkups
 
 			var missingWorkloads = new List<Manifest.DotNetWorkload>();
 
-			var requiredPacks = new List<WorkloadResolver.PackInfo>();
-
 			foreach (var rp in RequiredWorkloads)
 			{
 				if (!NuGetVersion.TryParse(rp.Version, out var rpVersion))
@@ -75,23 +73,9 @@ namespace DotNetCheck.Checkups
 				else
 				{
 					ReportStatus($"{rp.Id} ({rp.PackageId} : {rp.Version}) installed.", Status.Ok);
-
-					var workloadPacks = workloadManager.GetPacksInWorkload(rp.Id);
-
-					if (workloadPacks != null && workloadPacks.Any())
-					{
-						foreach (var wp in workloadPacks)
-						{
-							if (!(rp.IgnoredPackIds?.Any(ip => ip.Equals(wp.Id, StringComparison.OrdinalIgnoreCase)) ?? false))
-								requiredPacks.Add(wp);
-						}
-					}
 				}
 			}
 		
-			if (requiredPacks.Any())
-				history.ContributeState(this, "required_packs", requiredPacks.ToArray());
-
 			if (!missingWorkloads.Any())
 				return Task.FromResult(DiagnosticResult.Ok(this));
 

@@ -18,7 +18,6 @@ namespace DotNetCheck.Checkups
 				foreach (var sdk in sdks)
 				{
 					var workloads = sdk?.Workloads?.ToArray() ?? Array.Empty<DotNetWorkload>();
-					var packs = sdk?.Packs?.ToArray() ?? Array.Empty<DotNetSdkPack>();
 					var pkgSrcs = sdk?.PackageSources?.ToArray() ?? Array.Empty<string>();
 
 					string sdkVersion;
@@ -27,10 +26,6 @@ namespace DotNetCheck.Checkups
 
 					if (sdk.Workloads?.Any() ?? false)
 						yield return new DotNetWorkloadsCheckup(sharedState, sdkVersion, workloads, pkgSrcs);
-
-					// Always generate a packs check even if no packs, since the workloads may dynamically
-					// discover packs required and register them with the SharedState
-					yield return new DotNetPacksCheckup(sharedState, sdkVersion, packs, pkgSrcs);
 				}
 			}
 		}
