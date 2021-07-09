@@ -66,7 +66,7 @@ namespace DotNetCheck
 				return false;
 			}
 
-			var minSupportedDotNetSdkVersion = NuGetVersion.Parse("6.0.100-preview.5");
+			var minSupportedDotNetSdkVersion = Manifest.DotNetSdk.Version6Preview6;
 
 			// Check that we aren't on a manifest that wants too old of dotnet6
 			if (manifest?.Check?.DotNet?.Sdks?.Any(dnsdk =>
