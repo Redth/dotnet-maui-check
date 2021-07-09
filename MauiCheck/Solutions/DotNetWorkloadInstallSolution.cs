@@ -2,6 +2,8 @@
 using DotNetCheck.Manifest;
 using DotNetCheck.Models;
 using NuGet.Versioning;
+using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -31,12 +33,32 @@ namespace DotNetCheck.Solutions
 
 			var workloadManager = new DotNetWorkloadManager(SdkRoot, SdkVersion, NuGetPackageSources);
 
-			if (NuGetVersion.TryParse(Workload.Version, out var version)
-				&& await workloadManager.InstallWorkloadManifest(Workload.PackageId, Workload.Id, version, cancellationToken))
+			if (NuGetVersion.TryParse(Workload.Version, out var version))
 			{
-				// In 6.0-preview.6 or newer, we should use the dotnet cli to acquire the packs for the workload we are installing
-				if (NuGetVersion.TryParse(SdkVersion, out var nugetSdkVersion) && nugetSdkVersion >= DotNetCheck.Manifest.DotNetSdk.Version6Preview6)
+				// Manually download and install the manifest to get an explicit version of it to install
+				// we have to run `dotnet workload install <id> --skip-manifest-update` to make this happen
+				if (await workloadManager.InstallWorkloadManifest(Workload.PackageId, Workload.Id, version, cancellationToken))
+				{
+					// This runs the `dotnet workload install <id> --skip-manifest-update`
 					await workloadManager.CliInstall(Workload.Id);
+
+					// Find any template packs that the workload comes with
+					// we want to try and `dotnet new --uninstall` them
+					// Since if one was previously installed with `dotnet new -i` it will be chosen over the optional workload
+					// version and the user could get a message about a newer template being available to install
+					var templatePacks = workloadManager.GetPacksInWorkload(Workload.Id)?.Where(p => p.Kind == Microsoft.NET.Sdk.WorkloadManifestReader.WorkloadPackKind.Template);
+
+					if (templatePacks?.Any() ?? false)
+					{
+						ReportStatus("Uninstalling previous template versions...");
+
+						foreach (var tp in templatePacks)
+						{
+							try { await workloadManager.UninstallTemplate(tp.Id); }
+							catch { }
+						}
+					}
+				}
 
 				// Install: dotnet workload install id --
 				ReportStatus($"Installed Workload: {Workload.Id}.");

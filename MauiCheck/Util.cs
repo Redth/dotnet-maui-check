@@ -171,6 +171,9 @@ namespace DotNetCheck
 		}
 
 		public static Task<ShellProcessRunner.ShellProcessResult> WrapShellCommandWithSudo(string cmd, string[] args)
+			=> WrapShellCommandWithSudo(cmd, null, args);
+
+		public static Task<ShellProcessRunner.ShellProcessResult> WrapShellCommandWithSudo(string cmd, string workingDir, string[] args)
 		{
 			var actualCmd = cmd;
 			var actualArgs = string.Join(" ", args);
@@ -181,7 +184,7 @@ namespace DotNetCheck
 				actualArgs = $"-c 'sudo {cmd} {actualArgs}'"; 
 			}
 
-			var cli = new ShellProcessRunner(new ShellProcessRunnerOptions(actualCmd, actualArgs));
+			var cli = new ShellProcessRunner(new ShellProcessRunnerOptions(actualCmd, actualArgs) { WorkingDirectory = workingDir } );
 			return Task.FromResult(cli.WaitForExit());
 		}
 

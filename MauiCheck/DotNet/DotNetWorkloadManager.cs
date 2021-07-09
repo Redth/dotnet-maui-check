@@ -20,6 +20,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using Newtonsoft.Json.Linq;
+using DotNetCheck.Models;
 
 namespace DotNetCheck.DotNet
 {
@@ -34,16 +35,31 @@ namespace DotNetCheck.DotNet
 			CleanEmptyWorkloadDirectories(sdkRoot, sdkVersion);
 
 			manifestProvider = new SdkDirectoryWorkloadManifestProvider(SdkRoot, SdkVersion);
-			workloadResolver = WorkloadResolver.Create(manifestProvider, SdkRoot, SdkVersion);
+
+			UpdateWorkloadResolver();
+
+			DotNetCliWorkingDir = Path.Combine(Path.GetTempPath(), "maui-check-net-working-dir");
+			Directory.CreateDirectory(DotNetCliWorkingDir);
+
+			var globalJson = new DotNetGlobalJson();
+			globalJson.Sdk.Version = sdkVersion;
+			globalJson.Sdk.RollForward = "disable";
+			globalJson.Sdk.AllowPrerelease = true;
+			File.WriteAllText(Path.Combine(DotNetCliWorkingDir, "global.json"), globalJson.ToJson());
 		}
 
 		public readonly string SdkRoot;
 		public readonly string SdkVersion;
 
 		readonly SdkDirectoryWorkloadManifestProvider manifestProvider;
-		readonly WorkloadResolver workloadResolver;
+		WorkloadResolver workloadResolver;
 
 		public readonly string[] NuGetPackageSources;
+
+		readonly string DotNetCliWorkingDir;
+
+		void UpdateWorkloadResolver()
+			=> workloadResolver = WorkloadResolver.Create(manifestProvider, SdkRoot, SdkVersion);
 
 		void CleanEmptyWorkloadDirectories(string sdkRoot, string sdkVersion)
 		{
@@ -71,9 +87,34 @@ namespace DotNetCheck.DotNet
 
 		void DeleteExistingWorkloads(string sdkRoot, string sdkVersion, string workloadIdentifier)
 		{
+			// Run dotnet workload uninstall first on the workload id
+			try
+			{
+				Util.Log($"Running workload uninstall for {workloadIdentifier}");
+
+				var dotnetExe = Path.Combine(sdkRoot, DotNetSdk.DotNetExeName);
+
+				var args = new[] { "workload", "uninstall", workloadIdentifier };
+
+				Util.WrapShellCommandWithSudo(dotnetExe, DotNetCliWorkingDir, args.ToArray());
+			}
+			catch (Exception ex)
+			{
+				Util.Exception(ex);
+			}
+
 			if (NuGetVersion.TryParse(sdkVersion, out var v))
 			{
 				var sdkBand = $"{v.Major}.{v.Minor}.{v.Patch}";
+
+				// Try and clean up the metadata dir too
+				var metadataMarkerFile = Path.Combine(sdkRoot, "metadata", "workloads", sdkBand, "InstalledWorkloads", workloadIdentifier);
+
+				if (File.Exists(metadataMarkerFile))
+				{
+					try { File.Delete(metadataMarkerFile); }
+					catch { }
+				}
 
 				var manifestsDir = Path.Combine(sdkRoot, "sdk-manifests", sdkBand);
 
@@ -111,6 +152,9 @@ namespace DotNetCheck.DotNet
 					}
 				}
 			}
+
+			// Refresh the resolver to account for the uninstall
+			UpdateWorkloadResolver();
 		}
 
 		public IEnumerable<(string id, string version)> GetInstalledWorkloads()
@@ -125,7 +169,18 @@ namespace DotNetCheck.DotNet
 			}
 		}
 
-		public Task CliInstall(string workloadId)
+		public IEnumerable<WorkloadResolver.PackInfo> GetPacksInWorkload(string workloadId)
+		{
+			var packs = workloadResolver.GetPacksInWorkload(workloadId);
+			foreach (var p in packs)
+			{
+				var packInfo = workloadResolver.TryGetPackInfo(p);
+				if (packInfo != null)
+					yield return packInfo;
+			}
+		}
+
+		public async Task CliInstall(string workloadId)
 		{
 			// dotnet workload install id --skip-manifest-update --add-source x
 			var dotnetExe = Path.Combine(SdkRoot, DotNetSdk.DotNetExeName);
@@ -134,7 +189,20 @@ namespace DotNetCheck.DotNet
 
 			var args = new[] { "workload", "install", workloadId, "--skip-manifest-update" }.Concat(pkgSrcArgs);
 
-			return Util.WrapShellCommandWithSudo(dotnetExe, args.ToArray());
+			await Util.WrapShellCommandWithSudo(dotnetExe, DotNetCliWorkingDir, args.ToArray());
+
+			// Refresh the resolver to account for the install
+			UpdateWorkloadResolver();
+		}
+
+		public async Task UninstallTemplate(string templatePackId)
+		{
+			// dotnet new --uninstall <template>
+			var dotnetExe = Path.Combine(SdkRoot, DotNetSdk.DotNetExeName);
+
+			var args = new[] { "new", "--uninstall", templatePackId };
+
+			await Util.WrapShellCommandWithSudo(dotnetExe, DotNetCliWorkingDir, args.ToArray());
 		}
 
 		public Task<bool> InstallWorkloadManifest(string packageId, string workloadId, NuGetVersion manifestPackageVersion, CancellationToken cancelToken)
@@ -237,7 +305,6 @@ namespace DotNetCheck.DotNet
 					packagePathResolver,
 					packageExtractionContext,
 					cancelToken);
-
 
 				// Check for data/WorkloadManifest.json and data/WorkloadManifest.targets
 				var dataDir = Path.Combine(fullDestinationDir, "data");

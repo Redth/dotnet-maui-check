@@ -37,6 +37,8 @@ namespace DotNetCheck
 
 		public bool UseSystemShell { get; set; } = true;
 
+		public string WorkingDirectory { get; set; }
+
 		public IReadOnlyDictionary<string, string> EnvironmentVariables { get; set; } = new Dictionary<string, string>();
 	}
 
@@ -107,6 +109,9 @@ namespace DotNetCheck
 			if (Options.RedirectInput)
 				process.StartInfo.RedirectStandardInput = true;
 
+			if (!string.IsNullOrEmpty(options.WorkingDirectory))
+				process.StartInfo.WorkingDirectory = options.WorkingDirectory;
+
 			process.OutputDataReceived += (s, e) =>
 			{
 				if (e.Data != null)
@@ -129,6 +134,10 @@ namespace DotNetCheck
 					Options?.OutputCallback?.Invoke(e.Data);
 				}
 			};
+
+			if (verbose)
+				Console.WriteLine("SHELL: " + process.StartInfo.FileName + " " + process.StartInfo.Arguments);
+
 			process.Start();
 
 			if (Options.RedirectOutput)
