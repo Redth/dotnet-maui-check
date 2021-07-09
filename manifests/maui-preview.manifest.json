@@ -1,6 +1,6 @@
 {
   "check": {
-    "toolVersion": "0.6.0",
+    "toolVersion": "0.6.1",
     "variables": {
       "MAUI_VERSION": "6.0.100-preview.6.979",
       "OPENJDK_VERSION": "11.0.10.9",
