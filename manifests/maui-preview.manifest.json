@@ -2,7 +2,7 @@
   "check": {
     "toolVersion": "0.6.1",
     "variables": {
-      "MAUI_VERSION": "6.0.100-preview.6.999",
+      "MAUI_VERSION": "6.0.100-preview.6.1001",
       "OPENJDK_VERSION": "11.0.10.9",
       "MONOTOOLCHAIN_VERSION": "6.0.0-preview.6.21352.12"
     },
@@ -31,7 +31,7 @@
       "minimumVersion": "13.0"
     },
     "vswin": {
-      "minimumVersion": "16.11.0"
+      "minimumVersion": "17.0.0-pre.2.0"
     },
     "vsmac": {
       "minimumVersion": "8.10.0",
