@@ -107,7 +107,7 @@
           ],
           "workloads": [
             {
-                "workloadId": "microsoft-android-sdk-full",
+                "workloadId": "android-aot",
                 "packageId": "Microsoft.NET.Sdk.Android.Manifest-6.0.100",
                 "version": "$(ANDROID_SDK_VERSION)"
             },
