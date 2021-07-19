@@ -112,22 +112,22 @@
                 "version": "$(ANDROID_SDK_VERSION)"
             },
             {
-                "workloadId": "microsoft-ios-sdk-full",
+                "workloadId": "ios",
                 "packageId": "Microsoft.NET.Sdk.iOS.Manifest-6.0.100",
                 "version": "$(IOS_SDK_VERSION)"
             },
             {
-                "workloadId": "microsoft-maccatalyst-sdk-full",
+                "workloadId": "maccatalyst",
                 "packageId": "Microsoft.NET.Sdk.MacCatalyst.Manifest-6.0.100",
                 "version": "$(MACCATALYST_SDK_VERSION)"
             },
             {
-                "workloadId": "microsoft-tvos-sdk-full",
+                "workloadId": "tvos",
                 "packageId": "Microsoft.NET.Sdk.tvOS.Manifest-6.0.100",
                 "version": "$(TVOS_SDK_VERSION)"
             },
             {
-                "workloadId": "microsoft-macos-sdk-full",
+                "workloadId": "macos",
                 "packageId": "Microsoft.NET.Sdk.macOS.Manifest-6.0.100",
                 "version": "$(MACOS_SDK_VERSION)"
             },
