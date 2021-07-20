@@ -50,7 +50,7 @@ jobs:
           mkdir ./output
           mkdir ./artifacts
           & dotnet build --configuration Release ./MauiCheck.sln
-          [System.Convert]::FromBase64String($env:CODESIGN_PFX) | Set-Content codesigncert.pfx -Encoding Byte
+          [IO.File]::WriteAllBytes("codesigncert.pfx", [System.Convert]::FromBase64String($env:CODESIGN_PFX))
           & dotnet pack --output ./artifacts -p:PackageVersion=$VERSION -p:SigningCertificatePfxFile=codesigncert.pfx --configuration Release ./MauiCheck/MauiCheck.csproj
           Remove-Item codesigncert.pfx
 
@@ -72,7 +72,7 @@ jobs:
           echo "PACKAGE VERSION: $VERSION"
           mkdir ./output
           mkdir ./artifacts
-          [System.Convert]::FromBase64String($env:CODESIGN_PFX) | Set-Content codesigncert.pfx -Encoding Byte
+          [IO.File]::WriteAllBytes("codesigncert.pfx", [System.Convert]::FromBase64String($env:CODESIGN_PFX))
           dotnet build --configuration Release ./MauiCheck.sln
           dotnet pack --output ./artifacts -p:PackageVersion=$VERSION -p:SigningCertificatePfxFile=codesigncert.pfx --configuration Release ./MauiCheck/MauiCheck.csproj
           Remove-Item codesigncert.pfx
