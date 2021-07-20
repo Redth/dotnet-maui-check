@@ -27,7 +27,7 @@ jobs:
         run: |
           $decPfx = [System.Convert]::FromBase64String($env:CODESIGN_PFX)
           echo $decPfx.Length
-          [IO.File]::WriteAllBytes("codesigncert.pfx", $decPfx)
+          [IO.File]::WriteAllBytes("$pwd\codesigncert.pfx", $decPfx)
 
       - name: Checkout
         uses: actions/checkout@v2
@@ -58,7 +58,7 @@ jobs:
           mkdir ./output
           mkdir ./artifacts
           & dotnet build --configuration Release ./MauiCheck.sln
-          & dotnet pack --output ./artifacts -p:PackageVersion=$VERSION -p:SigningCertificatePfxFile="codesigncert.pfx" --configuration Release ./MauiCheck/MauiCheck.csproj
+          & dotnet pack --output ./artifacts -p:PackageVersion=$VERSION -p:SigningCertificatePfxFile="$pwd\codesigncert.pfx" --configuration Release ./MauiCheck/MauiCheck.csproj
 
       - name: Build and Pack - CI
         id: buildci
@@ -71,7 +71,7 @@ jobs:
           mkdir ./output
           mkdir ./artifacts
           dotnet build --configuration Release ./MauiCheck.sln
-          dotnet pack --output ./artifacts -p:PackageVersion=$VERSION -p:SigningCertificatePfxFile="codesigncert.pfx" --configuration Release ./MauiCheck/MauiCheck.csproj
+          dotnet pack --output ./artifacts -p:PackageVersion=$VERSION -p:SigningCertificatePfxFile="$pwd\codesigncert.pfx" --configuration Release ./MauiCheck/MauiCheck.csproj
       - name: Upload Artifacts
         uses: actions/upload-artifact@v1
         with:
