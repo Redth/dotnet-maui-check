@@ -39,18 +39,20 @@ jobs:
         with:
           dotnet-version: '6.0.x'
           include-prerelease: true
-
+          
       - name: Build and Pack - Release
         id: buildrelease
         if: github.event_name == 'release'
+        shell: pwsh
         run: |
-          arrTag=(${GITHUB_REF//\// })
-          VERSION="${arrTag[2]}"
+          $VERSION = $env:GITHUB_REF.Split('/')[2]
           echo "::set-output name=pkgverrelease::$VERSION"
           mkdir ./output
           mkdir ./artifacts
-          dotnet build --configuration Release ./MauiCheck.sln
-          dotnet pack --output ./artifacts -p:PackageVersion=$VERSION --configuration Release ./MauiCheck/MauiCheck.csproj
+          & dotnet build --configuration Release ./MauiCheck.sln
+          [System.Convert]::FromBase64String($env:CODESIGN_PFX) | Set-Content codesigncert.pfx -Encoding Byte
+          & dotnet pack --output ./artifacts -p:PackageVersion=$VERSION -p:SigningCertificatePfxFile=codesigncert.pfx --configuration Release ./MauiCheck/MauiCheck.csproj
+          Remove-Item codesigncert.pfx
 
       - name: Parse DotNet Versions from Manifest
         id: manifests
@@ -63,14 +65,17 @@ jobs:
       - name: Build and Pack - CI
         id: buildci
         if: github.event_name != 'release'
+        shell: pwsh
         run: |
-          VERSION=$NUPKG_MAJOR-ci$GITHUB_RUN_ID
+          $VERSION="$env:NUPKG_MAJOR-ci$env:GITHUB_RUN_ID"
           echo "::set-output name=pkgverci::$VERSION"
           echo "PACKAGE VERSION: $VERSION"
           mkdir ./output
           mkdir ./artifacts
+          [System.Convert]::FromBase64String($env:CODESIGN_PFX) | Set-Content codesigncert.pfx -Encoding Byte
           dotnet build --configuration Release ./MauiCheck.sln
-          dotnet pack --output ./artifacts -p:PackageVersion=$VERSION --configuration Release ./MauiCheck/MauiCheck.csproj
+          dotnet pack --output ./artifacts -p:PackageVersion=$VERSION -p:SigningCertificatePfxFile=codesigncert.pfx --configuration Release ./MauiCheck/MauiCheck.csproj
+          Remove-Item codesigncert.pfx
       - name: Upload Artifacts
         uses: actions/upload-artifact@v1
         with:
