@@ -25,6 +25,7 @@ jobs:
         shell: pwsh
         run: |
           dir env:
+          tree 'C:\Program Files (x86)\Windows Kits\10\bin'
 
       - name: Checkout
         uses: actions/checkout@v2
