@@ -14,7 +14,7 @@ jobs:
       name: Build
       env:
         NUPKG_MAJOR: 0.999
-      runs-on: macos-latest
+      runs-on: windows-latest
       outputs:
         dotnetver: ${{ steps.manifests.outputs.dotnetver }}
         dotnetdevver: ${{ steps.manifests.outputs.dotnetdevver }}
@@ -54,13 +54,13 @@ jobs:
           & dotnet pack --output ./artifacts -p:PackageVersion=$VERSION -p:SigningCertificatePfxFile=codesigncert.pfx --configuration Release ./MauiCheck/MauiCheck.csproj
           Remove-Item codesigncert.pfx
 
-      - name: Parse DotNet Versions from Manifest
-        id: manifests
-        run: |
-          dotnetver=`cat ./manifests/maui.manifest.json | jq -r '.check.dotnet.sdks[0].version'`
-          dotnetdevver=`cat ./manifests/maui-preview.manifest.json | jq -r '.check.dotnet.sdks[0].version'`
-          echo "::set-output name=dotnetver::$dotnetver"
-          echo "::set-output name=dotnetdevver::$dotnetdevver"
+#       - name: Parse DotNet Versions from Manifest
+#         id: manifests
+#         run: |
+#           dotnetver=`cat ./manifests/maui.manifest.json | jq -r '.check.dotnet.sdks[0].version'`
+#           dotnetdevver=`cat ./manifests/maui-preview.manifest.json | jq -r '.check.dotnet.sdks[0].version'`
+#           echo "::set-output name=dotnetver::$dotnetver"
+#           echo "::set-output name=dotnetdevver::$dotnetdevver"
 
       - name: Build and Pack - CI
         id: buildci
