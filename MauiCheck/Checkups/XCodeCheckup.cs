@@ -22,9 +22,6 @@ namespace DotNetCheck.Checkups
 		public NuGetVersion ExactVersion
 			=> Extensions.ParseVersion(Manifest?.Check?.XCode?.ExactVersion);
 
-		public bool Beta
-			=> Manifest?.Check?.XCode?.Beta ?? false;
-
 		public override string Id => "xcode";
 
 		public override string Title => $"XCode {MinimumVersion.ThisOrExact(ExactVersion)}";
