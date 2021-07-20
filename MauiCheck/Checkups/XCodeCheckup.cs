@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Claunia.PropertyList;
 using DotNetCheck.Models;
 using NuGet.Versioning;
 
@@ -21,6 +22,9 @@ namespace DotNetCheck.Checkups
 		public NuGetVersion ExactVersion
 			=> Extensions.ParseVersion(Manifest?.Check?.XCode?.ExactVersion);
 
+		public bool Beta
+			=> Manifest?.Check?.XCode?.Beta ?? false;
+
 		public override string Id => "xcode";
 
 		public override string Title => $"XCode {MinimumVersion.ThisOrExact(ExactVersion)}";
@@ -28,79 +32,47 @@ namespace DotNetCheck.Checkups
 		public override bool ShouldExamine(SharedState history)
 			=> Manifest?.Check?.XCode != null;
 
-		const string DefaultXcodePath = "/Applications/Xcode.app/Contents/Developer";
-
 		public override Task<DiagnosticResult> Examine(SharedState history)
 		{
-			FileInfo xcode = null;
+			var selected = GetSelectedXCode();
 
-			try
+			if (selected.Version.IsCompatible(MinimumVersion, ExactVersion))
 			{
-				xcode = GetSelectedXCode();
+				// Selected version is good
+				ReportStatus($"Xcode.app ({selected.VersionString} {selected.BuildVersion})", Status.Ok);
+				return Task.FromResult(DiagnosticResult.Ok(this));
 			}
-			catch (ArgumentException)
+
+			XCodeInfo eligibleXcode = null;
+
+			var xcodes = FindXCodeInstalls();
+
+			foreach (var x in xcodes)
+			{
+				if (x.Version.IsCompatible(MinimumVersion, ExactVersion))
+				{
+					eligibleXcode = x;
+					break;
+				}
+			}
+
+			if (eligibleXcode != null)
 			{
 				// If this is the case, they need to run xcode-select -s
-				ReportStatus($"Invalid xcode-select path found ({BugCommandLineToolsPath})", Status.Error);
+				ReportStatus($"No Xcode.app or an incompatible Xcode.app version is selected, but one was found at ({eligibleXcode.Path})", Status.Error);
 
 				return Task.FromResult(new DiagnosticResult(
 					Status.Error,
 					this,
-					new Suggestion("Run `sudo xcode-select --reset`",
+					new Suggestion("Run xcode-select -s <Path>",
 						new Solutions.ActionSolution(cancelToken =>
 						{
-							var args = $"-c 'sudo xcode-select --reset'";
-							Util.Log($"{ShellProcessRunner.MacOSShell} {args}");
-
-							var p = new ShellProcessRunner(new ShellProcessRunnerOptions(ShellProcessRunner.MacOSShell, args)
-							{
-								RedirectOutput = Util.Verbose
-							});
-
-							p.WaitForExit();
-
+							ShellProcessRunner.Run("xcode-select", "-s " + eligibleXcode.Path);
 							return Task.CompletedTask;
 						}))));
 			}
 
-			if (xcode == null)
-			{
-				// See if they have the default location xcode
-				if (Directory.Exists(DefaultXcodePath))
-				{
-					var defaultXcodeInfo = GetInfo(DefaultXcodePath);
-
-					// See if that default location has some version info and it's good enough for the required
-					if (defaultXcodeInfo?.Version?.IsCompatible(MinimumVersion, ExactVersion) ?? false)
-					{
-						// If this is the case, they need to run xcode-select -s
-						ReportStatus($"No Xcode.app is selected, but one was found ({DefaultXcodePath})", Status.Error);
-
-						return Task.FromResult(new DiagnosticResult(
-							Status.Error,
-							this,
-							new Suggestion("Run xcode-select -s <Path>",
-								new Solutions.ActionSolution(cancelToken =>
-								{
-									ShellProcessRunner.Run("xcode-select", "-s " + DefaultXcodePath);
-									return Task.CompletedTask;
-								}))));
-					}
-				}
-			}
-			else
-			{
-				// Get info with no default path
-				var info = GetInfo(xcode.FullName);
-
-				if (info?.Version?.IsCompatible(MinimumVersion, ExactVersion) ?? false)
-				{
-					ReportStatus($"XCode.app ({info.Version} {info.Build})", Status.Ok);
-					return Task.FromResult(DiagnosticResult.Ok(this));
-				}
-			}
-
-			ReportStatus($"XCode.app ({MinimumVersion}) not installed.", Status.Error);
+			ReportStatus($"Xcode.app ({MinimumVersion}) not installed.", Status.Error);
 
 			return Task.FromResult(new DiagnosticResult(
 				Status.Error,
@@ -108,67 +80,75 @@ namespace DotNetCheck.Checkups
 				new Suggestion($"Download XCode {MinimumVersion.ThisOrExact(ExactVersion)}")));
 		}
 
-		FileInfo GetSelectedXCode()
+		XCodeInfo GetSelectedXCode()
 		{
 			var r = ShellProcessRunner.Run("xcode-select", "-p");
 
-			var path = r.GetOutput().Trim();
+			var xcodeSelectedPath = r.GetOutput().Trim();
 
-			if (!string.IsNullOrEmpty(path))
+			if (!string.IsNullOrEmpty(xcodeSelectedPath))
 			{
-				if (path.Equals(BugCommandLineToolsPath))
-					throw new ArgumentException();
+				if (xcodeSelectedPath.Equals(BugCommandLineToolsPath))
+					throw new InvalidDataException();
 
-				var dir = new DirectoryInfo(path);
-
-				if (dir.Exists)
+				var infoPlist = Path.Combine(xcodeSelectedPath, "..", "Info.plist");
+				if (File.Exists(infoPlist))
 				{
-					var defXcodeBuildLoc = new FileInfo(Path.Combine(dir.FullName, "usr", "bin", "xcodebuild"));
-
-					if (defXcodeBuildLoc.Exists)
-						return defXcodeBuildLoc;
-
-					var xcbFiles = dir.GetFiles("xcodebuild", SearchOption.AllDirectories);
-
-					if (xcbFiles?.Any() ?? false)
-						return xcbFiles.FirstOrDefault();
+					return GetXcodeInfo(
+						Path.GetFullPath(
+							Path.Combine(xcodeSelectedPath, "..", "..")), true);
 				}
 			}
 
 			return null;
 		}
 
-		XCodeInfo GetInfo(string path)
+		public static readonly string[] LikelyPaths = new []
 		{
-			//Xcode 12.4
-			//Build version 12D4e
-			var r = ShellProcessRunner.Run(path ?? "xcodebuild", "-version");
+			"/Applications/Xcode.app",
+			"/Applications/Xcode-beta.app",
+		};
 
-			var info = new XCodeInfo();
-
-			foreach (var line in r.StandardOutput)
+		IEnumerable<XCodeInfo> FindXCodeInstalls()
+		{
+			foreach (var p in LikelyPaths)
 			{
-				if (line.StartsWith("Xcode"))
-				{
-					var vstr = line.Substring(5).Trim();
-					if (NuGetVersion.TryParse(vstr, out var v))
-						info.Version = v;
-				}
-				else if (line.StartsWith("Build version"))
-				{
-					info.Build = line.Substring(13)?.Trim();
-				}
+				var i = GetXcodeInfo(p, false);
+				if (i != null)
+					yield return i;
 			}
-
-			return info;
 		}
 
-		
+		XCodeInfo GetXcodeInfo(string path, bool selected)
+		{
+			var versionPlist = Path.Combine(path, "Contents", "version.plist");
+
+			if (File.Exists(versionPlist))
+			{
+				NSDictionary rootDict = (NSDictionary)PropertyListParser.Parse(versionPlist);
+				string cfBundleVersion = rootDict.ObjectForKey("CFBundleVersion")?.ToString();
+				string cfBundleShortVersion = rootDict.ObjectForKey("CFBundleShortVersionString")?.ToString();
+				string productBuildVersion = rootDict.ObjectForKey("ProductBuildVersion")?.ToString();
+
+				if (NuGetVersion.TryParse(cfBundleVersion, out var v))
+					return new XCodeInfo(v, cfBundleShortVersion, productBuildVersion, path, selected);
+			}
+			else
+			{
+				var infoPlist = Path.Combine(path, "Contents", "Info.plist");
+
+				if (File.Exists(infoPlist))
+				{
+					NSDictionary rootDict = (NSDictionary)PropertyListParser.Parse(infoPlist);
+					string cfBundleVersion = rootDict.ObjectForKey("CFBundleVersion")?.ToString();
+					string cfBundleShortVersion = rootDict.ObjectForKey("CFBundleShortVersionString")?.ToString();
+					if (NuGetVersion.TryParse(cfBundleVersion, out var v))
+						return new XCodeInfo(v, cfBundleShortVersion, string.Empty, path, selected);
+				}
+			}
+			return null;
+		}
 	}
 
-	public class XCodeInfo
-	{
-		public NuGetVersion Version { get; set; }
-		public string Build { get; set; }
-	}
+	public record XCodeInfo(NuGetVersion Version, string VersionString, string BuildVersion, string Path, bool Selected);
 }
