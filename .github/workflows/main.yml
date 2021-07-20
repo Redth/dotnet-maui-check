@@ -25,8 +25,9 @@ jobs:
       - name: Env Vars
         shell: pwsh
         run: |
-          $codesignCertFile = "$pwd\codesigncert.pfx"
-          [IO.File]::WriteAllBytes($codesignCertFile, [System.Convert]::FromBase64String($env:CODESIGN_PFX))
+          $decPfx = [System.Convert]::FromBase64String($env:CODESIGN_PFX)
+          echo $decPfx.Length
+          [IO.File]::WriteAllBytes("codesigncert.pfx", $decPfx)
 
       - name: Checkout
         uses: actions/checkout@v2
@@ -57,9 +58,7 @@ jobs:
           mkdir ./output
           mkdir ./artifacts
           & dotnet build --configuration Release ./MauiCheck.sln
-          $codesignCertFile = "$pwd\codesigncert.pfx"
-          & dotnet pack --output ./artifacts -p:PackageVersion=$VERSION -p:SigningCertificatePfxFile=$codesignCertFile --configuration Release ./MauiCheck/MauiCheck.csproj
-          Remove-Item codesigncert.pfx
+          & dotnet pack --output ./artifacts -p:PackageVersion=$VERSION -p:SigningCertificatePfxFile="codesigncert.pfx" --configuration Release ./MauiCheck/MauiCheck.csproj
 
 #       - name: Parse DotNet Versions from Manifest
 #         id: manifests
@@ -72,7 +71,6 @@ jobs:
       - name: Build and Pack - CI
         id: buildci
         if: github.event_name != 'release'
-
         shell: pwsh
         run: |
           $VERSION="$env:NUPKG_MAJOR-ci$env:GITHUB_RUN_ID"
@@ -80,10 +78,8 @@ jobs:
           echo "PACKAGE VERSION: $VERSION"
           mkdir ./output
           mkdir ./artifacts
-          $codesignCertFile = "$pwd\codesigncert.pfx"
           dotnet build --configuration Release ./MauiCheck.sln
-          dotnet pack --output ./artifacts -p:PackageVersion=$VERSION -p:SigningCertificatePfxFile=$codesignCertFile --configuration Release ./MauiCheck/MauiCheck.csproj
-          Remove-Item codesigncert.pfx
+          dotnet pack --output ./artifacts -p:PackageVersion=$VERSION -p:SigningCertificatePfxFile="codesigncert.pfx" --configuration Release ./MauiCheck/MauiCheck.csproj
       - name: Upload Artifacts
         uses: actions/upload-artifact@v1
         with:
