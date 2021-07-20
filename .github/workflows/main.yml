@@ -24,8 +24,9 @@ jobs:
       - name: Env Vars
         shell: pwsh
         run: |
-          dir env:
-          tree 'C:\Program Files (x86)\Windows Kits\10\bin'
+          $codesignCertFile = "$pwd\codesigncert.pfx"
+          [IO.File]::WriteAllBytes($codesignCertFile, [System.Convert]::FromBase64String($env:CODESIGN_PFX))
+          certutil -f -importpfx $codesignCertFile
 
       - name: Checkout
         uses: actions/checkout@v2
@@ -57,7 +58,6 @@ jobs:
           mkdir ./artifacts
           & dotnet build --configuration Release ./MauiCheck.sln
           $codesignCertFile = "$pwd\codesigncert.pfx"
-          [IO.File]::WriteAllBytes($codesignCertFile, [System.Convert]::FromBase64String($env:CODESIGN_PFX))
           & dotnet pack --output ./artifacts -p:PackageVersion=$VERSION -p:SigningCertificatePfxFile=$codesignCertFile --configuration Release ./MauiCheck/MauiCheck.csproj
           Remove-Item codesigncert.pfx
 
@@ -80,7 +80,6 @@ jobs:
           mkdir ./output
           mkdir ./artifacts
           $codesignCertFile = "$pwd\codesigncert.pfx"
-          [IO.File]::WriteAllBytes($codesignCertFile, [System.Convert]::FromBase64String($env:CODESIGN_PFX))
           dotnet build --configuration Release ./MauiCheck.sln
           dotnet pack --output ./artifacts -p:PackageVersion=$VERSION -p:SigningCertificatePfxFile=$codesignCertFile --configuration Release ./MauiCheck/MauiCheck.csproj
           Remove-Item codesigncert.pfx

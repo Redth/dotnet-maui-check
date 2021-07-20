@@ -100,7 +100,7 @@
     <ItemGroup>
       <FilesToSign Include="@(_PackageFiles)" Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('%(FullPath)', 'MauiCheck.dll'))" />
     </ItemGroup>
-    <Exec Command="&quot;$(SignToolPath)&quot; sign /f $(SigningCertificatePfxFile) /tr $(SigningTimestampServer) %(FilesToSign.FullPath)" />
+    <Exec Command="&quot;$(SignToolPath)&quot; sign /v /f $(SigningCertificatePfxFile) /fd sha256 /tr $(SigningTimestampServer) %(FilesToSign.FullPath)" />
   </Target>
 
   <Target Name="NugetSignAfterPack" AfterTargets="Pack" Condition="'$(SigningCertificatePfxFile)' != ''">
