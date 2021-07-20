@@ -60,14 +60,6 @@ jobs:
           & dotnet build --configuration Release ./MauiCheck.sln
           & dotnet pack --output ./artifacts -p:PackageVersion=$VERSION -p:SigningCertificatePfxFile="codesigncert.pfx" --configuration Release ./MauiCheck/MauiCheck.csproj
 
-#       - name: Parse DotNet Versions from Manifest
-#         id: manifests
-#         run: |
-#           dotnetver=`cat ./manifests/maui.manifest.json | jq -r '.check.dotnet.sdks[0].version'`
-#           dotnetdevver=`cat ./manifests/maui-preview.manifest.json | jq -r '.check.dotnet.sdks[0].version'`
-#           echo "::set-output name=dotnetver::$dotnetver"
-#           echo "::set-output name=dotnetdevver::$dotnetdevver"
-
       - name: Build and Pack - CI
         id: buildci
         if: github.event_name != 'release'
