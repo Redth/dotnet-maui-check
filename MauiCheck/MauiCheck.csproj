@@ -18,7 +18,7 @@
     <Owners>Redth</Owners>
     <summary>A dotnet tool for helping set up your .NET MAUI environment</summary>
     <PackageDescription>
-	A dotnet tool for helping set up your .NET MAUI environment
+  A dotnet tool for helping set up your .NET MAUI environment
     </PackageDescription>
     <Copyright>Copyright © Redth</Copyright>
     <PackageProjectUrl>https://github.com/redth/dotnet-maui-check</PackageProjectUrl>
@@ -90,4 +90,20 @@
       <HintPath>..\libs\Xamarin.Installer.AndroidSDK.Manager.dll</HintPath>
     </Reference>
   </ItemGroup>
+
+  <PropertyGroup>
+    <SigningTimestampServer>http://timestamp.entrust.net/TSS/RFC3161sha2TS</SigningTimestampServer>
+    <SignToolPath>C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64\signtool.exe</SignToolPath>
+  </PropertyGroup>
+
+  <Target Name="AuthenticodeSignBeforeBack" BeforeTargets="GenerateNuspec" Condition="'$(SigningCertificatePfxFile)' != ''">
+    <ItemGroup>
+      <FilesToSign Include="@(_PackageFiles)" Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('%(FullPath)', 'MauiCheck.dll'))" />
+    </ItemGroup>
+    <Exec Command="&quot;$(SignToolPath)&quot; sign /f $(SigningCertificatePfxFile) /tr $(SigningTimestampServer) %(FilesToSign.FullPath)" />
+  </Target>
+
+  <Target Name="NugetSignAfterPack" AfterTargets="Pack" Condition="'$(SigningCertificatePfxFile)' != ''">
+    <Exec Command="nuget sign $(PackageOutputAbsolutePath)\*.nupkg -CertificatePath $(SigningCertificatePfxFile) -Timestamper $(SigningTimestampServer)" />
+  </Target>
 </Project>
