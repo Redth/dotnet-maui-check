@@ -8,7 +8,7 @@ on:
   pull_request:
     branches:
     - master
-    
+
 jobs:
     build:
       name: Build
@@ -22,13 +22,6 @@ jobs:
         pkgverrelease: ${{ steps.buildrelease.outputs.pkgverrelease }}
         pkgverci: ${{ steps.buildci.outputs.pkgverci }}
       steps:
-      - name: Env Vars
-        shell: pwsh
-        run: |
-          $decPfx = [System.Convert]::FromBase64String($env:CODESIGN_PFX)
-          echo $decPfx.Length
-          [IO.File]::WriteAllBytes("$pwd\codesigncert.pfx",[System.Convert]::FromBase64String($env:CODESIGN_PFX))
-
       - name: Checkout
         uses: actions/checkout@v2
 
