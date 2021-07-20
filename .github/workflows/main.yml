@@ -27,7 +27,6 @@ jobs:
         run: |
           $codesignCertFile = "$pwd\codesigncert.pfx"
           [IO.File]::WriteAllBytes($codesignCertFile, [System.Convert]::FromBase64String($env:CODESIGN_PFX))
-          certutil -f -importpfx $codesignCertFile
 
       - name: Checkout
         uses: actions/checkout@v2
