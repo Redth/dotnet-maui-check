@@ -57,7 +57,7 @@ jobs:
           mkdir ./artifacts
           & dotnet build --configuration Release ./MauiCheck.sln
           [IO.File]::WriteAllBytes("codesigncert.pfx", [System.Convert]::FromBase64String($env:CODESIGN_PFX))
-          & dotnet pack --output ./artifacts -p:PackageVersion=$VERSION -p:SignToolPath=signtool.exe -p:SigningCertificatePfxFile=codesigncert.pfx --configuration Release ./MauiCheck/MauiCheck.csproj
+          & dotnet pack --output ./artifacts -p:PackageVersion=$VERSION -p:SignToolPath="C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\signtool.exe" -p:SigningCertificatePfxFile=codesigncert.pfx --configuration Release ./MauiCheck/MauiCheck.csproj
           Remove-Item codesigncert.pfx
 
 #       - name: Parse DotNet Versions from Manifest
@@ -80,7 +80,7 @@ jobs:
           mkdir ./artifacts
           [IO.File]::WriteAllBytes("codesigncert.pfx", [System.Convert]::FromBase64String($env:CODESIGN_PFX))
           dotnet build --configuration Release ./MauiCheck.sln
-          dotnet pack --output ./artifacts -p:PackageVersion=$VERSION -p:SignToolPath=signtool.exe -p:SigningCertificatePfxFile=codesigncert.pfx --configuration Release ./MauiCheck/MauiCheck.csproj
+          dotnet pack --output ./artifacts -p:PackageVersion=$VERSION -p:SignToolPath="C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\signtool.exe" -p:SigningCertificatePfxFile=codesigncert.pfx --configuration Release ./MauiCheck/MauiCheck.csproj
           Remove-Item codesigncert.pfx
       - name: Upload Artifacts
         uses: actions/upload-artifact@v1
