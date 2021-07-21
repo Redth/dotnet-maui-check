@@ -97,10 +97,8 @@
 
   <Target Name="AuthenticodeSignBeforeBack" BeforeTargets="GenerateNuspec" Condition="'$(SigningCertificatePfxFile)' != ''">
     <ItemGroup>
-      <FilesToSign Include="@(_PackageFiles)" Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('%(FullPath)', 'MauiCheck.dll$'))" />
-      <FilesToSign Include="@(_PackageFiles)" Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('%(FullPath)', 'MauiCheck.exe$'))" />
-      <FilesToSign Include="@(_PackageFiles)" Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('%(FullPath)', 'maui-check$'))" />
-      <FilesToSign Include="@(_PackageFiles)" Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('%(FullPath)', 'maui-check.exe$'))" />
+      <FilesToSign Include="@(_PackageFiles)" Condition=" '%(_PackageFiles.Filename)%(_PackageFiles.Extension)' == 'MauiCheck.dll' " />
+      <FilesToSign Include="@(_PackageFiles)" Condition=" '%(_PackageFiles.Filename)%(_PackageFiles.Extension)' == 'maui-check.exe' " />
     </ItemGroup>
     <Exec Command="&quot;$(SignToolPath)&quot; sign /v /f $(SigningCertificatePfxFile) /fd sha256 /tr $(SigningTimestampServer) %(FilesToSign.FullPath)" />
   </Target>
