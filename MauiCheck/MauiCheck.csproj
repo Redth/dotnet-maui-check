@@ -7,6 +7,7 @@
     <ToolCommandName>maui-check</ToolCommandName>
     <PackageOutputPath>./artifacts</PackageOutputPath>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <PackAsToolShimRuntimeIdentifiers>win-x64;win-x86;osx-x64</PackAsToolShimRuntimeIdentifiers>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
@@ -98,7 +99,7 @@
 
   <Target Name="AuthenticodeSignBeforeBack" BeforeTargets="GenerateNuspec" Condition="'$(SigningCertificatePfxFile)' != ''">
     <ItemGroup>
-      <FilesToSign Include="@(_PackageFiles)" Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('%(FullPath)', 'MauiCheck.dll'))" />
+      <FilesToSign Include="@(_PackageFiles)" Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('%(FullPath)', 'MauiCheck.dll')) Or $([System.Text.RegularExpressions.Regex]::IsMatch('%(FullPath)', 'MauiCheck.exe'))" />
     </ItemGroup>
     <Exec Command="&quot;$(SignToolPath)&quot; sign /v /f $(SigningCertificatePfxFile) /fd sha256 /tr $(SigningTimestampServer) %(FilesToSign.FullPath)" />
   </Target>
