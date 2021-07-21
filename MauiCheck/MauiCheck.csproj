@@ -28,8 +28,6 @@
     <AssemblyFileVersion>$(PackageVersion)</AssemblyFileVersion>
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <DebugType>portable</DebugType>
   </PropertyGroup>
@@ -99,7 +97,10 @@
 
   <Target Name="AuthenticodeSignBeforeBack" BeforeTargets="GenerateNuspec" Condition="'$(SigningCertificatePfxFile)' != ''">
     <ItemGroup>
-      <FilesToSign Include="@(_PackageFiles)" Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('%(FullPath)', 'MauiCheck.dll')) Or $([System.Text.RegularExpressions.Regex]::IsMatch('%(FullPath)', 'MauiCheck.exe'))" />
+      <FilesToSign Include="@(_PackageFiles)" Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('%(FullPath)', 'MauiCheck.dll'))" />
+      <FilesToSign Include="@(_PackageFiles)" Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('%(FullPath)', 'MauiCheck.exe'))" />
+      <FilesToSign Include="@(_PackageFiles)" Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('%(FullPath)', 'maui-check'))" />
+      <FilesToSign Include="@(_PackageFiles)" Condition=" $([System.Text.RegularExpressions.Regex]::IsMatch('%(FullPath)', 'maui-check.exe'))" />
     </ItemGroup>
     <Exec Command="&quot;$(SignToolPath)&quot; sign /v /f $(SigningCertificatePfxFile) /fd sha256 /tr $(SigningTimestampServer) %(FilesToSign.FullPath)" />
   </Target>
