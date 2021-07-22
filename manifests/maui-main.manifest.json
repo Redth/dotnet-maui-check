@@ -1,10 +1,10 @@
 {
   "check": {
-    "toolVersion": "0.6.1",
+    "toolVersion": "0.6.4",
     "variables": {
-      "MAUI_VERSION": "6.0.100-preview.6.1001",
+      "MAUI_VERSION": "6.0.100-preview.7.1063",
       "OPENJDK_VERSION": "11.0.10.9",
-      "MONOTOOLCHAIN_VERSION": "6.0.0-preview.6.21352.12"
+      "MONOTOOLCHAIN_VERSION": "6.0.0-preview.7.21371.11"
     },
     "variableMappers":[
       {
@@ -28,7 +28,7 @@
       }
     },
     "xcode": {
-      "minimumVersion": "13.0"
+      "minimumVersion": "19203"
     },
     "vswin": {
       "minimumVersion": "17.0.0-pre.2.0"
