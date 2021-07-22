@@ -135,11 +135,6 @@
                 "workloadId": "maui",
                 "packageId": "Microsoft.NET.Sdk.Maui.Manifest-6.0.100",
                 "version": "$(MAUI_VERSION)"
-            },
-            {
-                "workloadId": "microsoft-net-runtime-android",
-                "packageId": "microsoft.net.workload.mono.toolchain.manifest-6.0.100",
-                "version": "$(MONOTOOLCHAIN_VERSION)"
             }
           ],
           "packs": []
