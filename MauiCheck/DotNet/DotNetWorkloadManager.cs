@@ -96,7 +96,7 @@ namespace DotNetCheck.DotNet
 
 				var args = new[] { "workload", "uninstall", workloadIdentifier };
 
-				Util.WrapShellCommandWithSudo(dotnetExe, DotNetCliWorkingDir, args.ToArray());
+				Util.WrapShellCommandWithSudo(dotnetExe, DotNetCliWorkingDir, true, args.ToArray());
 			}
 			catch (Exception ex)
 			{
@@ -207,7 +207,7 @@ namespace DotNetCheck.DotNet
 
 			var args = new[] { "new", "--uninstall", templatePackId };
 
-			await Util.WrapShellCommandWithSudo(dotnetExe, DotNetCliWorkingDir, args.ToArray());
+			await Util.WrapShellCommandWithSudo(dotnetExe, DotNetCliWorkingDir, false, args.ToArray());
 		}
 
 		public Task<bool> InstallWorkloadManifest(string packageId, string workloadId, NuGetVersion manifestPackageVersion, CancellationToken cancelToken)
