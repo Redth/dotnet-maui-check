@@ -85,7 +85,7 @@ namespace DotNetCheck.DotNet
 			}
 		}
 
-		void DeleteExistingWorkloads(string sdkRoot, string sdkVersion, string workloadIdentifier)
+		async Task DeleteExistingWorkloads(string sdkRoot, string sdkVersion, string workloadIdentifier)
 		{
 			// Run dotnet workload uninstall first on the workload id
 			try
@@ -96,7 +96,7 @@ namespace DotNetCheck.DotNet
 
 				var args = new[] { "workload", "uninstall", workloadIdentifier };
 
-				Util.WrapShellCommandWithSudo(dotnetExe, DotNetCliWorkingDir, true, args.ToArray());
+				await Util.WrapShellCommandWithSudo(dotnetExe, DotNetCliWorkingDir, true, args.ToArray());
 			}
 			catch (Exception ex)
 			{
@@ -194,7 +194,13 @@ namespace DotNetCheck.DotNet
 
 			var args = new[] { "workload", "install", workloadId, "--skip-manifest-update" }.Concat(pkgSrcArgs);
 
-			await Util.WrapShellCommandWithSudo(dotnetExe, DotNetCliWorkingDir, true, args.ToArray());
+			var r = await Util.WrapShellCommandWithSudo(dotnetExe, DotNetCliWorkingDir, true, args.ToArray());
+
+			// Throw if this failed with a bad exit code
+			if (r.ExitCode != 0)
+			{
+				throw new Exception($"Failed to install workload: {workloadId}");
+			}
 
 			// Refresh the resolver to account for the install
 			UpdateWorkloadResolver();
@@ -210,13 +216,13 @@ namespace DotNetCheck.DotNet
 			await Util.WrapShellCommandWithSudo(dotnetExe, DotNetCliWorkingDir, false, args.ToArray());
 		}
 
-		public Task<bool> InstallWorkloadManifest(string packageId, string workloadId, NuGetVersion manifestPackageVersion, CancellationToken cancelToken)
+		public async Task<bool> InstallWorkloadManifest(string packageId, string workloadId, NuGetVersion manifestPackageVersion, CancellationToken cancelToken)
 		{
-			DeleteExistingWorkloads(SdkRoot, SdkVersion, workloadId);
+			await DeleteExistingWorkloads(SdkRoot, SdkVersion, workloadId);
 
 			var manifestRoot = GetSdkManifestRoot();
 
-			return AcquireNuGet(packageId, manifestPackageVersion, manifestRoot, false, cancelToken, true);
+			return await AcquireNuGet(packageId, manifestPackageVersion, manifestRoot, false, cancelToken, true);
 		}
 
 		string GetSdkManifestRoot()
