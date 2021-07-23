@@ -185,11 +185,16 @@ namespace DotNetCheck.DotNet
 			// dotnet workload install id --skip-manifest-update --add-source x
 			var dotnetExe = Path.Combine(SdkRoot, DotNetSdk.DotNetExeName);
 
+			// Arg switched to --source in >= preview 7
+			var addSourceArg = "--source";
+			if (NuGetVersion.Parse(SdkVersion) <= DotNetCheck.Manifest.DotNetSdk.Version6Preview6)
+				addSourceArg = "--add-source";
+
 			var pkgSrcArgs = NuGetPackageSources.Select(ps => $"--add-source \"{ps}\"");
 
 			var args = new[] { "workload", "install", workloadId, "--skip-manifest-update" }.Concat(pkgSrcArgs);
 
-			await Util.WrapShellCommandWithSudo(dotnetExe, DotNetCliWorkingDir, args.ToArray());
+			await Util.WrapShellCommandWithSudo(dotnetExe, DotNetCliWorkingDir, true, args.ToArray());
 
 			// Refresh the resolver to account for the install
 			UpdateWorkloadResolver();
