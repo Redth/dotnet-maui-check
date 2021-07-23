@@ -190,7 +190,7 @@ namespace DotNetCheck.DotNet
 			if (NuGetVersion.Parse(SdkVersion) <= DotNetCheck.Manifest.DotNetSdk.Version6Preview6)
 				addSourceArg = "--add-source";
 
-			var pkgSrcArgs = NuGetPackageSources.Select(ps => $"--add-source \"{ps}\"");
+			var pkgSrcArgs = NuGetPackageSources.Select(ps => $"{addSourceArg} \"{ps}\"");
 
 			var args = new[] { "workload", "install", workloadId, "--skip-manifest-update" }.Concat(pkgSrcArgs);
 
