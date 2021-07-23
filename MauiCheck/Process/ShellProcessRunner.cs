@@ -27,6 +27,8 @@ namespace DotNetCheck
 		public string Executable { get; set; }
 		public string Args { get; set; }
 
+		public bool Verbose { get;set; }
+
 		public CancellationToken CancellationToken { get; set; } = CancellationToken.None;
 
 		public Action<string> OutputCallback { get; set; }
@@ -62,7 +64,7 @@ namespace DotNetCheck
 
 		public ShellProcessRunner(ShellProcessRunnerOptions options)
 		{
-			verbose = Util.Verbose;
+			verbose = Util.Verbose || options.Verbose;
 			Options = options;
 			standardOutput = new List<string>();
 			standardError = new List<string>();
