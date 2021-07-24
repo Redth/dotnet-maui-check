@@ -2,7 +2,7 @@
   "check": {
     "toolVersion": "0.6.7",
     "variables": {
-      "MAUI_VERSION": "6.0.100-preview.7.1068",
+      "MAUI_VERSION": "6.0.100-preview.7.1078",
       "OPENJDK_VERSION": "11.0.10.9",
       "MONOTOOLCHAIN_VERSION": "6.0.0-preview.7.21371.11"
     },
