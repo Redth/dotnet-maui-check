@@ -1,22 +1,22 @@
 {
   "check": {
-    "toolVersion": "0.6.1",
+    "toolVersion": "0.6.7",
     "variables": {
-      "MAUI_VERSION": "6.0.100-preview.6.1003",
-      "OPENJDK_VERSION": "11.0.10.9",
-      "MONOTOOLCHAIN_VERSION": "6.0.0-preview.6.21352.12"
+      "MAUI_VERSION": "6.0.100-preview.7.1135",
+      "OPENJDK_VERSION": "11.0.10.9"
     },
     "variableMappers":[
       {
         "$type" : "DotNetCheck.Manifest.XmlVariableMapper, MauiCheck",
-        "sourceUri" : "https://raw.githubusercontent.com/dotnet/maui/release/6.0.1xx-preview6/eng/Versions.props",
+        "sourceUri" : "https://raw.githubusercontent.com/dotnet/maui/release/6.0.1xx-preview7/eng/Versions.props",
         "mappings": [
           { "name": "DOTNET_SDK_VERSION", "xpath": "//Project/PropertyGroup/MicrosoftDotnetSdkInternalPackageVersion/text()" },
           { "name": "MACCATALYST_SDK_VERSION", "xpath": "//Project/PropertyGroup/MicrosoftMacCatalystSdkPackageVersion/text()" },
           { "name": "IOS_SDK_VERSION", "xpath": "//Project/PropertyGroup/MicrosoftiOSSdkPackageVersion/text()" },
           { "name": "TVOS_SDK_VERSION", "xpath": "//Project/PropertyGroup/MicrosofttvOSSdkPackageVersion/text()" },
           { "name": "MACOS_SDK_VERSION", "xpath": "//Project/PropertyGroup/MicrosoftmacOSSdkPackageVersion/text()" },
-          { "name": "ANDROID_SDK_VERSION", "xpath": "//Project/PropertyGroup/MicrosoftAndroidSdkWindowsPackageVersion/text()" }
+          { "name": "ANDROID_SDK_VERSION", "xpath": "//Project/PropertyGroup/MicrosoftAndroidSdkWindowsPackageVersion/text()" },
+          { "name": "WASMTOOLS_VERSION", "xpath": "//Project/PropertyGroup/MicrosoftNETCoreAppRefPackageVersion/text()" }
         ]
       }
     ],
@@ -28,10 +28,10 @@
       }
     },
     "xcode": {
-      "minimumVersion": "13.0"
+      "minimumVersion": "19203"
     },
     "vswin": {
-      "minimumVersion": "17.0.0-pre.2.0"
+      "minimumVersion": "17.0.0-pre.3.0"
     },
     "vsmac": {
       "minimumVersion": "8.10.0",
@@ -93,7 +93,7 @@
       "sdks": [
         {
           "version": "$(DOTNET_SDK_VERSION)",
-          "requireExact": true,
+          "requireExact": false,
           "enableWorkloadResolver": false,
           "urls": {
             "win64": "https://dotnetcli.azureedge.net/dotnet/Sdk/$(DOTNET_SDK_VERSION)/dotnet-sdk-$(DOTNET_SDK_VERSION)-win-x64.exe",
@@ -102,32 +102,32 @@
           },
           "packageSources": [
             "https://pkgs.dev.azure.com/azure-public/vside/_packaging/xamarin-impl/nuget/v3/index.json",
-            "https://pkgs.dev.azure.com/dnceng/public/_packaging/6.0.100-preview.6.21355.2-shipping/nuget/v3/index.json",
+            "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet6/nuget/v3/index.json",
             "https://api.nuget.org/v3/index.json"
           ],
           "workloads": [
             {
-                "workloadId": "microsoft-android-sdk-full",
+                "workloadId": "android-aot",
                 "packageId": "Microsoft.NET.Sdk.Android.Manifest-6.0.100",
                 "version": "$(ANDROID_SDK_VERSION)"
             },
             {
-                "workloadId": "microsoft-ios-sdk-full",
+                "workloadId": "ios",
                 "packageId": "Microsoft.NET.Sdk.iOS.Manifest-6.0.100",
                 "version": "$(IOS_SDK_VERSION)"
             },
             {
-                "workloadId": "microsoft-maccatalyst-sdk-full",
+                "workloadId": "maccatalyst",
                 "packageId": "Microsoft.NET.Sdk.MacCatalyst.Manifest-6.0.100",
                 "version": "$(MACCATALYST_SDK_VERSION)"
             },
             {
-                "workloadId": "microsoft-tvos-sdk-full",
+                "workloadId": "tvos",
                 "packageId": "Microsoft.NET.Sdk.tvOS.Manifest-6.0.100",
                 "version": "$(TVOS_SDK_VERSION)"
             },
             {
-                "workloadId": "microsoft-macos-sdk-full",
+                "workloadId": "macos",
                 "packageId": "Microsoft.NET.Sdk.macOS.Manifest-6.0.100",
                 "version": "$(MACOS_SDK_VERSION)"
             },
@@ -137,9 +137,9 @@
                 "version": "$(MAUI_VERSION)"
             },
             {
-                "workloadId": "microsoft-net-runtime-android",
+                "workloadId": "wasm-tools",
                 "packageId": "microsoft.net.workload.mono.toolchain.manifest-6.0.100",
-                "version": "$(MONOTOOLCHAIN_VERSION)"
+                "version": "$(WASMTOOLS_VERSION)"
             }
           ],
           "packs": []
