@@ -2,7 +2,7 @@
   "check": {
     "toolVersion": "0.6.7",
     "variables": {
-      "MAUI_VERSION": "6.0.100-preview.7.1124",
+      "MAUI_VERSION": "6.0.100-preview.7.1135",
       "OPENJDK_VERSION": "11.0.10.9"
     },
     "variableMappers":[
@@ -15,7 +15,8 @@
           { "name": "IOS_SDK_VERSION", "xpath": "//Project/PropertyGroup/MicrosoftiOSSdkPackageVersion/text()" },
           { "name": "TVOS_SDK_VERSION", "xpath": "//Project/PropertyGroup/MicrosofttvOSSdkPackageVersion/text()" },
           { "name": "MACOS_SDK_VERSION", "xpath": "//Project/PropertyGroup/MicrosoftmacOSSdkPackageVersion/text()" },
-          { "name": "ANDROID_SDK_VERSION", "xpath": "//Project/PropertyGroup/MicrosoftAndroidSdkWindowsPackageVersion/text()" }
+          { "name": "ANDROID_SDK_VERSION", "xpath": "//Project/PropertyGroup/MicrosoftAndroidSdkWindowsPackageVersion/text()" },
+          { "name": "WASMTOOLS_VERSION", "xpath": "//Project/PropertyGroup/MicrosoftNETCoreAppRefPackageVersion/text()" }
         ]
       }
     ],
@@ -134,6 +135,11 @@
                 "workloadId": "maui",
                 "packageId": "Microsoft.NET.Sdk.Maui.Manifest-6.0.100",
                 "version": "$(MAUI_VERSION)"
+            },
+            {
+                "workloadId": "wasm-tools",
+                "packageId": "microsoft.net.workload.mono.toolchain.manifest-6.0.100",
+                "version": "$(WASMTOOLS_VERSION)"
             }
           ],
           "packs": []
