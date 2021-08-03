@@ -69,6 +69,9 @@ namespace DotNetCheck.Checkups
 
 			try
 			{
+				if (!Util.IsWindows)
+					throw new PlatformNotSupportedException("Creating Android Emulators from the tool is currently unsupported on this platform.");
+
 				if (avdManager != null)
 				{
 					var devices = avdManager.ListDevices();
