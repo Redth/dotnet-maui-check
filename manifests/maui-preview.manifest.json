@@ -2,7 +2,7 @@
   "check": {
     "toolVersion": "0.6.7",
     "variables": {
-      "MAUI_VERSION": "6.0.100-preview.7.1164",
+      "MAUI_VERSION": "6.0.100-preview.7.1206",
       "EMSCRIPTEN_WORKLOAD_VERSION": "6.0.0-preview.7.21377.2",
       "OPENJDK_VERSION": "11.0.10.9"
     },
@@ -103,7 +103,7 @@
           },
           "packageSources": [
             "https://pkgs.dev.azure.com/azure-public/vside/_packaging/xamarin-impl/nuget/v3/index.json",
-            "https://pkgs.dev.azure.com/dnceng/public/_packaging/6.0.100-preview.7.21377.35-shipping-4/nuget/v3/index.json",
+            "https://pkgs.dev.azure.com/dnceng/public/_packaging/6.0.100-preview.7.21379.14-shipping-1/nuget/v3/index.json",
             "https://api.nuget.org/v3/index.json"
           ],
           "workloads": [
