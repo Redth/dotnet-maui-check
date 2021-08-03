@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Newtonsoft.Json;
@@ -14,7 +15,7 @@ namespace DotNetCheck.Manifest
 		[JsonProperty("mappings")]
 		public List<XPathVariableMapping> Mappings { get; set; } = new List<XPathVariableMapping>();
 
-		public override void Map()
+		public override Task Map()
 		{
 			var xml = XDocument.Load(SourceUri);
 
@@ -35,7 +36,8 @@ namespace DotNetCheck.Manifest
 
 				this.Variables[mapping.Name] = value;
 			}
-				
+
+			return Task.CompletedTask;
 		}
 	}
 }

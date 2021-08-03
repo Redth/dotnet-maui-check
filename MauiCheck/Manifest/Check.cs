@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace DotNetCheck.Manifest
 {
@@ -39,13 +40,13 @@ namespace DotNetCheck.Manifest
 		[JsonProperty("filepermissions")]
 		public List<FilePermissions> FilePermissions { get; set; }
 
-		public void MapVariables()
+		public async Task MapVariables()
 		{
 			if (VariableMappers?.Any() ?? false)
 			{
 				foreach (var mapper in VariableMappers)
 				{
-					mapper.Map();
+					await mapper.Map();
 
 					foreach (var v in mapper.Variables)
 						Variables[v.Key] = v.Value;

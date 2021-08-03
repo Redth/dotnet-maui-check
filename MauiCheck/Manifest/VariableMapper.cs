@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace DotNetCheck.Manifest
 {
@@ -6,6 +7,6 @@ namespace DotNetCheck.Manifest
 	{
 		public Dictionary<string, object> Variables = new Dictionary<string, object>();
 
-		public abstract void Map();
+		public abstract Task Map();
 	}
 }

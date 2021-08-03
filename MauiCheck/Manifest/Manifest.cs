@@ -23,7 +23,7 @@ namespace DotNetCheck.Manifest
 		public static async Task<Manifest> FromFile(string filename)
 		{
 			var json = await System.IO.File.ReadAllTextAsync(filename);
-			return FromJson(json);
+			return await FromJson(json);
 		}
 
 		public static async Task<Manifest> FromUrl(string url)
@@ -31,16 +31,16 @@ namespace DotNetCheck.Manifest
 			var http = new HttpClient();
 			var json = await http.GetStringAsync(url);
 
-			return FromJson(json);
+			return await FromJson(json);
 		}
 
-		public static Manifest FromJson(string json)
+		public static async Task<Manifest> FromJson(string json)
 		{
 			var m = JsonConvert.DeserializeObject<Manifest>(json, new JsonSerializerSettings {
 				TypeNameHandling = TypeNameHandling.Auto
 			});
 
-			m?.Check?.MapVariables();
+			await m?.Check?.MapVariables();
 
 			return m;
 		}
