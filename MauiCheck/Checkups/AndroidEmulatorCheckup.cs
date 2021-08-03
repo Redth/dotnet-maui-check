@@ -39,7 +39,7 @@ namespace DotNetCheck.Checkups
 			var avds = new List<AndroidSdk.AvdManager.Avd>();
 
 			// Try invoking the java avdmanager library first
-			if (File.Exists(java) && Util.IsWindows)
+			if (File.Exists(java))
 			{
 				avdManager = new AndroidSdk.AvdManager(java,
 					history.GetEnvironmentVariable("ANDROID_SDK_ROOT") ?? history.GetEnvironmentVariable("ANDROID_HOME"));
@@ -69,9 +69,6 @@ namespace DotNetCheck.Checkups
 
 			try
 			{
-				if (!Util.IsWindows)
-					throw new PlatformNotSupportedException("Creating Android Emulators from the tool is currently unsupported on this platform.");
-
 				if (avdManager != null)
 				{
 					var devices = avdManager.ListDevices();
