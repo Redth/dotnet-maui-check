@@ -286,9 +286,11 @@ namespace DotNetCheck.AndroidSdk
 			var libPath = Path.GetFullPath(Path.Combine(adbManager.DirectoryName, "..", "lib"));
 			var toolPath = Path.GetFullPath(Path.Combine(adbManager.DirectoryName, ".."));
 
+			var cpSeparator = Util.IsWindows ? ';' : ':';
+
 			// Get all the .jars in the tools\lib folder to use as classpath
 			//var classPath = "avdmanager-classpath.jar";
-			var classPath = string.Join(';', Directory.GetFiles(libPath, "*.jar").Select(f => new FileInfo(f).Name));
+			var classPath = string.Join(cpSeparator, Directory.GetFiles(libPath, "*.jar").Select(f => new FileInfo(f).Name));
 
 			var proc = new Process();
 			// This is the package and class that contains the main() for avdmanager
