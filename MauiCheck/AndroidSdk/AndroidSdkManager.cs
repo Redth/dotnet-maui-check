@@ -58,12 +58,8 @@ namespace DotNetCheck.AndroidSdk
 				homeDir = new DirectoryInfo(home);
 
 			Home = homeDir ?? FindHome()?.FirstOrDefault();
-
-			AvdManager = new AvdManager(Home);
 		}
 
 		public readonly DirectoryInfo Home;
-
-		public readonly AvdManager AvdManager;
 	}
 }

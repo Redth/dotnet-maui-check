@@ -7,21 +7,24 @@ namespace DotNetCheck.AndroidSdk
 {
 	public abstract class SdkTool
 	{
-		public SdkTool()
+		public SdkTool(string java)
 		{ }
 
-		public SdkTool(string androidSdkHome)
-			: this(new DirectoryInfo(androidSdkHome))
+		public SdkTool(string java, string androidSdkHome)
+			: this(new FileInfo(java), new DirectoryInfo(androidSdkHome))
 		{ }
 
-		public SdkTool(DirectoryInfo androidSdkHome)
+		public SdkTool(FileInfo java,  DirectoryInfo androidSdkHome)
 		{
 			AndroidSdkHome = androidSdkHome;
+			Java = java;
 		}
 
 		internal abstract string SdkPackageId { get; }
 
 		public DirectoryInfo AndroidSdkHome { get; internal set; }
+
+		public FileInfo Java { get; internal set; }
 
 		public abstract FileInfo FindToolPath(DirectoryInfo androidSdkHome = null);
 
