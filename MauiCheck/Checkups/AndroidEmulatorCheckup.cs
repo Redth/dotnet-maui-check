@@ -8,6 +8,7 @@ using NuGet.Versioning;
 using DotNetCheck.Solutions;
 using Xamarin.Installer.AndroidSDK;
 using Xamarin.Installer.AndroidSDK.Manager;
+using System.IO;
 
 namespace DotNetCheck.Checkups
 {
@@ -28,14 +29,26 @@ namespace DotNetCheck.Checkups
 
 		public override Task<DiagnosticResult> Examine(SharedState history)
 		{
-			var android = new AndroidSdk.AndroidSdkManager(
-				history.GetEnvironmentVariable("ANDROID_SDK_ROOT") ?? history.GetEnvironmentVariable("ANDROID_HOME"));
+			AndroidSdk.AvdManager avdManager = null;
 
-			var avds = AndroidSdk.AvdManager.ListAvdsFromFiles(); // android.AvdManager.ListAvds();
+			var javaHome = history.GetEnvironmentVariable("JAVA_HOME");
+			string java = null;
+			if (!string.IsNullOrEmpty(javaHome) && Directory.Exists(javaHome))
+				java = Path.Combine(javaHome, "bin", "java" + (Util.IsWindows ? ".exe" : ""));
 
-			// This isn't really helpful anymore as avd cli tools don't seem to work with JDK 11
-			//if (!avds.Any())
-			//	avds = android.AvdManager.ListAvds();
+			var avds = new List<AndroidSdk.AvdManager.Avd>();
+
+			// Try invoking the java avdmanager library first
+			if (File.Exists(java))
+			{
+				avdManager = new AndroidSdk.AvdManager(java,
+					history.GetEnvironmentVariable("ANDROID_SDK_ROOT") ?? history.GetEnvironmentVariable("ANDROID_HOME"));
+				avds.AddRange(avdManager.ListAvds());
+			}
+
+			// Fallback to manually reading the avd files
+			if (!avds.Any())
+				avds.AddRange(AndroidSdk.AvdManager.ListAvdsFromFiles());
 
 			if (avds.Any())
 			{
@@ -56,9 +69,12 @@ namespace DotNetCheck.Checkups
 
 			try
 			{
-				var devices = android.AvdManager.ListDevices();
+				if (avdManager != null)
+				{
+					var devices = avdManager.ListDevices();
 
-				preferredDevice = devices.FirstOrDefault(d => d.Name.Contains("pixel", StringComparison.OrdinalIgnoreCase));
+					preferredDevice = devices.FirstOrDefault(d => d.Name.Contains("pixel", StringComparison.OrdinalIgnoreCase));
+				}
 			}
 			catch (Exception ex)
 			{
@@ -94,7 +110,7 @@ namespace DotNetCheck.Checkups
 
 								var sdkId = sdkPackage?.Path ?? me.SdkId;
 
-								android.AvdManager.Create($"Android_Emulator_{me.ApiLevel}", sdkId, device: preferredDevice?.Id, tag: "google_apis", force: true, interactive: true);
+								avdManager.Create($"Android_Emulator_{me.ApiLevel}", sdkId, device: preferredDevice?.Id, tag: "google_apis", force: true, interactive: true);
 								return Task.CompletedTask;
 							}
 							catch (Exception ex)
