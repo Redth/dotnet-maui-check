@@ -180,7 +180,7 @@ namespace DotNetCheck.DotNet
 			}
 		}
 
-		public async Task CliInstall(string workloadId)
+		public async Task CliInstall(IEnumerable<string> workloadIds)
 		{
 			// dotnet workload install id --skip-manifest-update --add-source x
 			var dotnetExe = Path.Combine(SdkRoot, DotNetSdk.DotNetExeName);
@@ -190,16 +190,19 @@ namespace DotNetCheck.DotNet
 			if (NuGetVersion.Parse(SdkVersion) <= DotNetCheck.Manifest.DotNetSdk.Version6Preview6)
 				addSourceArg = "--add-source";
 
-			var pkgSrcArgs = NuGetPackageSources.Select(ps => $"{addSourceArg} \"{ps}\"");
-
-			var args = new[] { "workload", "install", workloadId, "--skip-manifest-update" }.Concat(pkgSrcArgs);
+			var args = new List<string>();
+			args.Add("workload");
+			args.Add("install");
+			args.AddRange(workloadIds);
+			args.Add("--skip-manifest-update");
+			args.AddRange(NuGetPackageSources.Select(ps => $"{addSourceArg} \"{ps}\""));
 
 			var r = await Util.WrapShellCommandWithSudo(dotnetExe, DotNetCliWorkingDir, true, args.ToArray());
 
 			// Throw if this failed with a bad exit code
 			if (r.ExitCode != 0)
 			{
-				throw new Exception($"Failed to install workload: {workloadId}");
+				throw new Exception($"Failed to install workload: {workloadIds}");
 			}
 
 			// Refresh the resolver to account for the install

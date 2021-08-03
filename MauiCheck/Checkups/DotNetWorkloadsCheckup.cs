@@ -79,14 +79,11 @@ namespace DotNetCheck.Checkups
 			if (!missingWorkloads.Any())
 				return Task.FromResult(DiagnosticResult.Ok(this));
 
-			var remedies = missingWorkloads
-				.Select(mw => new DotNetWorkloadInstallSolution(SdkRoot, sdkVersion, mw, NuGetPackageSources));
-
 			return Task.FromResult(new DiagnosticResult(
 				Status.Error,
 				this,
 				new Suggestion("Install Missing SDK Workloads",
-				remedies.ToArray())));
+				new DotNetWorkloadInstallSolution(SdkRoot, sdkVersion, missingWorkloads.ToArray(), NuGetPackageSources))));
 		}
 	}
 }
