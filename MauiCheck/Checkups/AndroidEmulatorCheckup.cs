@@ -39,7 +39,7 @@ namespace DotNetCheck.Checkups
 			var avds = new List<AndroidSdk.AvdManager.Avd>();
 
 			// Try invoking the java avdmanager library first
-			if (File.Exists(java))
+			if (File.Exists(java) && Util.IsWindows)
 			{
 				avdManager = new AndroidSdk.AvdManager(java,
 					history.GetEnvironmentVariable("ANDROID_SDK_ROOT") ?? history.GetEnvironmentVariable("ANDROID_HOME"));
