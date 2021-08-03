@@ -1,22 +1,64 @@
 {
   "check": {
-    "toolVersion": "0.6.7",
+    "toolVersion": "0.7.0",
     "variables": {
-      "MAUI_VERSION": "6.0.100-preview.7.1135",
       "OPENJDK_VERSION": "11.0.10.9"
     },
-    "variableMappers":[
+    "variableMappers": [
       {
-        "$type" : "DotNetCheck.Manifest.XmlVariableMapper, MauiCheck",
-        "sourceUri" : "https://raw.githubusercontent.com/dotnet/maui/main/eng/Versions.props",
+        "$type": "DotNetCheck.Manifest.NuGetFeedVariableMapper, MauiCheck",
+        "packageSources": [ "https://pkgs.dev.azure.com/azure-public/vside/_packaging/xamarin-impl/nuget/v3/index.json" ],
         "mappings": [
-          { "name": "DOTNET_SDK_VERSION", "xpath": "//Project/PropertyGroup/MicrosoftDotnetSdkInternalPackageVersion/text()" },
-          { "name": "MACCATALYST_SDK_VERSION", "xpath": "//Project/PropertyGroup/MicrosoftMacCatalystSdkPackageVersion/text()" },
-          { "name": "IOS_SDK_VERSION", "xpath": "//Project/PropertyGroup/MicrosoftiOSSdkPackageVersion/text()" },
-          { "name": "TVOS_SDK_VERSION", "xpath": "//Project/PropertyGroup/MicrosofttvOSSdkPackageVersion/text()" },
-          { "name": "MACOS_SDK_VERSION", "xpath": "//Project/PropertyGroup/MicrosoftmacOSSdkPackageVersion/text()" },
-          { "name": "ANDROID_SDK_VERSION", "xpath": "//Project/PropertyGroup/MicrosoftAndroidSdkWindowsPackageVersion/text()" },
-          { "name": "WASMTOOLS_VERSION", "xpath": "//Project/PropertyGroup/MicrosoftNETCoreAppRefPackageVersion/text()" }
+          {
+            "name": "MAUI_VERSION",
+            "packageId": "Microsoft.NET.Sdk.Maui.Manifest-6.0.100",
+            "packageVersion": "6.0.100-rc.1.*"
+          }
+        ]
+      },
+      {
+        "$type": "DotNetCheck.Manifest.NuGetFeedVariableMapper, MauiCheck",
+        "packageSources": [ "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet6/nuget/v3/index.json" ],
+        "mappings": [
+          {
+            "name": "EMSCRIPTEN_WORKLOAD_VERSION",
+            "packageId": "microsoft.net.workload.emscripten.manifest-6.0.100",
+            "packageVersion": "6.0.0-rc.1.*"
+          }
+        ]
+      },
+      {
+        "$type": "DotNetCheck.Manifest.XmlVariableMapper, MauiCheck",
+        "sourceUri": "https://raw.githubusercontent.com/dotnet/maui/main/eng/Versions.props",
+        "mappings": [
+          {
+            "name": "DOTNET_SDK_VERSION",
+            "xpath": "//Project/PropertyGroup/MicrosoftDotnetSdkInternalPackageVersion/text()"
+          },
+          {
+            "name": "MACCATALYST_SDK_VERSION",
+            "xpath": "//Project/PropertyGroup/MicrosoftMacCatalystSdkPackageVersion/text()"
+          },
+          {
+            "name": "IOS_SDK_VERSION",
+            "xpath": "//Project/PropertyGroup/MicrosoftiOSSdkPackageVersion/text()"
+          },
+          {
+            "name": "TVOS_SDK_VERSION",
+            "xpath": "//Project/PropertyGroup/MicrosofttvOSSdkPackageVersion/text()"
+          },
+          {
+            "name": "MACOS_SDK_VERSION",
+            "xpath": "//Project/PropertyGroup/MicrosoftmacOSSdkPackageVersion/text()"
+          },
+          {
+            "name": "ANDROID_SDK_VERSION",
+            "xpath": "//Project/PropertyGroup/MicrosoftAndroidSdkWindowsPackageVersion/text()"
+          },
+          {
+            "name": "WASMTOOLS_VERSION",
+            "xpath": "//Project/PropertyGroup/MicrosoftNETCoreAppRefPackageVersion/text()"
+          }
         ]
       }
     ],
@@ -31,7 +73,7 @@
       "minimumVersion": "19203"
     },
     "vswin": {
-      "minimumVersion": "17.0.0-pre.2.0"
+      "minimumVersion": "17.0.0-pre.3.0"
     },
     "vsmac": {
       "minimumVersion": "8.10.0",
@@ -72,6 +114,10 @@
         {
           "path": "platform-tools",
           "version": "31.0.0"
+        },
+        {
+          "path": "cmdline-tools;3.0",
+          "version": "3.0"
         }
       ],
       "emulators": [
@@ -140,6 +186,11 @@
                 "workloadId": "wasm-tools",
                 "packageId": "microsoft.net.workload.mono.toolchain.manifest-6.0.100",
                 "version": "$(WASMTOOLS_VERSION)"
+            },
+            {
+                "workloadId": "microsoft-net-sdk-emscripten",
+                "packageId": "microsoft.net.workload.emscripten.manifest-6.0.100",
+                "version": "$(EMSCRIPTEN_WORKLOAD_VERSION)"
             }
           ],
           "packs": []
