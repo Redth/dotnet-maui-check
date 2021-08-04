@@ -2,7 +2,7 @@
   "profiles": {
     "MauiCheck": {
       "commandName": "Project",
-      "commandLineArgs": "--verbose --main"
+      "commandLineArgs": "--verbose --preview"
     }
   }
 }
