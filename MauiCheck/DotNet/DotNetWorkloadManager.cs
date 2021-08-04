@@ -76,7 +76,7 @@ namespace DotNetCheck.DotNet
 			var rollbackFile = Path.Combine(DotNetCliWorkingDir, "workload.json");
 			File.WriteAllText(rollbackFile, json.ToString());
 
-			Util.Log(json.ToString());
+			Util.Log($"Updating with Rollback File:" + Environment.NewLine + json.ToString());
 
 			return rollbackFile;
 		}
