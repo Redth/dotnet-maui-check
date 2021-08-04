@@ -10,15 +10,14 @@ using NuGet.Versioning;
 
 namespace DotNetCheck.Checkups
 {
-	public class DotNetWorkloadsCheckup
-		: Checkup
+	public class DotNetWorkloadsCheckupLegacy : Checkup
 	{
-		public DotNetWorkloadsCheckup() : base()
+		public DotNetWorkloadsCheckupLegacy() : base()
 		{
 			throw new Exception("Do not IOC this type directly");
 		}
 
-		public DotNetWorkloadsCheckup(SharedState sharedState, string sdkVersion, Manifest.DotNetWorkload[] requiredWorkloads, params string[] nugetPackageSources) : base()
+		public DotNetWorkloadsCheckupLegacy(SharedState sharedState, string sdkVersion, Manifest.DotNetWorkload[] requiredWorkloads, params string[] nugetPackageSources) : base()
 		{
 			var dotnet = new DotNetSdk(sharedState);
 
@@ -34,20 +33,27 @@ namespace DotNetCheck.Checkups
 		public readonly Manifest.DotNetWorkload[] RequiredWorkloads;
 
 		public override IEnumerable<CheckupDependency> DeclareDependencies(IEnumerable<string> checkupIds)
-			=> new[] { new CheckupDependency("dotnet") };
+			=> new [] { new CheckupDependency("dotnet") };
 
 		public override string Id => "dotnetworkloads-" + SdkVersion;
 
 		public override string Title => $".NET SDK - Workloads ({SdkVersion})";
 
-		public override async Task<DiagnosticResult> Examine(SharedState history)
+		public override Task<DiagnosticResult> Examine(SharedState history)
 		{
 			if (!history.TryGetEnvironmentVariable("DOTNET_SDK_VERSION", out var sdkVersion))
 				sdkVersion = SdkVersion;
 
-			var workloadManager = new DotNetWorkloadManager(SdkRoot, sdkVersion, NuGetPackageSources);
+			var workloadManager = new DotNetWorkloadManagerLegacy(SdkRoot, sdkVersion, NuGetPackageSources);
 
+			//var installedWorkloads = workloadManager.GetInstalledWorkloads();
 
+			// This is a bit of a hack where we manually check the sdk-manifests/{SDK_VERSION}/* folders
+			// for installed workloads, and then go manually parse the manifest json
+			// as well as look for a .nuspec file from the extracted nupkg when it was installed
+			// the nuspec file contains the version we actually care about for now since the manifest json
+			// has a long number which is meaningless right now and will eventually be changed to a string
+			// when that happens we can use the actual resolver's method to get installed workload info
 			var installedPackageWorkloads = workloadManager.GetInstalledWorkloads();
 
 			var missingWorkloads = new List<Manifest.DotNetWorkload>();
@@ -69,18 +75,15 @@ namespace DotNetCheck.Checkups
 					ReportStatus($"{rp.Id} ({rp.PackageId} : {rp.Version}) installed.", Status.Ok);
 				}
 			}
-
+		
 			if (!missingWorkloads.Any())
-				return DiagnosticResult.Ok(this);
+				return Task.FromResult(DiagnosticResult.Ok(this));
 
-			return new DiagnosticResult(
+			return Task.FromResult(new DiagnosticResult(
 				Status.Error,
 				this,
-				new Suggestion("Install or Update SDK Workloads",
-				new ActionSolution(async _ =>
-				{
-					await workloadManager.Install(RequiredWorkloads);
-				})));
+				new Suggestion("Install Missing SDK Workloads",
+				new DotNetWorkloadInstallSolution(SdkRoot, sdkVersion, missingWorkloads.ToArray(), NuGetPackageSources))));
 		}
 	}
 }

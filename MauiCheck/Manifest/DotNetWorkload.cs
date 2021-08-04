@@ -18,6 +18,12 @@ namespace DotNetCheck.Manifest
 		[JsonProperty("workloadVersion")]
 		public string WorkloadVersion { get; set; }
 
+		[JsonProperty("workloadManifestId")]
+		public string WorkloadManifestId { get; set; }
+
+		[JsonProperty("abstract")]
+		public bool Abstract { get; set; } = false;
+
 		[JsonProperty("ignoredPackIds")]
 		public List<string> IgnoredPackIds { get; set; }
 	}

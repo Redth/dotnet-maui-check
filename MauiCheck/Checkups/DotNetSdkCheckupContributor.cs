@@ -1,5 +1,6 @@
 ﻿using DotNetCheck.Manifest;
 using DotNetCheck.Models;
+using NuGet.Versioning;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +26,12 @@ namespace DotNetCheck.Checkups
 						sdkVersion = sdk.Version;
 
 					if (sdk.Workloads?.Any() ?? false)
-						yield return new DotNetWorkloadsCheckup(sharedState, sdkVersion, workloads, pkgSrcs);
+					{
+						if (NuGetVersion.Parse(sdkVersion) >= Manifest.DotNetSdk.Version6Preview7)
+							yield return new DotNetWorkloadsCheckup(sharedState, sdkVersion, workloads, pkgSrcs);
+						else
+							yield return new DotNetWorkloadsCheckupLegacy(sharedState, sdkVersion, workloads, pkgSrcs);
+					}
 				}
 			}
 		}
