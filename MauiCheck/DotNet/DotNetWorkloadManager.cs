@@ -34,10 +34,6 @@ namespace DotNetCheck.DotNet
 
 			CleanEmptyWorkloadDirectories(sdkRoot, sdkVersion);
 
-			manifestProvider = new SdkDirectoryWorkloadManifestProvider(SdkRoot, SdkVersion);
-
-			UpdateWorkloadResolver();
-
 			DotNetCliWorkingDir = Path.Combine(Path.GetTempPath(), "maui-check-net-working-dir");
 			Directory.CreateDirectory(DotNetCliWorkingDir);
 
@@ -51,15 +47,9 @@ namespace DotNetCheck.DotNet
 		public readonly string SdkRoot;
 		public readonly string SdkVersion;
 
-		readonly SdkDirectoryWorkloadManifestProvider manifestProvider;
-		WorkloadResolver workloadResolver;
-
 		public readonly string[] NuGetPackageSources;
 
 		readonly string DotNetCliWorkingDir;
-
-		void UpdateWorkloadResolver()
-			=> workloadResolver = WorkloadResolver.Create(manifestProvider, SdkRoot, SdkVersion);
 
 		void CleanEmptyWorkloadDirectories(string sdkRoot, string sdkVersion)
 		{
@@ -152,26 +142,31 @@ namespace DotNetCheck.DotNet
 					}
 				}
 			}
-
-			// Refresh the resolver to account for the uninstall
-			UpdateWorkloadResolver();
 		}
 
 		public IEnumerable<(string id, string version)> GetInstalledWorkloads()
 		{
+			var manifestProvider = new SdkDirectoryWorkloadManifestProvider(SdkRoot, SdkVersion);
+
 			foreach (var manifestInfo in manifestProvider.GetManifests())
 			{
-				var m = WorkloadManifestReader.ReadWorkloadManifest(manifestInfo.manifestId, manifestInfo.manifestStream);
+				using (var manifestStream = manifestInfo.openManifestStream())
+				{
+					var m = WorkloadManifestReader.ReadWorkloadManifest(manifestInfo.manifestId, manifestStream);
 
-				// Each workload manifest can have one or more workloads defined
-				foreach (var wl in m.Workloads)
-					yield return (wl.Key.ToString(), m.Version);
+					// Each workload manifest can have one or more workloads defined
+					foreach (var wl in m.Workloads)
+						yield return (wl.Key.ToString(), m.Version);
+				}
 			}
 		}
 
 		public IEnumerable<WorkloadResolver.PackInfo> GetPacksInWorkload(string workloadId)
 		{
-			var packs = workloadResolver.GetPacksInWorkload(workloadId);
+			var workloadResolver = WorkloadResolver.Create(new SdkDirectoryWorkloadManifestProvider(SdkRoot, SdkVersion), SdkRoot, SdkVersion);
+
+			var wid = new Microsoft.NET.Sdk.WorkloadManifestReader.WorkloadId(workloadId);
+			var packs = workloadResolver.GetPacksInWorkload(wid);
 			foreach (var p in packs)
 			{
 				var packInfo = workloadResolver.TryGetPackInfo(p);
@@ -202,11 +197,8 @@ namespace DotNetCheck.DotNet
 			// Throw if this failed with a bad exit code
 			if (r.ExitCode != 0)
 			{
-				throw new Exception($"Failed to install workload: {workloadIds}");
+				throw new Exception("Failed to install workload: " + string.Join(", ", workloadIds));
 			}
-
-			// Refresh the resolver to account for the install
-			UpdateWorkloadResolver();
 		}
 
 		public async Task UninstallTemplate(string templatePackId)
