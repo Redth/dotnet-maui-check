@@ -34,7 +34,7 @@ namespace DotNetCheck.Solutions
 
 			ReportStatus($"Installing Workloads: " + string.Join(' ', workloadIds));
 
-			var workloadManager = new DotNetWorkloadManager(SdkRoot, SdkVersion, NuGetPackageSources);
+			var workloadManager = new DotNetWorkloadManagerLegacy(SdkRoot, SdkVersion, NuGetPackageSources);
 
 			foreach (var workload in Workloads)
 			{
