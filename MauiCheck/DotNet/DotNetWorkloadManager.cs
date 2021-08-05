@@ -55,6 +55,10 @@ namespace DotNetCheck.DotNet
 		{
 			var rollbackFile = WriteRollbackFile(workloads);
 
+			RemoveOldMetadata();
+
+			await CliRepair();
+
 			await CliUpdateWithRollback(rollbackFile);
 
 			await CliInstall(workloads.Where(w => !w.Abstract).Select(w => w.Id));
@@ -116,6 +120,29 @@ namespace DotNetCheck.DotNet
 			}
 		}
 
+		void RemoveOldMetadata()
+		{
+			var dir = GetInstalledWorkloadMetadataDir();
+
+			var oldWorkloadIds = new [] {
+				"microsoft-android-sdk-full",
+				"microsoft-ios-sdk-full",
+				"microsoft-maccatalyst-sdk-full",
+				"microsoft-macos-sdk-full",
+				"microsoft-tvos-sdk-full"
+			};
+
+			foreach (var owid in oldWorkloadIds)
+			{
+				try
+				{
+					var f = Path.Combine(dir, owid);
+					if (File.Exists(f))
+						File.Delete(f);
+				}
+				catch { }
+			}
+		}
 
 		async Task CliInstall(IEnumerable<string> workloadIds)
 		{
@@ -171,6 +198,30 @@ namespace DotNetCheck.DotNet
 				throw new Exception("Workload Update failed: `dotnet " + string.Join(' ', args) + "`");
 		}
 
+		async Task CliRepair()
+		{
+			// dotnet workload install id --skip-manifest-update --add-source x
+			var dotnetExe = Path.Combine(SdkRoot, DotNetSdk.DotNetExeName);
+
+			// Arg switched to --source in >= preview 7
+			var addSourceArg = "--source";
+			if (NuGetVersion.Parse(SdkVersion) <= DotNetCheck.Manifest.DotNetSdk.Version6Preview6)
+				addSourceArg = "--add-source";
+
+			var args = new List<string>
+			{
+				"workload",
+				"repair"
+			};
+			args.AddRange(NuGetPackageSources.Select(ps => $"{addSourceArg} \"{ps}\""));
+
+			var r = await Util.WrapShellCommandWithSudo(dotnetExe, DotNetCliWorkingDir, true, args.ToArray());
+
+			// Throw if this failed with a bad exit code
+			if (r.ExitCode != 0)
+				throw new Exception("Workload Repair failed: `dotnet " + string.Join(' ', args) + "`");
+		}
+
 		void CleanEmptyWorkloadDirectories(string sdkRoot, string sdkVersion)
 		{
 			if (NuGetVersion.TryParse(sdkVersion, out var v))
@@ -193,6 +244,19 @@ namespace DotNetCheck.DotNet
 					}
 				}
 			}
+		}
+
+		string GetInstalledWorkloadMetadataDir()
+		{
+			int last2DigitsTo0(int versionBuild)
+				=> versionBuild / 100 * 100;
+
+			if (!Version.TryParse(SdkVersion.Split('-')[0], out var result))
+				throw new ArgumentException("Invalid 'SdkVersion' version: " + SdkVersion);
+
+			var sdkVersionBand = $"{result.Major}.{result.Minor}.{last2DigitsTo0(result.Build)}";
+			
+			return Path.Combine(SdkRoot, "metadata", "workloads", sdkVersionBand, "InstalledWorkloads");
 		}
 	}
 }
