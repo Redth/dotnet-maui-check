@@ -85,6 +85,9 @@ namespace DotNetCheck.Cli
 				sharedState.SetEnvironmentVariable("DOTNET_ROOT", settings.DotNetSdkRoot);
 			}
 
+			if (settings.ForceDotNet)
+				sharedState.SetEnvironmentVariable("DOTNET_FORCE", "true");
+
 			var checkups = CheckupManager.BuildCheckupGraph(manifest, sharedState);
 
 			AnsiConsole.MarkupLine(" ok");

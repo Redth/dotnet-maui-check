@@ -25,6 +25,9 @@ namespace DotNetCheck
 		[CommandOption("--dotnet <SDK_ROOT>")]
 		public string DotNetSdkRoot { get; set; }
 
+		[CommandOption("--force-dotnet")]
+		public bool ForceDotNet { get; set; }
+
 		[CommandOption("-v|--verbose")]
 		public bool Verbose { get; set; }
 

@@ -45,6 +45,9 @@ namespace DotNetCheck.Checkups
 			if (!history.TryGetEnvironmentVariable("DOTNET_SDK_VERSION", out var sdkVersion))
 				sdkVersion = SdkVersion;
 
+			var force = history.TryGetEnvironmentVariable("DOTNET_FORCE", out var forceDotNet)
+				&& (forceDotNet?.Equals("true", StringComparison.OrdinalIgnoreCase) ?? false);
+
 			var workloadManager = new DotNetWorkloadManager(SdkRoot, sdkVersion, NuGetPackageSources);
 
 
@@ -70,7 +73,7 @@ namespace DotNetCheck.Checkups
 				}
 			}
 
-			if (!missingWorkloads.Any())
+			if (!missingWorkloads.Any() && !force)
 				return DiagnosticResult.Ok(this);
 
 			return new DiagnosticResult(
