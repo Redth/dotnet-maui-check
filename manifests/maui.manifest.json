@@ -152,7 +152,8 @@
             "osx": "https://dotnetcli.azureedge.net/dotnet/Sdk/$(DOTNET_SDK_VERSION)/dotnet-sdk-$(DOTNET_SDK_VERSION)-osx-x64.pkg"
           },
           "packageSources": [
-            "https://api.nuget.org/v3/index.json"
+            "https://api.nuget.org/v3/index.json",
+            "https://pkgs.dev.azure.com/dnceng/public/_packaging/6.0.100-preview.7.21379.14-shipping-1/nuget/v3/index.json"
           ],
           "workloads": [
             {
