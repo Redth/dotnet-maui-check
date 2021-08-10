@@ -7,18 +7,18 @@ namespace DotNetCheck.Solutions
 {
 	public class ActionSolution : Solution
 	{
-		public ActionSolution(Func<CancellationToken, Task> curer)
+		public ActionSolution(Func<Solution, CancellationToken, Task> curer)
 		{
 			Curer = curer;
 		}
 
-		public Func<CancellationToken, Task> Curer { get; private set; }
+		public Func<Solution, CancellationToken, Task> Curer { get; private set; }
 
 		public override async Task Implement(SharedState sharedState, CancellationToken cancellationToken)
 		{
 			await base.Implement(sharedState, cancellationToken);
 
-			await Curer?.Invoke(cancellationToken);
+			await Curer?.Invoke(this, cancellationToken);
 		}
 	}
 }

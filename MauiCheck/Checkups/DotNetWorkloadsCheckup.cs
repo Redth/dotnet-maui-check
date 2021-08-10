@@ -80,7 +80,7 @@ namespace DotNetCheck.Checkups
 				Status.Error,
 				this,
 				new Suggestion("Install or Update SDK Workloads",
-				new ActionSolution(async _ =>
+				new ActionSolution(async (sln, cancel) =>
 				{
 					await workloadManager.Install(RequiredWorkloads);
 				})));

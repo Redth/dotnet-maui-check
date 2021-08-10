@@ -62,7 +62,7 @@ namespace DotNetCheck.Checkups
 					Status.Error,
 					this,
 					new Suggestion("Run xcode-select -s <Path>",
-						new Solutions.ActionSolution(cancelToken =>
+						new Solutions.ActionSolution((sln, cancelToken) =>
 						{
 							ShellProcessRunner.Run("xcode-select", "-s " + eligibleXcode.Path);
 							return Task.CompletedTask;
