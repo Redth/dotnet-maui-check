@@ -7,29 +7,29 @@
     "variableMappers": [
       {
         "$type": "DotNetCheck.Manifest.NuGetFeedVariableMapper, MauiCheck",
-        "packageSources": [ "https://pkgs.dev.azure.com/azure-public/vside/_packaging/xamarin-impl/nuget/v3/index.json" ],
+        "packageSources": [ "https://api.nuget.org/v3/index.json" ],
         "mappings": [
           {
             "name": "MAUI_VERSION",
             "packageId": "Microsoft.NET.Sdk.Maui.Manifest-6.0.100",
-            "packageVersion": "6.0.100-rc.1.*"
+            "packageVersion": "6.0.100-preview.7.*"
           }
         ]
       },
       {
         "$type": "DotNetCheck.Manifest.NuGetFeedVariableMapper, MauiCheck",
-        "packageSources": [ "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet6/nuget/v3/index.json" ],
+        "packageSources": [ "https://api.nuget.org/v3/index.json" ],
         "mappings": [
           {
             "name": "EMSCRIPTEN_WORKLOAD_VERSION",
             "packageId": "microsoft.net.workload.emscripten.manifest-6.0.100",
-            "packageVersion": "6.0.0-rc.1.*"
+            "packageVersion": "6.0.0-preview.7.*"
           }
         ]
       },
       {
         "$type": "DotNetCheck.Manifest.XmlVariableMapper, MauiCheck",
-        "sourceUri": "https://raw.githubusercontent.com/dotnet/maui/main/eng/Versions.props",
+        "sourceUri": "https://raw.githubusercontent.com/dotnet/maui/release/6.0.1xx-preview7/eng/Versions.props",
         "mappings": [
           {
             "name": "DOTNET_SDK_VERSION",
@@ -147,8 +147,6 @@
             "osx": "https://dotnetcli.azureedge.net/dotnet/Sdk/$(DOTNET_SDK_VERSION)/dotnet-sdk-$(DOTNET_SDK_VERSION)-osx-x64.pkg"
           },
           "packageSources": [
-            "https://pkgs.dev.azure.com/azure-public/vside/_packaging/xamarin-impl/nuget/v3/index.json",
-            "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet6/nuget/v3/index.json",
             "https://api.nuget.org/v3/index.json"
           ],
           "workloads": [
