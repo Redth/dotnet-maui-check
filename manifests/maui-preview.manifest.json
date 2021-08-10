@@ -1,13 +1,15 @@
 {
   "check": {
-    "toolVersion": "0.7.1",
+    "toolVersion": "0.7.2",
     "variables": {
       "OPENJDK_VERSION": "11.0.10.9"
     },
     "variableMappers": [
       {
         "$type": "DotNetCheck.Manifest.NuGetFeedVariableMapper, MauiCheck",
-        "packageSources": [ "https://pkgs.dev.azure.com/azure-public/vside/_packaging/xamarin-impl/nuget/v3/index.json" ],
+        "packageSources": [
+          "https://api.nuget.org/v3/index.json"
+        ],
         "mappings": [
           {
             "name": "MAUI_VERSION",
@@ -18,7 +20,10 @@
       },
       {
         "$type": "DotNetCheck.Manifest.NuGetFeedVariableMapper, MauiCheck",
-        "packageSources": [ "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet6/nuget/v3/index.json" ],
+        "packageSources": [
+          "https://pkgs.dev.azure.com/dnceng/public/_packaging/6.0.100-preview.7.21379.14-shipping-1/nuget/v3/index.json",
+          "https://api.nuget.org/v3/index.json"
+        ],
         "mappings": [
           {
             "name": "EMSCRIPTEN_WORKLOAD_VERSION",
@@ -147,9 +152,8 @@
             "osx": "https://dotnetcli.azureedge.net/dotnet/Sdk/$(DOTNET_SDK_VERSION)/dotnet-sdk-$(DOTNET_SDK_VERSION)-osx-x64.pkg"
           },
           "packageSources": [
-            "https://pkgs.dev.azure.com/azure-public/vside/_packaging/xamarin-impl/nuget/v3/index.json",
-            "https://pkgs.dev.azure.com/dnceng/public/_packaging/6.0.100-preview.7.21379.14-shipping-1/nuget/v3/index.json",
-            "https://api.nuget.org/v3/index.json"
+            "https://api.nuget.org/v3/index.json",
+            "https://pkgs.dev.azure.com/dnceng/public/_packaging/6.0.100-preview.7.21379.14-shipping-1/nuget/v3/index.json"
           ],
           "workloads": [
             {
