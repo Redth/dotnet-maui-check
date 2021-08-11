@@ -14,6 +14,15 @@ To run:
 maui-check
 ```
 
+## Troubleshooting
+
+If you run into problems with maui-check, you should generally try the following:
+
+1. Update the tool to the latest version: `dotnet tool update -g redth.net.maui.check --source https://api.nuget.org/v3/index.json`
+2. Run with `maui-check --force-dotnet` to ensure the workload repair/update/install commands run regardless of if maui-check thinks the workload versions look good
+3. If you have errors still, it may help to run the [Clean-Old-DotNet6-Previews.ps1](https://github.com/Redth/dotnet-maui-check/blob/main/Clean-Old-DotNet6-Previews.ps1) script to remove old SDK Packs, templates, or otherwise old cached preview files that might be causing the problem.  Try running `maui-check --force-dotnet` again after this step.
+4. Finally, if you have problems, run with `--verbose` flag and capture the output and add it to a new issue.
+
 ## Command line arguments
 
 ### `-m <FILE_OR_URL>`, `--manifest <FILE_OR_URL>` Manifest File or Url
