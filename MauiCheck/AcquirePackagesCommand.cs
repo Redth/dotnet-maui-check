@@ -134,11 +134,16 @@ namespace DotNetCheck
 
 			async Task<bool> download(PackageIdentity pkgIdentity)
 			{
-				AnsiConsole.MarkupLine($"\t{pkgIdentity.Id} {pkgIdentity.Version} ...");
+				var destFile = Path.Combine(directory, $"{pkgIdentity.Id}.{pkgIdentity.Version}.nupkg");
 
-				using var downloader = await byIdRes.GetPackageDownloaderAsync(pkgIdentity, cache, logger, cancelToken);
+				if (!File.Exists(destFile))
+				{
+					AnsiConsole.MarkupLine($"\t{pkgIdentity.Id} {pkgIdentity.Version} ...");
 
-				await downloader.CopyNupkgFileToAsync(Path.Combine(directory, $"{pkgIdentity.Id}.{pkgIdentity.Version}.nupkg"), cancelToken);
+					using var downloader = await byIdRes.GetPackageDownloaderAsync(pkgIdentity, cache, logger, cancelToken);
+
+					await downloader.CopyNupkgFileToAsync(destFile, cancelToken);
+				}
 
 				return true;
 			}
