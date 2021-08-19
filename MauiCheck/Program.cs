@@ -43,13 +43,14 @@ namespace DotNetCheck
 				config.AddCommand<CheckCommand>("check");
 				config.AddCommand<ListCheckupCommand>("list");
 				config.AddCommand<ConfigCommand>("config");
+				config.AddCommand<AcquirePackagesCommand>("acquirepackages");
 			});
 
 			var finalArgs = new List<string>();
 
 			var firstArg = args?.FirstOrDefault()?.Trim()?.ToLowerInvariant() ?? string.Empty;
 
-			if (firstArg != "list" && firstArg != "config")
+			if (firstArg != "list" && firstArg != "config" && firstArg != "acquirepackages")
 				finalArgs.Add("check");
 
 			if (args?.Any() ?? false)

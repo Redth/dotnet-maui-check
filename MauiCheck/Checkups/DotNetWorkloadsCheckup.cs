@@ -87,8 +87,17 @@ namespace DotNetCheck.Checkups
 				Status.Error,
 				this,
 				new Suggestion("Install or Update SDK Workloads",
-				new ActionSolution(async _ =>
+				new ActionSolution(async (sln, cancel) =>
 				{
+					try
+					{
+						await workloadManager.Repair();
+					}
+					catch (Exception ex)
+					{
+						ReportStatus("Warning: Workload repair failed", Status.Warning);
+					}
+
 					await workloadManager.Install(RequiredWorkloads);
 				})));
 		}

@@ -92,7 +92,7 @@ namespace DotNetCheck.Checkups
 				this,
 				new Suggestion("Create an Android Emulator",
 					missingEmulators.Select(me =>
-						new ActionSolution(t =>
+						new ActionSolution((sln, cancel) =>
 						{
 							try
 							{

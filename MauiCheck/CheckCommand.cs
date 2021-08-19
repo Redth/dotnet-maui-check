@@ -87,6 +87,8 @@ namespace DotNetCheck.Cli
 
 			if (settings.ForceDotNet)
 				sharedState.SetEnvironmentVariable("DOTNET_FORCE", "true");
+			if (settings.CI)
+				sharedState.SetEnvironmentVariable("CI", "true");
 
 			var checkups = CheckupManager.BuildCheckupGraph(manifest, sharedState);
 

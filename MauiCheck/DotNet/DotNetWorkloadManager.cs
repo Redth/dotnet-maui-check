@@ -51,13 +51,18 @@ namespace DotNetCheck.DotNet
 
 		readonly string DotNetCliWorkingDir;
 
+		public async Task Repair()
+		{
+			RemoveOldMetadata();
+
+			await CliRepair();
+		}
+
 		public async Task Install(Manifest.DotNetWorkload[] workloads)
 		{
 			var rollbackFile = WriteRollbackFile(workloads);
 
 			RemoveOldMetadata();
-
-			await CliRepair();
 
 			await CliUpdateWithRollback(rollbackFile);
 

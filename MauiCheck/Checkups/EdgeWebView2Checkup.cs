@@ -13,7 +13,8 @@ namespace DotNetCheck.Checkups
 		public override string Title => $"Edge WebView2";
 		
 		public override bool ShouldExamine(SharedState history)
-			=> Manifest?.Check?.VSWin != null;
+			=> Manifest?.Check?.VSWin != null
+				&& !(history.GetEnvironmentVariable("CI") ?? "false").Equals("true", System.StringComparison.OrdinalIgnoreCase);
 
 		public override Task<DiagnosticResult> Examine(SharedState history)
 		{

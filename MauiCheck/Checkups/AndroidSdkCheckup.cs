@@ -168,7 +168,7 @@ For more information see: [underline]https://aka.ms/dotnet-androidsdk-help[/]";
 				this,
 				new Suggestion("Install or Update Android SDK packages",
 					desc,
-					new Solutions.ActionSolution(async cancelToken =>
+					new Solutions.ActionSolution(async (sln, cancelToken) =>
 					{
 						try
 						{
