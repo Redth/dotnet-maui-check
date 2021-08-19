@@ -40,13 +40,20 @@ namespace DotNetCheck.Checkups
 
 		public override string Title => $".NET SDK - Workloads ({SdkVersion})";
 
+		static bool wasForceRunAlready = false;
+
 		public override async Task<DiagnosticResult> Examine(SharedState history)
 		{
 			if (!history.TryGetEnvironmentVariable("DOTNET_SDK_VERSION", out var sdkVersion))
 				sdkVersion = SdkVersion;
 
 			var force = history.TryGetEnvironmentVariable("DOTNET_FORCE", out var forceDotNet)
-				&& (forceDotNet?.Equals("true", StringComparison.OrdinalIgnoreCase) ?? false);
+				&& (forceDotNet?.Equals("true", StringComparison.OrdinalIgnoreCase) ?? false)
+				&& !wasForceRunAlready;
+
+			// Don't allow multiple force runs, just the first
+			if (force)
+				wasForceRunAlready = true;
 
 			var workloadManager = new DotNetWorkloadManager(SdkRoot, sdkVersion, NuGetPackageSources);
 
