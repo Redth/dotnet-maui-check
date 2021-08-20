@@ -4,6 +4,7 @@ using Microsoft.NET.Sdk.WorkloadManifestReader;
 using Newtonsoft.Json;
 using NuGet.Common;
 using NuGet.Configuration;
+using NuGet.Packaging;
 using NuGet.Packaging.Core;
 using NuGet.Packaging.Signing;
 using NuGet.Protocol;
@@ -24,6 +25,8 @@ namespace DotNetCheck
 {
 	public class AcquirePackagesCommand : AsyncCommand<AcquirePackagesSettings>
 	{
+		internal static Dictionary<string, (SourceRepository source, FindPackageByIdResource byIdRes)> nugetSources = new();
+
 		public override async Task<int> ExecuteAsync(CommandContext context, AcquirePackagesSettings settings)
 		{
 			AnsiConsole.Markup($"[bold blue]{Icon.Thinking} Synchronizing configuration...[/]");
@@ -39,7 +42,15 @@ namespace DotNetCheck
 			AnsiConsole.MarkupLine(" ok");
 
 			var manifestDotNetSdk = manifest?.Check?.DotNet?.Sdks?.FirstOrDefault();
-			
+
+			foreach (var s in manifestDotNetSdk.PackageSources)
+			{
+				var nugetSource = Repository.Factory.GetCoreV3(s);
+				var byIdRes = await nugetSource.GetResourceAsync<FindPackageByIdResource>();
+
+				nugetSources.Add(s, (nugetSource, byIdRes));
+			}
+
 			var dn = new DotNetSdk(new SharedState());
 			var sdks = await dn.GetSdks();
 
@@ -62,17 +73,17 @@ namespace DotNetCheck
 
 			var nugetWorkloadManifestProvider = new NuGetManifestProvider(new NuGetVersion(sdkVersion));
 
-			await nugetWorkloadManifestProvider.AcquireManifests(settings.DownloadDirectory, manifestDotNetSdk.PackageSources, manifestDotNetSdk.Workloads, cancelTokenSource.Token);
+			await nugetWorkloadManifestProvider.AcquireManifests(settings.DownloadDirectory, manifestDotNetSdk.Workloads, cancelTokenSource.Token);
 
-			foreach (var workload in manifestDotNetSdk.Workloads)
+			var items = new Dictionary<string, string>();
+
+			try
 			{
-				AnsiConsole.MarkupLine($"Acquiring packages for: {workload.Id} ...");
-
-				var items = new Dictionary<string, string>();
-
 				foreach (var mfst in nugetWorkloadManifestProvider.GetManifests())
 				{
-					var manifestReader = WorkloadManifestReader.ReadWorkloadManifest(workload.WorkloadManifestId, mfst.openManifestStream());
+					AnsiConsole.MarkupLine($"Acquiring packages for: {mfst.manifestId} ...");
+
+					var manifestReader = WorkloadManifestReader.ReadWorkloadManifest(mfst.manifestId, mfst.openManifestStream());
 
 					foreach (var wlPack in manifestReader.Packs)
 					{
@@ -83,18 +94,22 @@ namespace DotNetCheck
 								var packageId = wlPackAlias.ToString();
 								var packageVersion = wlPack.Value.Version;
 
-								await GetNuGetDependencyTree(settings.DownloadDirectory, manifestDotNetSdk.PackageSources, packageId, new NuGetVersion(packageVersion), cancelTokenSource.Token);
+								await GetNuGetDependencyTree(settings.DownloadDirectory, packageId, new NuGetVersion(packageVersion), cancelTokenSource.Token);
 							}
 						}
 						else
 						{
-							var packageId = wlPack.Value.ToString();
+							var packageId = wlPack.Value.Id;
 							var packageVersion = wlPack.Value.Version;
 
-							await GetNuGetDependencyTree(settings.DownloadDirectory, manifestDotNetSdk.PackageSources, packageId, new NuGetVersion(packageVersion), cancelTokenSource.Token);
+							await GetNuGetDependencyTree(settings.DownloadDirectory, packageId, new NuGetVersion(packageVersion), cancelTokenSource.Token);
 						}
 					}
 				}
+			}
+			catch (Exception ex)
+			{
+				Util.Exception(ex);
 			}
 
 			ToolInfo.ExitPrompt(settings.NonInteractive);
@@ -102,21 +117,14 @@ namespace DotNetCheck
 		}
 
 
-		async Task GetNuGetDependencyTree(string destinationDir, IEnumerable<string> packageSources, string packageId, NuGetVersion packageVersion, CancellationToken cancelToken)
+		async Task GetNuGetDependencyTree(string destinationDir, string packageId, NuGetVersion packageVersion, CancellationToken cancelToken)
 		{
 			var cache = NullSourceCacheContext.Instance;
 			var logger = NullLogger.Instance;
 
-			foreach (var pkgSrc in packageSources)
+			foreach (var src in nugetSources)
 			{
-				var nugetSource = Repository.Factory.GetCoreV3(pkgSrc);
-				var byIdRes = await nugetSource.GetResourceAsync<FindPackageByIdResource>();
-
-				// Cause a retry if this is null
-				if (byIdRes == null)
-					throw new InvalidDataException();
-
-				if (await DownloadPackage(destinationDir, nugetSource, cache, logger, byIdRes, packageId, new VersionRange(packageVersion), cancelToken))
+				if (await DownloadPackage(destinationDir, src.Value.source, cache, logger, src.Value.byIdRes, packageId, new VersionRange(packageVersion), cancelToken))
 					break;
 			}
 		}
@@ -132,20 +140,31 @@ namespace DotNetCheck
 			if (bestVersion == null)
 				return false;
 
-			async Task<bool> download(PackageIdentity pkgIdentity)
+			async Task<PackageArchiveReader> download(string destFile, PackageIdentity pkgIdentity)
 			{
-				var destFile = Path.Combine(directory, $"{pkgIdentity.Id}.{pkgIdentity.Version}.nupkg");
+				var tries = 0;
 
-				if (!File.Exists(destFile))
+				while (tries <= 3)
 				{
-					AnsiConsole.MarkupLine($"\t{pkgIdentity.Id} {pkgIdentity.Version} ...");
+					tries++;
 
-					using var downloader = await byIdRes.GetPackageDownloaderAsync(pkgIdentity, cache, logger, cancelToken);
+					try
+					{
+						if (!File.Exists(destFile) || tries > 1)
+						{
+							using var downloader = await byIdRes.GetPackageDownloaderAsync(pkgIdentity, cache, logger, cancelToken);
+							await downloader.CopyNupkgFileToAsync(destFile, cancelToken);
+						}
 
-					await downloader.CopyNupkgFileToAsync(destFile, cancelToken);
+						return new PackageArchiveReader(File.OpenRead(destFile));
+					}
+					catch (Exception ex)
+					{
+						Util.Exception(ex);
+					}
 				}
 
-				return true;
+				return null;
 			}
 
 			bool foundAll = false;
@@ -154,12 +173,25 @@ namespace DotNetCheck
 			{
 				foundAll = true;
 
-				if (!await download(new PackageIdentity(packageId, bestVersion)))
+				var destFile = Path.Combine(directory, $"{packageId}.{bestVersion}.nupkg");
+
+				AnsiConsole.Markup($"  -> {packageId} {bestVersion} ... ");
+
+				var packageReader = await download(destFile, new PackageIdentity(packageId, bestVersion));
+
+				if (packageReader == null)
+				{
+					AnsiConsole.MarkupLine($"{Icon.Error}");
 					return false;
+				}
 
-				var deps = await byIdRes.GetDependencyInfoAsync(packageId, bestVersion, cache, logger, cancelToken);
+				AnsiConsole.MarkupLine($"{Icon.Success}");
+				var dependencyGroups = new List<PackageDependencyGroup>();
 
-				foreach (var depGrp in deps.DependencyGroups)
+				dependencyGroups.AddRange(await packageReader.GetPackageDependenciesAsync(cancelToken));
+				packageReader.Dispose();
+
+				foreach (var depGrp in dependencyGroups)
 				{
 					foreach (var depPkg in depGrp.Packages)
 					{
@@ -188,7 +220,7 @@ namespace DotNetCheck
 
 		List<(string id, string dir, string file)> manifestDirs = new();
 
-		public async Task AcquireManifests(string directory, List<string> packageSources, List<Manifest.DotNetWorkload> workloads, CancellationToken cancelToken)
+		public async Task AcquireManifests(string directory, List<Manifest.DotNetWorkload> workloads, CancellationToken cancelToken)
 		{
 			var cache = NullSourceCacheContext.Instance;
 			var logger = NullLogger.Instance;
@@ -208,10 +240,12 @@ namespace DotNetCheck
 
 				Directory.CreateDirectory(manifestDir);
 
-				foreach (var pkgSrc in packageSources)
+				var nupkgFile = Path.Combine(directory, $"{workload.PackageId}.{workload.Version}.nupkg");
+
+				foreach (var src in AcquirePackagesCommand.nugetSources)
 				{
-					var nugetSource = Repository.Factory.GetCoreV3(pkgSrc);
-					var byIdRes = await nugetSource.GetResourceAsync<FindPackageByIdResource>();
+					var nugetSource = src.Value.source;
+					var byIdRes = src.Value.byIdRes;
 
 					// Cause a retry if this is null
 					if (byIdRes == null)
@@ -224,27 +258,43 @@ namespace DotNetCheck
 					if (downloader == null)
 						continue;
 
-					var nupkgFile = Path.Combine(directory, $"{workload.PackageId}.{workload.Version}.nupkg");
-					await downloader.CopyNupkgFileToAsync(nupkgFile, cancelToken);
+					var tries = 0;
 
-					using (var sr = File.OpenRead(nupkgFile))
-					using (var zipArchive = new System.IO.Compression.ZipArchive(sr, System.IO.Compression.ZipArchiveMode.Read))
+					while (tries <= 3)
 					{
-						foreach (var zipEntry in zipArchive.Entries)
+						tries++;
+
+						try
 						{
-							var entryName = zipEntry.FullName;
+							if (!File.Exists(nupkgFile) || tries > 1)
+								await downloader.CopyNupkgFileToAsync(nupkgFile, cancelToken);
 
-							if (!entryName.EndsWith("WorkloadManifest.json", StringComparison.Ordinal))
-								continue;
-
-							var workloadFile = Path.Combine(manifestDir, "WorkloadManifest.json");
-							using (var manifestZipStream = zipEntry.Open())
-							using (var manifestFileStream = File.Create(workloadFile))
+							using (var sr = File.OpenRead(nupkgFile))
+							using (var zipArchive = new System.IO.Compression.ZipArchive(sr, System.IO.Compression.ZipArchiveMode.Read))
 							{
-								await manifestZipStream.CopyToAsync(manifestFileStream);
+								foreach (var zipEntry in zipArchive.Entries)
+								{
+									var entryName = zipEntry.FullName;
+
+									if (!entryName.EndsWith("WorkloadManifest.json", StringComparison.Ordinal))
+										continue;
+
+									var workloadFile = Path.Combine(manifestDir, "WorkloadManifest.json");
+									using (var manifestZipStream = zipEntry.Open())
+									using (var manifestFileStream = File.Create(workloadFile))
+									{
+										await manifestZipStream.CopyToAsync(manifestFileStream);
+									}
+
+									manifestDirs.Add((workload.Id, manifestDir, workloadFile));
+								}
 							}
 
-							manifestDirs.Add((workload.Id, manifestDir, workloadFile));
+							break;
+						}
+						catch (Exception ex)
+						{
+							Util.Exception(ex);
 						}
 					}
 
