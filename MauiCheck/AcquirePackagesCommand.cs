@@ -143,20 +143,21 @@ namespace DotNetCheck
 
 			foreach (var src in nugetSources)
 			{
-				if (await DownloadPackage(destinationDir, src.Value.source, cache, logger, src.Value.byIdRes, packageId, new VersionRange(packageVersion), cancelToken))
+				if (await DownloadPackage(destinationDir, src.Value.source, cache, logger, src.Value.byIdRes, packageId, packageVersion, cancelToken))
 					break;
 			}
 		}
 
-		async Task<bool> DownloadPackage(string directory, SourceRepository nugetSource, SourceCacheContext cache, ILogger logger, FindPackageByIdResource byIdRes, string packageId, VersionRange versionRange, CancellationToken cancelToken)
+		async Task<bool> DownloadPackage(string directory, SourceRepository nugetSource, SourceCacheContext cache, ILogger logger, FindPackageByIdResource byIdRes, string packageId, NuGetVersion packageVersion, CancellationToken cancelToken)
 		{
 			var packageVersionsAvailable = await byIdRes.GetAllVersionsAsync(packageId, cache, logger, cancelToken);
 
 			if (!(packageVersionsAvailable?.Any() ?? false))
 				return false;
 
-			var bestVersion = versionRange.FindBestMatch(packageVersionsAvailable);
-			if (bestVersion == null)
+			// Require the exact version, otherwise we'll try other feeds
+			var matchingExplicitVersion = packageVersionsAvailable.FirstOrDefault(pv => pv == packageVersion);
+			if (matchingExplicitVersion == null)
 				return false;
 
 			async Task<PackageArchiveReader> download(string destFile, PackageIdentity pkgIdentity)
@@ -188,15 +189,15 @@ namespace DotNetCheck
 
 			bool foundAll = false;
 
-			if (await byIdRes.DoesPackageExistAsync(packageId, bestVersion, cache, logger, cancelToken))
+			if (await byIdRes.DoesPackageExistAsync(packageId, matchingExplicitVersion, cache, logger, cancelToken))
 			{
 				foundAll = true;
 
-				var destFile = Path.Combine(directory, $"{packageId}.{bestVersion}.nupkg");
+				var destFile = Path.Combine(directory, $"{packageId}.{matchingExplicitVersion}.nupkg");
 
-				AnsiConsole.Markup($"  -> {packageId} {bestVersion} ... ");
+				AnsiConsole.Markup($"  -> {packageId} {matchingExplicitVersion} ... ");
 
-				var packageReader = await download(destFile, new PackageIdentity(packageId, bestVersion));
+				var packageReader = await download(destFile, new PackageIdentity(packageId, matchingExplicitVersion));
 
 				if (packageReader == null)
 				{
@@ -214,7 +215,8 @@ namespace DotNetCheck
 				{
 					foreach (var depPkg in depGrp.Packages)
 					{
-						if (!await DownloadPackage(directory, nugetSource, cache, logger, byIdRes, depPkg.Id, depPkg.VersionRange, cancelToken))
+						var version = depPkg.VersionRange.MinVersion;
+						if (!await DownloadPackage(directory, nugetSource, cache, logger, byIdRes, depPkg.Id, version, cancelToken))
 							foundAll = false;
 					}
 				}
