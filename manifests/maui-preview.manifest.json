@@ -70,8 +70,8 @@
       }
     },
     "xcode": {
-      "minimumVersion": "19223.2",
-      "versionName": "13 Beta 5"
+      "exactVersion": "19223.2",
+      "exactVersionName": "13 Beta 5"
     },
     "vswin": {
       "minimumVersion": "17.0.0-pre.3.0"
