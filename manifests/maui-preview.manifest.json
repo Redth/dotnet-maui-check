@@ -1,6 +1,6 @@
 {
   "check": {
-    "toolVersion": "0.7.7",
+    "toolVersion": "0.8.0",
     "variables": {
       "OPENJDK_VERSION": "11.0.10.9"
     },
@@ -143,6 +143,7 @@
             "osx": "https://dotnetcli.azureedge.net/dotnet/Sdk/$(DOTNET_SDK_VERSION)/dotnet-sdk-$(DOTNET_SDK_VERSION)-osx-x64.pkg"
           },
           "packageSources": [
+            "https://pkgs.dev.azure.com/xamarin/public/_packaging/maui-dotnet6-rc1/nuget/v3/index.json",
             "https://pkgs.dev.azure.com/azure-public/vside/_packaging/xamarin-impl/nuget/v3/index.json",
             "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet6/nuget/v3/index.json",
             "https://api.nuget.org/v3/index.json"
