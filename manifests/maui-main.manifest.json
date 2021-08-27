@@ -83,15 +83,15 @@
       "packages": [
         {
           "path": "emulator",
-          "version": "30.4.5"
+          "version": "30.8.4"
         },
         {
-          "path": "build-tools;30.0.2",
-          "version": "30.0.2"
+          "path": "build-tools;31.0.0",
+          "version": "31.0.0"
         },
         {
-          "path": "platforms;android-30",
-          "version": "3"
+          "path": "platforms;android-31",
+          "version": "1"
         },
         {
           "path": "system-images;android-30;google_apis;x86",
@@ -113,7 +113,7 @@
         },
         {
           "path": "platform-tools",
-          "version": "31.0.0"
+          "version": "31.0.3"
         },
         {
           "path": "cmdline-tools;3.0",
