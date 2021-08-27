@@ -1,6 +1,6 @@
 {
   "check": {
-    "toolVersion": "0.7.1",
+    "toolVersion": "0.7.7",
     "variables": {
       "OPENJDK_VERSION": "11.0.10.9"
     },
@@ -12,7 +12,7 @@
           {
             "name": "MAUI_VERSION",
             "packageId": "Microsoft.NET.Sdk.Maui.Manifest-6.0.100",
-            "packageVersion": "6.0.100-rc.1.*"
+            "packageVersion": "6.0.100-rc.2.*"
           }
         ]
       },
@@ -23,7 +23,7 @@
           {
             "name": "EMSCRIPTEN_WORKLOAD_VERSION",
             "packageId": "microsoft.net.workload.emscripten.manifest-6.0.100",
-            "packageVersion": "6.0.0-rc.1.*"
+            "packageVersion": "6.0.0-rc.2.*"
           }
         ]
       },
@@ -70,7 +70,8 @@
       }
     },
     "xcode": {
-      "minimumVersion": "19203"
+      "exactVersion": "19223.2",
+      "exactVersionName": "13 Beta 5"
     },
     "vswin": {
       "minimumVersion": "17.0.0-pre.3.0"
