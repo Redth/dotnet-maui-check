@@ -1,40 +1,35 @@
 {
   "check": {
-    "toolVersion": "0.7.3",
+    "toolVersion": "0.7.1",
     "variables": {
       "OPENJDK_VERSION": "11.0.10.9"
     },
     "variableMappers": [
       {
         "$type": "DotNetCheck.Manifest.NuGetFeedVariableMapper, MauiCheck",
-        "packageSources": [
-          "https://api.nuget.org/v3/index.json"
-        ],
+        "packageSources": [ "https://pkgs.dev.azure.com/azure-public/vside/_packaging/xamarin-impl/nuget/v3/index.json" ],
         "mappings": [
           {
             "name": "MAUI_VERSION",
             "packageId": "Microsoft.NET.Sdk.Maui.Manifest-6.0.100",
-            "packageVersion": "6.0.100-preview.7*"
+            "packageVersion": "6.0.100-rc.1.*"
           }
         ]
       },
       {
         "$type": "DotNetCheck.Manifest.NuGetFeedVariableMapper, MauiCheck",
-        "packageSources": [
-          "https://pkgs.dev.azure.com/dnceng/public/_packaging/6.0.100-preview.7.21379.14-shipping-1/nuget/v3/index.json",
-          "https://api.nuget.org/v3/index.json"
-        ],
+        "packageSources": [ "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet6/nuget/v3/index.json" ],
         "mappings": [
           {
             "name": "EMSCRIPTEN_WORKLOAD_VERSION",
             "packageId": "microsoft.net.workload.emscripten.manifest-6.0.100",
-            "packageVersion": "6.0.0-preview.7.*"
+            "packageVersion": "6.0.0-rc.1.*"
           }
         ]
       },
       {
         "$type": "DotNetCheck.Manifest.XmlVariableMapper, MauiCheck",
-        "sourceUri": "https://raw.githubusercontent.com/dotnet/maui/release/6.0.1xx-preview7/eng/Versions.props",
+        "sourceUri": "https://raw.githubusercontent.com/dotnet/maui/release/6.0.1xx-rc1/eng/Versions.props",
         "mappings": [
           {
             "name": "DOTNET_SDK_VERSION",
@@ -75,7 +70,8 @@
       }
     },
     "xcode": {
-      "minimumVersion": "19203"
+      "minimumVersion": "19223.2",
+      "versionName": "13 Beta 5"
     },
     "vswin": {
       "minimumVersion": "17.0.0-pre.3.0"
@@ -88,37 +84,33 @@
       "packages": [
         {
           "path": "emulator",
-          "version": "30.4.5"
+          "version": "30.8.4"
         },
         {
-          "path": "build-tools;30.0.2",
-          "version": "30.0.2"
+          "path": "build-tools;31.0.0",
+          "version": "31.0.0"
         },
         {
-          "path": "platforms;android-30",
-          "version": "3"
+          "path": "platforms;android-31",
+          "version": "1"
         },
         {
-          "path": "system-images;android-30;google_apis;x86",
-          "version": "9",
+          "path": "system-images;android-31;google_apis;x86_64",
+          "version": "6",
           "alternatives": [
             {
-              "path": "system-images;android-30;google_apis_playstore;x86",
-              "version": "9"
+              "path": "system-images;android-31;google_apis_playstore;x86_64",
+              "version": "6"
             },
             {
-              "path": "system-images;android-30;google_apis;x86_64",
-              "version": "10"
-            },
-            {
-              "path": "system-images;android-30;google_apis_playstore;x86_64",
-              "version": "10"
+              "path": "system-images;android-31;google_apis;arm64-v8a",
+              "version": "6"
             }
           ]
         },
         {
           "path": "platform-tools",
-          "version": "31.0.0"
+          "version": "31.0.3"
         },
         {
           "path": "cmdline-tools;3.0",
@@ -127,14 +119,13 @@
       ],
       "emulators": [
         {
-          "sdkId": "system-images;android-30;google_apis;x86",
+          "sdkId": "system-images;android-31;google_apis;x86_64",
           "alternateSdkIds": [
-            "system-images;android-30;google_apis_playstore;x86",
-            "system-images;android-30;google_apis;x86_64",
-            "system-images;android-30;google_apis_playstore;x86_64"
+            "system-images;android-31;google_apis_playstore;x86_64",
+            "system-images;android-30;google_apis;arm64-v8a"
           ],
-          "desc": "Android Emulator - x86 - API30 - Google API's",
-          "apiLevel": 30,
+          "desc": "Android Emulator - x86_64 - API31 - Google API's",
+          "apiLevel": 31,
           "tag": "google_apis",
           "device": "pixel"
         }
@@ -152,8 +143,9 @@
             "osx": "https://dotnetcli.azureedge.net/dotnet/Sdk/$(DOTNET_SDK_VERSION)/dotnet-sdk-$(DOTNET_SDK_VERSION)-osx-x64.pkg"
           },
           "packageSources": [
-            "https://api.nuget.org/v3/index.json",
-            "https://pkgs.dev.azure.com/dnceng/public/_packaging/6.0.100-preview.7.21379.14-shipping-1/nuget/v3/index.json"
+            "https://pkgs.dev.azure.com/azure-public/vside/_packaging/xamarin-impl/nuget/v3/index.json",
+            "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet6/nuget/v3/index.json",
+            "https://api.nuget.org/v3/index.json"
           ],
           "workloads": [
             {
