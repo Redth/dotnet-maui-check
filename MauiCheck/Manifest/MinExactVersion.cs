@@ -16,5 +16,11 @@ namespace DotNetCheck.Manifest
 
 		[JsonProperty("optional")]
 		public bool Optional { get; set; } = false;
+
+		[JsonProperty("minimumVersionName")]
+		public string MinimumVersionName { get; set; }
+
+		[JsonProperty("exactVersionName")]
+		public string ExactVersionName { get; set; }
 	}
 }

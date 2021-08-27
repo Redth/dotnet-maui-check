@@ -17,14 +17,23 @@ namespace DotNetCheck.Checkups
 			=> platform == Platform.OSX;
 
 		public NuGetVersion MinimumVersion
-			=> Extensions.ParseVersion(Manifest?.Check?.XCode?.MinimumVersion, new NuGetVersion("12.3"));
+			=> Extensions.ParseVersion(Manifest?.Check?.XCode?.MinimumVersion);
+
+		public string MinimumVersionName
+			=> Manifest?.Check?.XCode?.MinimumVersionName;
 
 		public NuGetVersion ExactVersion
 			=> Extensions.ParseVersion(Manifest?.Check?.XCode?.ExactVersion);
 
+		public string ExactVersionName
+			=> Manifest?.Check?.XCode?.ExactVersionName;
+
+		public string VersionName
+			=> ExactVersionName ?? MinimumVersionName ?? ExactVersion?.ToString() ?? MinimumVersion?.ToString();
+
 		public override string Id => "xcode";
 
-		public override string Title => $"XCode {MinimumVersion.ThisOrExact(ExactVersion)}";
+		public override string Title => $"XCode {VersionName}";
 
 		public override bool ShouldExamine(SharedState history)
 			=> Manifest?.Check?.XCode != null;
@@ -36,7 +45,7 @@ namespace DotNetCheck.Checkups
 			if (selected.Version.IsCompatible(MinimumVersion, ExactVersion))
 			{
 				// Selected version is good
-				ReportStatus($"Xcode.app ({selected.VersionString} {selected.BuildVersion})", Status.Ok);
+				ReportStatus($"Xcode.app ({VersionName})", Status.Ok);
 				return Task.FromResult(DiagnosticResult.Ok(this));
 			}
 
@@ -69,12 +78,12 @@ namespace DotNetCheck.Checkups
 						}))));
 			}
 
-			ReportStatus($"Xcode.app ({MinimumVersion}) not installed.", Status.Error);
+			ReportStatus($"Xcode.app ({VersionName}) not installed.", Status.Error);
 
 			return Task.FromResult(new DiagnosticResult(
 				Status.Error,
 				this,
-				new Suggestion($"Download XCode {MinimumVersion.ThisOrExact(ExactVersion)}")));
+				new Suggestion($"Download XCode {VersionName}")));
 		}
 
 		XCodeInfo GetSelectedXCode()
