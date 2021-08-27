@@ -25,6 +25,13 @@ namespace DotNetCheck
 {
 	public class AcquirePackagesCommand : AsyncCommand<AcquirePackagesSettings>
 	{
+		readonly static string[] WorkloadPackageMsiAliases = new[]
+		{
+			".Msi.x86",
+			".Msi.x64",
+			".Msi.arm64"
+		};
+
 		internal static Dictionary<string, (SourceRepository source, FindPackageByIdResource byIdRes)> nugetSources = new();
 
 		public override async Task<int> ExecuteAsync(CommandContext context, AcquirePackagesSettings settings)
@@ -95,6 +102,12 @@ namespace DotNetCheck
 								var packageVersion = wlPack.Value.Version;
 
 								await GetNuGetDependencyTree(settings.DownloadDirectory, packageId, new NuGetVersion(packageVersion), cancelTokenSource.Token);
+
+								foreach (var msiAlias in WorkloadPackageMsiAliases)
+								{
+									var msiPackageId = $"{packageId}{msiAlias}";
+									await GetNuGetDependencyTree(settings.DownloadDirectory, msiPackageId, new NuGetVersion(packageVersion), cancelTokenSource.Token);
+								}
 							}
 						}
 						else
@@ -103,6 +116,12 @@ namespace DotNetCheck
 							var packageVersion = wlPack.Value.Version;
 
 							await GetNuGetDependencyTree(settings.DownloadDirectory, packageId, new NuGetVersion(packageVersion), cancelTokenSource.Token);
+
+							foreach (var msiAlias in WorkloadPackageMsiAliases)
+							{
+								var msiPackageId = $"{packageId}{msiAlias}";
+								await GetNuGetDependencyTree(settings.DownloadDirectory, msiPackageId, new NuGetVersion(packageVersion), cancelTokenSource.Token);
+							}
 						}
 					}
 				}
