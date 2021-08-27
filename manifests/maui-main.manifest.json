@@ -94,20 +94,16 @@
           "version": "1"
         },
         {
-          "path": "system-images;android-30;google_apis;x86",
-          "version": "9",
+          "path": "system-images;android-31;google_apis;x86_64",
+          "version": "6",
           "alternatives": [
             {
-              "path": "system-images;android-30;google_apis_playstore;x86",
-              "version": "9"
+              "path": "system-images;android-31;google_apis_playstore;x86_64",
+              "version": "6"
             },
             {
-              "path": "system-images;android-30;google_apis;x86_64",
-              "version": "10"
-            },
-            {
-              "path": "system-images;android-30;google_apis_playstore;x86_64",
-              "version": "10"
+              "path": "system-images;android-31;google_apis;arm64-v8a",
+              "version": "6"
             }
           ]
         },
@@ -122,14 +118,13 @@
       ],
       "emulators": [
         {
-          "sdkId": "system-images;android-30;google_apis;x86",
+          "sdkId": "system-images;android-31;google_apis;x86_64",
           "alternateSdkIds": [
-            "system-images;android-30;google_apis_playstore;x86",
-            "system-images;android-30;google_apis;x86_64",
-            "system-images;android-30;google_apis_playstore;x86_64"
+            "system-images;android-31;google_apis_playstore;x86_64",
+            "system-images;android-30;google_apis;arm64-v8a"
           ],
-          "desc": "Android Emulator - x86 - API30 - Google API's",
-          "apiLevel": 30,
+          "desc": "Android Emulator - x86_64 - API31 - Google API's",
+          "apiLevel": 31,
           "tag": "google_apis",
           "device": "pixel"
         }
