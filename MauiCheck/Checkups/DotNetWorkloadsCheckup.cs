@@ -89,13 +89,16 @@ namespace DotNetCheck.Checkups
 				new Suggestion("Install or Update SDK Workloads",
 				new ActionSolution(async (sln, cancel) =>
 				{
-					try
+					if (history.GetEnvironmentVariableFlagSet("DOTNET_FORCE"))
 					{
-						await workloadManager.Repair();
-					}
-					catch (Exception ex)
-					{
-						ReportStatus("Warning: Workload repair failed", Status.Warning);
+						try
+						{
+							await workloadManager.Repair();
+						}
+						catch (Exception ex)
+						{
+							ReportStatus("Warning: Workload repair failed", Status.Warning);
+						}
 					}
 
 					await workloadManager.Install(RequiredWorkloads);

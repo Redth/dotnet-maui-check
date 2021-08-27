@@ -61,6 +61,9 @@ namespace DotNetCheck.Models
 		public string GetEnvironmentVariable(string name)
 			=> envVars.ContainsKey(name) ? envVars?[name] : null;
 
+		public bool GetEnvironmentVariableFlagSet(string name)
+			=> GetEnvironmentVariable(name)?.Equals("true", StringComparison.OrdinalIgnoreCase) ?? false;
+
 		public bool TryGetEnvironmentVariable(string name, out string value)
 			=> envVars.TryGetValue(name, out value);
 
