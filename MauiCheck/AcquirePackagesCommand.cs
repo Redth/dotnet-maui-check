@@ -102,7 +102,8 @@ namespace DotNetCheck
 
 			try
 			{
-				foreach (var mfst in nugetWorkloadManifestProvider.GetManifests())
+				var manifests = nugetWorkloadManifestProvider.GetManifests();
+				foreach (var mfst in manifests)
 				{
 					AnsiConsole.MarkupLine($"Acquiring packages for: {mfst.manifestId} ...");
 
@@ -154,7 +155,10 @@ namespace DotNetCheck
 
 		async Task GetNuGetDependencyTree(string destinationDir, string packageId, NuGetVersion packageVersion, CancellationToken cancelToken, bool includeDependencies)
 		{
-			var cache = NullSourceCacheContext.Instance;
+			var cache = new SourceCacheContext();
+			cache.DirectDownload = true;
+			cache.NoCache = true;
+
 			var logger = NullLogger.Instance;
 
 			foreach (var src in nugetSources)
