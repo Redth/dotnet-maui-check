@@ -163,8 +163,6 @@ namespace DotNetCheck.DotNet
 			{
 				"workload",
 				"install",
-				"--sdk-version",
-				SdkVersion,
 				"--no-cache",
 				"--disable-parallel"
 			};
@@ -188,8 +186,6 @@ namespace DotNetCheck.DotNet
 			{
 				"workload",
 				"update",
-				"--sdk-version",
-				SdkVersion,
 				"--no-cache",
 				"--disable-parallel",
 				"--from-rollback-file",
