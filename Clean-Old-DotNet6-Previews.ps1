@@ -5,6 +5,13 @@ param (
 		[switch]$FullDelete = $false
 )
 
+$psMajorVersion = $host.Version.Major
+
+if ($psMajorVersion -lt 7)
+{
+	throw "This script requires PowerShell v7 or newer."
+}
+
 $requireAdmin = $false
 
 # Otherwise look for the default paths
@@ -86,4 +93,7 @@ foreach ($rmPath in $rmPaths)
 	Remove-Item -Recurse -Force -Path (Join-Path -Path $DotnetRoot -ChildPath $rmPath)
 }
 
-Remove-Item -Recurse -Force -Path ~/.templateengine
+if (Test-Path ~/.templateengine)
+{
+	Remove-Item -Recurse -Force -Path ~/.templateengine
+}
