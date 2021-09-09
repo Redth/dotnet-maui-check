@@ -97,3 +97,8 @@ if (Test-Path ~/.templateengine)
 {
 	Remove-Item -Recurse -Force -Path ~/.templateengine
 }
+
+if (Test-Path ~/.dotnet/sdk-advertising)
+{
+	Remove-Item -Recurse -Force -Path "~/.dotnet/sdk-advertising/6.0*"
+}
