@@ -18,7 +18,7 @@
       },
       {
         "$type": "DotNetCheck.Manifest.NuGetFeedVariableMapper, MauiCheck",
-        "packageSources": [ "https://aka.ms/dotnet/maui/rc1/index.json" ],
+        "packageSources": [ "https://aka.ms/dotnet/maui/rc1/index.json", "https://pkgs.dev.azure.com/dnceng/public/_packaging/6.0.100-rc.1.21458.32-shipping/nuget/v3/index.json" ],
         "mappings": [
           {
             "name": "EMSCRIPTEN_WORKLOAD_VERSION",
@@ -144,7 +144,7 @@
           },
           "packageSources": [
             "https://aka.ms/dotnet/maui/rc1/index.json",
-            " https://pkgs.dev.azure.com/dnceng/public/_packaging/6.0.100-rc.1.21457.2-shipping/nuget/v3/index.json",
+            "https://pkgs.dev.azure.com/dnceng/public/_packaging/6.0.100-rc.1.21458.32-shipping/nuget/v3/index.json",
             "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet6/nuget/v3/index.json",
             "https://api.nuget.org/v3/index.json"
           ],
