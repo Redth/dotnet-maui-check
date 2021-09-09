@@ -34,7 +34,7 @@ namespace DotNetCheck.DotNet
 
 			CleanEmptyWorkloadDirectories(sdkRoot, sdkVersion);
 
-			DotNetCliWorkingDir = Path.Combine(Path.GetTempPath(), "maui-check-dotnet-work-dir");
+			DotNetCliWorkingDir = Path.Combine(Path.GetTempPath(), "maui-check-" + Guid.NewGuid().ToString("N").Substring(0, 8));
 			Directory.CreateDirectory(DotNetCliWorkingDir);
 
 			var globalJson = new DotNetGlobalJson();
