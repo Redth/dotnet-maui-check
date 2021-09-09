@@ -156,6 +156,12 @@
               "version": "$(ANDROID_SDK_VERSION)"
             },
             {
+              "workloadId": "android",
+              "workloadManifestId": "microsoft.net.sdk.android",
+              "packageId": "Microsoft.NET.Sdk.Android.Manifest-6.0.100",
+              "version": "$(ANDROID_SDK_VERSION)"
+            },
+            {
               "workloadId": "ios",
               "workloadManifestId": "microsoft.net.sdk.ios",
               "packageId": "Microsoft.NET.Sdk.iOS.Manifest-6.0.100",
