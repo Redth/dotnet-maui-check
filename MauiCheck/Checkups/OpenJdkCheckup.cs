@@ -81,7 +81,7 @@ namespace DotNetCheck.Checkups
 						try
 						{
 							Environment.SetEnvironmentVariable("JAVA_HOME", jdk.Directory.FullName, EnvironmentVariableTarget.Machine);
-							ReportStatus($"Set Environemnt Variable: JAVA_HOME={jdk.Directory.FullName}", Status.Ok);
+							ReportStatus($"Set Environment Variable: JAVA_HOME={jdk.Directory.FullName}", Status.Ok);
 						} catch { }
 					}
 				}
