@@ -33,5 +33,8 @@ namespace DotNetCheck
 
 		[CommandOption("--ci")]
 		public bool CI { get; set; }
+
+		[CommandOption("-l|--logfile <PATH>")]
+		public string LogFile { get; set; }
 	}
 }
