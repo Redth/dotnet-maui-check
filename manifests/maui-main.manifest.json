@@ -12,7 +12,7 @@
           {
             "name": "MAUI_VERSION",
             "packageId": "Microsoft.NET.Sdk.Maui.Manifest-6.0.100",
-            "packageVersion": "6.0.100-rc.2.*"
+            "packageVersion": "6.0.100-preview.9.*"
           }
         ]
       },
