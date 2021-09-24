@@ -7,7 +7,7 @@
     "variableMappers": [
       {
         "$type": "DotNetCheck.Manifest.NuGetFeedVariableMapper, MauiCheck",
-        "packageSources": [ "https://pkgs.dev.azure.com/xamarin/public/_packaging/maui-main/nuget/v3/index.json" ],
+        "packageSources": [ "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet6/nuget/v3/index.json" ],
         "mappings": [
           {
             "name": "MAUI_VERSION",
@@ -143,7 +143,6 @@
             "osx": "https://dotnetcli.azureedge.net/dotnet/Sdk/$(DOTNET_SDK_VERSION)/dotnet-sdk-$(DOTNET_SDK_VERSION)-osx-x64.pkg"
           },
           "packageSources": [
-            "https://pkgs.dev.azure.com/xamarin/public/_packaging/maui-main/nuget/v3/index.json",
             "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet6/nuget/v3/index.json",
             "https://api.nuget.org/v3/index.json"
           ],
