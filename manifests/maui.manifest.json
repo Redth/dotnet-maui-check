@@ -2,15 +2,15 @@
   "check": {
     "toolVersion": "0.8.6",
     "variables": {
-      "DOTNET_SDK_VERSION": "6.0.100-rc.1.21458.32",
-      "MAUI_VERSION": "6.0.100-rc.1.1608",
-      "MACCATALYST_SDK_VERSION": "15.0.100-rc.1.1534",
-      "IOS_SDK_VERSION": "15.0.100-rc.1.1534",
-      "TVOS_SDK_VERSION": "15.0.100-rc.1.1534",
-      "MACOS_SDK_VERSION": "12.0.100-rc.1.1534",
-      "ANDROID_SDK_VERSION": "31.0.100-rc.1.12",
-      "WASMTOOLS_VERSION": "6.0.0-rc.1.21451.13",
-      "EMSCRIPTEN_WORKLOAD_VERSION": "6.0.0-rc.1.21430.3",
+      "DOTNET_SDK_VERSION": "6.0.100-rc.2.21505.57",
+      "MAUI_VERSION": "6.0.101-preview.9.1843",
+      "MACCATALYST_SDK_VERSION": "15.0.101-preview.9.31",
+      "IOS_SDK_VERSION": "15.0.101-preview.9.31",
+      "TVOS_SDK_VERSION": "15.0.101-preview.9.31",
+      "MACOS_SDK_VERSION": "12.0.101-preview.9.31",
+      "ANDROID_SDK_VERSION": "31.0.101-preview.9.16",
+      "WASMTOOLS_VERSION": "6.0.0-rc.2.21480.5",
+      "EMSCRIPTEN_WORKLOAD_VERSION": "6.0.0-rc.2.21474.1",
       "OPENJDK_VERSION": "11.0.10.9"
     },
     "variableMappers": [],
@@ -26,7 +26,7 @@
       "exactVersionName": "13 Beta 5"
     },
     "vswin": {
-      "minimumVersion": "17.0.0-pre.4.0"
+      "minimumVersion": "17.0.0-pre.5.0"
     },
     "vsmac": {
       "minimumVersion": "8.10.0",
@@ -65,8 +65,8 @@
           "version": "31.0.3"
         },
         {
-          "path": "cmdline-tools;3.0",
-          "version": "3.0"
+          "path": "cmdline-tools;5.0",
+          "version": "5.0"
         }
       ],
       "emulators": [

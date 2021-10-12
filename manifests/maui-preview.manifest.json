@@ -1,19 +1,67 @@
 {
   "check": {
-    "toolVersion": "0.8.6",
+    "toolVersion": "0.9.0",
     "variables": {
-      "DOTNET_SDK_VERSION": "6.0.100-rc.1.21458.32",
-      "MAUI_VERSION": "6.0.100-rc.1.1608",
-      "MACCATALYST_SDK_VERSION": "15.0.100-rc.1.1534",
-      "IOS_SDK_VERSION": "15.0.100-rc.1.1534",
-      "TVOS_SDK_VERSION": "15.0.100-rc.1.1534",
-      "MACOS_SDK_VERSION": "12.0.100-rc.1.1534",
-      "ANDROID_SDK_VERSION": "31.0.100-rc.1.12",
-      "WASMTOOLS_VERSION": "6.0.0-rc.1.21451.13",
-      "EMSCRIPTEN_WORKLOAD_VERSION": "6.0.0-rc.1.21430.3",
       "OPENJDK_VERSION": "11.0.10.9"
     },
-    "variableMappers": [],
+    "variableMappers": [
+      {
+        "$type": "DotNetCheck.Manifest.NuGetFeedVariableMapper, MauiCheck",
+        "packageSources": [ "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet6/nuget/v3/index.json" ],
+        "mappings": [
+          {
+            "name": "MAUI_VERSION",
+            "packageId": "Microsoft.NET.Sdk.Maui.Manifest-6.0.100",
+            "packageVersion": "6.0.101-preview.9.*"
+          }
+        ]
+      },
+      {
+        "$type": "DotNetCheck.Manifest.NuGetFeedVariableMapper, MauiCheck",
+        "packageSources": [ "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet6/nuget/v3/index.json" ],
+        "mappings": [
+          {
+            "name": "EMSCRIPTEN_WORKLOAD_VERSION",
+            "packageId": "microsoft.net.workload.emscripten.manifest-6.0.100",
+            "packageVersion": "6.0.0-rc2.*"
+          }
+        ]
+      },
+      {
+        "$type": "DotNetCheck.Manifest.XmlVariableMapper, MauiCheck",
+        "sourceUri": "https://raw.githubusercontent.com/dotnet/maui/release/6.0.1xx-preview9/eng/Versions.props",
+        "mappings": [
+          {
+            "name": "DOTNET_SDK_VERSION",
+            "xpath": "//Project/PropertyGroup/MicrosoftDotnetSdkInternalPackageVersion/text()"
+          },
+          {
+            "name": "MACCATALYST_SDK_VERSION",
+            "xpath": "//Project/PropertyGroup/MicrosoftMacCatalystSdkPackageVersion/text()"
+          },
+          {
+            "name": "IOS_SDK_VERSION",
+            "xpath": "//Project/PropertyGroup/MicrosoftiOSSdkPackageVersion/text()"
+          },
+          {
+            "name": "TVOS_SDK_VERSION",
+            "xpath": "//Project/PropertyGroup/MicrosofttvOSSdkPackageVersion/text()"
+          },
+          {
+            "name": "MACOS_SDK_VERSION",
+            "xpath": "//Project/PropertyGroup/MicrosoftmacOSSdkPackageVersion/text()"
+          },
+          {
+            "name": "ANDROID_SDK_VERSION",
+            "xpath": "//Project/PropertyGroup/MicrosoftAndroidSdkWindowsPackageVersion/text()"
+          },
+          {
+            "name": "WASMTOOLS_VERSION",
+            "xpath": "//Project/PropertyGroup/MicrosoftNETCoreAppRefPackageVersion/text()"
+          }
+        ]
+      }
+    ],
     "openjdk": {
       "version": "11.0",
       "urls": {
@@ -26,7 +74,7 @@
       "exactVersionName": "13 Beta 5"
     },
     "vswin": {
-      "minimumVersion": "17.0.0-pre.4.0"
+      "minimumVersion": "17.0.0-pre.5.0"
     },
     "vsmac": {
       "minimumVersion": "8.10.0",
@@ -65,8 +113,8 @@
           "version": "31.0.3"
         },
         {
-          "path": "cmdline-tools;3.0",
-          "version": "3.0"
+          "path": "cmdline-tools;5.0",
+          "version": "5.0"
         }
       ],
       "emulators": [
@@ -95,8 +143,8 @@
             "osx": "https://dotnetcli.azureedge.net/dotnet/Sdk/$(DOTNET_SDK_VERSION)/dotnet-sdk-$(DOTNET_SDK_VERSION)-osx-x64.pkg"
           },
           "packageSources": [
-            "https://api.nuget.org/v3/index.json",
-            "https://pkgs.dev.azure.com/dnceng/public/_packaging/6.0.100-rc.1.21458.32-shipping/nuget/v3/index.json"
+            "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet6/nuget/v3/index.json",
+            "https://api.nuget.org/v3/index.json"
           ],
           "workloads": [
             {
