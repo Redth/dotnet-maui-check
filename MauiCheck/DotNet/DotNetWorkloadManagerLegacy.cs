@@ -147,7 +147,7 @@ namespace DotNetCheck.DotNet
 
 		public IEnumerable<(string id, string version)> GetInstalledWorkloads()
 		{
-			var manifestProvider = new SdkDirectoryWorkloadManifestProvider(SdkRoot, SdkVersion);
+			var manifestProvider = new SdkDirectoryWorkloadManifestProvider(SdkRoot, SdkVersion, null);
 
 			foreach (var manifestInfo in manifestProvider.GetManifests())
 			{
@@ -164,7 +164,7 @@ namespace DotNetCheck.DotNet
 
 		public IEnumerable<WorkloadResolver.PackInfo> GetPacksInWorkload(string workloadId)
 		{
-			var workloadResolver = WorkloadResolver.Create(new SdkDirectoryWorkloadManifestProvider(SdkRoot, SdkVersion), SdkRoot, SdkVersion);
+			var workloadResolver = WorkloadResolver.Create(new SdkDirectoryWorkloadManifestProvider(SdkRoot, SdkVersion, null), SdkRoot, SdkVersion, null);
 
 			var wid = new Microsoft.NET.Sdk.WorkloadManifestReader.WorkloadId(workloadId);
 			var packs = workloadResolver.GetPacksInWorkload(wid);

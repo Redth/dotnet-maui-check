@@ -310,10 +310,10 @@ namespace DotNetCheck
 		public IEnumerable<string> GetManifestDirectories()
 			=> manifestDirs.Select(m => m.dir);
 
-		public IEnumerable<(string manifestId, string informationalPath, Func<Stream> openManifestStream)> GetManifests()
-					=> manifestDirs.Select(m => (m.id, m.dir, new Func<Stream>(() => File.OpenRead(m.file))));
+		public IEnumerable<(string manifestId, string informationalPath, Func<Stream> openManifestStream, Func<Stream> openLocalizationStream)> GetManifests()
+					=> manifestDirs.Select(m => (m.id, m.dir, new Func<Stream>(() => File.OpenRead(m.file)), new Func<Stream>(() => null)));
 
 		public string GetSdkFeatureBand()
 			=> $"{SdkVersion.Major}.{SdkVersion.Minor}.{SdkVersion.Patch}";
-	}
+    }
 }

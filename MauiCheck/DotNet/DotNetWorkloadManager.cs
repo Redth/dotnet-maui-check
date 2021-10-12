@@ -94,7 +94,7 @@ namespace DotNetCheck.DotNet
 		{
 			var items = new Dictionary<string, string>();
 
-			var manifestProvider = new SdkDirectoryWorkloadManifestProvider(SdkRoot, SdkVersion);
+			var manifestProvider = new SdkDirectoryWorkloadManifestProvider(SdkRoot, SdkVersion, null);
 
 			foreach (var manifestInfo in manifestProvider.GetManifests())
 			{
@@ -110,7 +110,7 @@ namespace DotNetCheck.DotNet
 
 		public IEnumerable<(string id, string version)> GetInstalledWorkloads()
 		{
-			var manifestProvider = new SdkDirectoryWorkloadManifestProvider(SdkRoot, SdkVersion);
+			var manifestProvider = new SdkDirectoryWorkloadManifestProvider(SdkRoot, SdkVersion, null);
 
 			foreach (var manifestInfo in manifestProvider.GetManifests())
 			{
