@@ -57,6 +57,10 @@ namespace DotNetCheck.Cli
 			var checkupStatus = new Dictionary<string, Models.Status>();
 			var sharedState = new SharedState();
 
+			sharedState.SetEnvironmentVariable("MAUI_CHECK_SETTINGS_FIX", settings.Fix.ToString());
+			sharedState.SetEnvironmentVariable("MAUI_CHECK_SETTINGS_CI", settings.CI.ToString());
+			sharedState.SetEnvironmentVariable("MAUI_CHECK_SETTINGS_NONINTERACTIVE", settings.NonInteractive.ToString());
+
 			var results = new Dictionary<string, DiagnosticResult>();
 			var consoleStatus = AnsiConsole.Status();
 

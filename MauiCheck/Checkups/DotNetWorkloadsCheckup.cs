@@ -83,26 +83,41 @@ namespace DotNetCheck.Checkups
 			if (!missingWorkloads.Any() && !force)
 				return DiagnosticResult.Ok(this);
 
+			var canPerform = true;
+
+			if (Util.IsWindows)
+			{
+				var interactive = !history.GetEnvironmentVariableFlagSet("MAUI_CHECK_SETTINGS_NONINTERACTIVE");
+
+				Spectre.Console.AnsiConsole.MarkupLine($"[bold red]{Icon.Bell} Managing Workload installation from the CLI is NOT recommended.  Instead you should install the latest Visual Studio preview to automatically get the newest release of .NET MAUI workloads installed.[/]");
+
+				// If this is not a CI / Fix flag install, ask if we want to confirm to continue the CLI install after seeing the warning
+				if (interactive)
+					canPerform = Spectre.Console.AnsiConsole.Confirm("Are you sure you would like to continue the CLI workload installation?", false);
+			}
+
 			return new DiagnosticResult(
 				Status.Error,
 				this,
 				new Suggestion("Install or Update SDK Workloads",
-				new ActionSolution(async (sln, cancel) =>
-				{
-					if (history.GetEnvironmentVariableFlagSet("DOTNET_FORCE"))
-					{
-						try
+					canPerform ?
+						new ActionSolution(async (sln, cancel) =>
 						{
-							await workloadManager.Repair();
-						}
-						catch (Exception ex)
-						{
-							ReportStatus("Warning: Workload repair failed", Status.Warning);
-						}
-					}
+							if (history.GetEnvironmentVariableFlagSet("DOTNET_FORCE"))
+							{
+								try
+								{
+									await workloadManager.Repair();
+								}
+								catch (Exception ex)
+								{
+									ReportStatus("Warning: Workload repair failed", Status.Warning);
+								}
+							}
 
-					await workloadManager.Install(RequiredWorkloads);
-				})));
+							await workloadManager.Install(RequiredWorkloads);
+						}) 
+					: null));
 		}
 	}
 }
