@@ -88,7 +88,7 @@ namespace DotNetCheck.Checkups
 			{
 				var interactive = !history.GetEnvironmentVariableFlagSet("MAUI_CHECK_SETTINGS_NONINTERACTIVE");
 
-				Spectre.Console.AnsiConsole.MarkupLine($"[bold red]{Icon.Bell} Managing Workload installation from the CLI is NOT recommended.  Instead you should install the latest Visual Studio preview to automatically get the newest release of .NET MAUI workloads installed.[/]");
+				Spectre.Console.AnsiConsole.MarkupLine($"[bold red]{Icon.Bell} Managing Workload installation from the CLI is [underline]NOT recommended[/].  Instead you should install the latest Visual Studio preview to automatically get the newest release of .NET MAUI workloads installed.[/]");
 
 				// If this is not a CI / Fix flag install, ask if we want to confirm to continue the CLI install after seeing the warning
 				if (interactive)
@@ -116,7 +116,7 @@ namespace DotNetCheck.Checkups
 
 							await workloadManager.Install(RequiredWorkloads);
 						}))
-				: new Suggestion("Install the latest Visual Studio Preview", "To install or update to the latest workloads for .NET MAUI, install the latest Visual Studio Preview and choose .NET MAUI in the list of features to install under the .NET Mobile Workload: https://visualstudio.microsoft.com/vs/preview/"));
+				: new Suggestion("Install the latest Visual Studio Preview", "To install or update to the latest workloads for .NET MAUI, install the latest Visual Studio Preview and choose .NET MAUI in the list of features to install under the .NET Mobile Workload: [underline]https://visualstudio.microsoft.com/vs/preview/[/]"));
 		}
 	}
 }
