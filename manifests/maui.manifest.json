@@ -2,15 +2,15 @@
   "check": {
     "toolVersion": "0.9.0",
     "variables": {
-      "DOTNET_SDK_VERSION": "6.0.100-rc.2.21505.57",
-      "MAUI_VERSION": "6.0.101-preview.9.1843",
-      "MACCATALYST_SDK_VERSION": "15.0.101-preview.9.31",
-      "IOS_SDK_VERSION": "15.0.101-preview.9.31",
-      "TVOS_SDK_VERSION": "15.0.101-preview.9.31",
-      "MACOS_SDK_VERSION": "12.0.101-preview.9.31",
-      "ANDROID_SDK_VERSION": "31.0.101-preview.9.16",
-      "WASMTOOLS_VERSION": "6.0.0-rc.2.21480.5",
-      "EMSCRIPTEN_WORKLOAD_VERSION": "6.0.0-rc.2.21474.1",
+      "DOTNET_SDK_VERSION": "6.0.100",
+      "MAUI_VERSION": "6.0.101-preview.10.2068",
+      "MACCATALYST_SDK_VERSION": "15.0.101-preview.10.251",
+      "IOS_SDK_VERSION": "15.0.101-preview.10.251",
+      "TVOS_SDK_VERSION": "15.0.101-preview.10.251",
+      "MACOS_SDK_VERSION": "12.0.101-preview.10.251",
+      "ANDROID_SDK_VERSION": "31.0.101-preview.10.59",
+      "WASMTOOLS_VERSION": "6.0.0",
+      "EMSCRIPTEN_WORKLOAD_VERSION": "6.0.0",
       "OPENJDK_VERSION": "11.0.10.9"
     },
     "variableMappers": [],
@@ -22,11 +22,11 @@
       }
     },
     "xcode": {
-      "exactVersion": "19223.2",
-      "exactVersionName": "13 Beta 5"
+      "exactVersion": "19466",
+      "exactVersionName": "13.1"
     },
     "vswin": {
-      "minimumVersion": "17.0.0-pre.5.0"
+      "minimumVersion": "17.1-pre.1.0"
     },
     "vsmac": {
       "minimumVersion": "8.10.0",
@@ -95,8 +95,7 @@
             "osx": "https://dotnetcli.azureedge.net/dotnet/Sdk/$(DOTNET_SDK_VERSION)/dotnet-sdk-$(DOTNET_SDK_VERSION)-osx-x64.pkg"
           },
           "packageSources": [
-            "https://api.nuget.org/v3/index.json",
-            "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet6/nuget/v3/index.json"
+            "https://api.nuget.org/v3/index.json"
           ],
           "workloads": [
             {
