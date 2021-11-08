@@ -50,7 +50,7 @@
           },
           {
             "name": "EMSCRIPTEN_WORKLOAD_VERSION",
-            "xpath": "//Project/PropertyGroup/MicrosoftNETWorkloadEmscriptenManifest60100PackageVersion"
+            "xpath": "//Project/PropertyGroup/MicrosoftNETWorkloadEmscriptenManifest60100PackageVersion/text()"
           }
         ]
       }
