@@ -1,6 +1,6 @@
 {
   "check": {
-    "toolVersion": "0.9.0",
+    "toolVersion": "0.10.0",
     "variables": {
       "OPENJDK_VERSION": "11.0.10.9"
     },
@@ -12,24 +12,13 @@
           {
             "name": "MAUI_VERSION",
             "packageId": "Microsoft.NET.Sdk.Maui.Manifest-6.0.100",
-            "packageVersion": "6.0.101-preview.9.*"
-          }
-        ]
-      },
-      {
-        "$type": "DotNetCheck.Manifest.NuGetFeedVariableMapper, MauiCheck",
-        "packageSources": [ "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet6/nuget/v3/index.json" ],
-        "mappings": [
-          {
-            "name": "EMSCRIPTEN_WORKLOAD_VERSION",
-            "packageId": "microsoft.net.workload.emscripten.manifest-6.0.100",
-            "packageVersion": "6.0.0-rc2.*"
+            "packageVersion": "6.0.101-preview.10.*"
           }
         ]
       },
       {
         "$type": "DotNetCheck.Manifest.XmlVariableMapper, MauiCheck",
-        "sourceUri": "https://raw.githubusercontent.com/dotnet/maui/release/6.0.1xx-preview9/eng/Versions.props",
+        "sourceUri": "https://raw.githubusercontent.com/dotnet/maui/release/6.0.1xx-preview10/eng/Versions.props",
         "mappings": [
           {
             "name": "DOTNET_SDK_VERSION",
@@ -58,6 +47,10 @@
           {
             "name": "WASMTOOLS_VERSION",
             "xpath": "//Project/PropertyGroup/MicrosoftNETCoreAppRefPackageVersion/text()"
+          },
+          {
+            "name": "EMSCRIPTEN_WORKLOAD_VERSION",
+            "xpath": "//Project/PropertyGroup/MicrosoftNETWorkloadEmscriptenManifest60100PackageVersion"
           }
         ]
       }
@@ -70,11 +63,11 @@
       }
     },
     "xcode": {
-      "exactVersion": "19223.2",
-      "exactVersionName": "13 Beta 5"
+      "exactVersion": "19466",
+      "exactVersionName": "13.1"
     },
     "vswin": {
-      "minimumVersion": "17.0.0-pre.5.0"
+      "minimumVersion": "17.1.0-pre.1.0"
     },
     "vsmac": {
       "minimumVersion": "8.10.0",
@@ -140,7 +133,8 @@
           "urls": {
             "win64": "https://dotnetcli.azureedge.net/dotnet/Sdk/$(DOTNET_SDK_VERSION)/dotnet-sdk-$(DOTNET_SDK_VERSION)-win-x64.exe",
             "win": "https://dotnetcli.azureedge.net/dotnet/Sdk/$(DOTNET_SDK_VERSION)/dotnet-sdk-$(DOTNET_SDK_VERSION)-win-x86.exe",
-            "osx": "https://dotnetcli.azureedge.net/dotnet/Sdk/$(DOTNET_SDK_VERSION)/dotnet-sdk-$(DOTNET_SDK_VERSION)-osx-x64.pkg"
+            "osx": "https://dotnetcli.azureedge.net/dotnet/Sdk/$(DOTNET_SDK_VERSION)/dotnet-sdk-$(DOTNET_SDK_VERSION)-osx-x64.pkg",
+            "osxArm64": "https://dotnetcli.azureedge.net/dotnet/Sdk/$(DOTNET_SDK_VERSION)/dotnet-sdk-$(DOTNET_SDK_VERSION)-osx-arm64.pkg"
           },
           "packageSources": [
             "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet6/nuget/v3/index.json",
