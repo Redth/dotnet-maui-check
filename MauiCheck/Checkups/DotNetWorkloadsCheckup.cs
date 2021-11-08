@@ -57,7 +57,6 @@ namespace DotNetCheck.Checkups
 
 			var workloadManager = new DotNetWorkloadManager(SdkRoot, sdkVersion, NuGetPackageSources);
 
-
 			var installedPackageWorkloads = workloadManager.GetInstalledWorkloads();
 
 			var missingWorkloads = new List<Manifest.DotNetWorkload>();
@@ -99,8 +98,8 @@ namespace DotNetCheck.Checkups
 			return new DiagnosticResult(
 				Status.Error,
 				this,
-				new Suggestion("Install or Update SDK Workloads",
-					canPerform ?
+				canPerform ? 
+					new Suggestion("Install or Update SDK Workloads",
 						new ActionSolution(async (sln, cancel) =>
 						{
 							if (history.GetEnvironmentVariableFlagSet("DOTNET_FORCE"))
@@ -116,8 +115,8 @@ namespace DotNetCheck.Checkups
 							}
 
 							await workloadManager.Install(RequiredWorkloads);
-						}) 
-					: null));
+						}))
+				: new Suggestion("Install the latest Visual Studio Preview", "To install or update to the latest workloads for .NET MAUI, install the latest Visual Studio Preview and choose .NET MAUI in the list of features to install under the .NET Mobile Workload: https://visualstudio.microsoft.com/vs/preview/"));
 		}
 	}
 }
