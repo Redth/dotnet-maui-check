@@ -27,10 +27,7 @@ namespace DotNetCheck.Checkups
 
 					if (sdk.Workloads?.Any() ?? false)
 					{
-						if (NuGetVersion.Parse(sdkVersion) >= Manifest.DotNetSdk.Version6Preview7)
-							yield return new DotNetWorkloadsCheckup(sharedState, sdkVersion, workloads, pkgSrcs);
-						else
-							yield return new DotNetWorkloadsCheckupLegacy(sharedState, sdkVersion, workloads, pkgSrcs);
+						yield return new DotNetWorkloadsCheckup(sharedState, sdkVersion, workloads, pkgSrcs);
 					}
 				}
 			}

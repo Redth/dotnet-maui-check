@@ -64,9 +64,7 @@ namespace DotNetCheck.DotNet
 
 			RemoveOldMetadata();
 
-			await CliUpdateWithRollback(rollbackFile);
-
-			await CliInstall(workloads.Where(w => !w.Abstract).Select(w => w.Id));
+			await CliInstallWithRollback(rollbackFile, workloads.Where(w => !w.Abstract).Select(w => w.Id));
 		}
 
 		string WriteRollbackFile(Manifest.DotNetWorkload[] workloads)
@@ -149,26 +147,23 @@ namespace DotNetCheck.DotNet
 			}
 		}
 
-		async Task CliInstall(IEnumerable<string> workloadIds)
+		async Task CliInstallWithRollback(string rollbackFile, IEnumerable<string> workloadIds)
 		{
-			// dotnet workload install id --skip-manifest-update --add-source x
+			// dotnet workload install id --from-rollback-file --source x
 			var dotnetExe = Path.Combine(SdkRoot, DotNetSdk.DotNetExeName);
-
-			// Arg switched to --source in >= preview 7
-			var addSourceArg = "--source";
-			if (NuGetVersion.Parse(SdkVersion) <= DotNetCheck.Manifest.DotNetSdk.Version6Preview6)
-				addSourceArg = "--add-source";
 
 			var args = new List<string>
 			{
 				"workload",
 				"install",
-				"--no-cache",
-				"--disable-parallel"
+				// "--no-cache",
+				// "--disable-parallel"
+				"--from-rollback-file",
+				$"\"{rollbackFile}\""
+				
 			};
 			args.AddRange(workloadIds);
-			args.Add("--skip-manifest-update");
-			args.AddRange(NuGetPackageSources.Select(ps => $"{addSourceArg} \"{ps}\""));
+			args.AddRange(NuGetPackageSources.Select(ps => $"--source \"{ps}\""));
 
 			var r = await Util.WrapShellCommandWithSudo(dotnetExe, DotNetCliWorkingDir, true, args.ToArray());
 
@@ -177,44 +172,18 @@ namespace DotNetCheck.DotNet
 				throw new Exception("Workload Install failed: `dotnet " + string.Join(' ', args) + "`");
 		}
 
-		async Task CliUpdateWithRollback(string rollbackFile)
-		{
-			// dotnet workload install id --skip-manifest-update --add-source x
-			var dotnetExe = Path.Combine(SdkRoot, DotNetSdk.DotNetExeName);
-
-			var args = new List<string>
-			{
-				"workload",
-				"update",
-				"--no-cache",
-				"--disable-parallel",
-				"--from-rollback-file",
-				$"\"{rollbackFile}\""
-			};
-			args.AddRange(NuGetPackageSources.Select(ps => $"--source \"{ps}\""));
-
-			var r = await Util.WrapShellCommandWithSudo(dotnetExe, DotNetCliWorkingDir, true, args.ToArray());
-
-			if (r.ExitCode != 0)
-				throw new Exception("Workload Update failed: `dotnet " + string.Join(' ', args) + "`");
-		}
 
 		async Task CliRepair()
 		{
-			// dotnet workload install id --skip-manifest-update --add-source x
+			// dotnet workload repair --source x
 			var dotnetExe = Path.Combine(SdkRoot, DotNetSdk.DotNetExeName);
-
-			// Arg switched to --source in >= preview 7
-			var addSourceArg = "--source";
-			if (NuGetVersion.Parse(SdkVersion) <= DotNetCheck.Manifest.DotNetSdk.Version6Preview6)
-				addSourceArg = "--add-source";
 
 			var args = new List<string>
 			{
 				"workload",
 				"repair"
 			};
-			args.AddRange(NuGetPackageSources.Select(ps => $"{addSourceArg} \"{ps}\""));
+			args.AddRange(NuGetPackageSources.Select(ps => $"--source \"{ps}\""));
 
 			var r = await Util.WrapShellCommandWithSudo(dotnetExe, DotNetCliWorkingDir, true, args.ToArray());
 
