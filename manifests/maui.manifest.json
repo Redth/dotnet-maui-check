@@ -1,14 +1,14 @@
 {
   "check": {
-    "toolVersion": "0.9.0",
+    "toolVersion": "0.10.0",
     "variables": {
       "DOTNET_SDK_VERSION": "6.0.100",
-      "MAUI_VERSION": "6.0.101-preview.10.2068",
-      "MACCATALYST_SDK_VERSION": "15.0.101-preview.10.251",
-      "IOS_SDK_VERSION": "15.0.101-preview.10.251",
-      "TVOS_SDK_VERSION": "15.0.101-preview.10.251",
-      "MACOS_SDK_VERSION": "12.0.101-preview.10.251",
-      "ANDROID_SDK_VERSION": "31.0.101-preview.10.59",
+      "MAUI_VERSION": "6.0.101-preview.11.2349",
+      "MACCATALYST_SDK_VERSION": "15.0.101-preview.11.551",
+      "IOS_SDK_VERSION": "15.0.101-preview.11.551",
+      "TVOS_SDK_VERSION": "15.0.101-preview.11.551",
+      "MACOS_SDK_VERSION": "12.0.101-preview.11.551",
+      "ANDROID_SDK_VERSION": "31.0.101-preview.11.117",
       "WASMTOOLS_VERSION": "6.0.0",
       "EMSCRIPTEN_WORKLOAD_VERSION": "6.0.0",
       "OPENJDK_VERSION": "11.0.10.9"
@@ -26,7 +26,7 @@
       "exactVersionName": "13.1"
     },
     "vswin": {
-      "minimumVersion": "17.1-pre.1.0"
+      "minimumVersion": "17.1-pre.2.0"
     },
     "vsmac": {
       "minimumVersion": "8.10.0",
