@@ -105,9 +105,9 @@ namespace DotNetCheck
 				var manifests = nugetWorkloadManifestProvider.GetManifests();
 				foreach (var mfst in manifests)
 				{
-					AnsiConsole.MarkupLine($"Acquiring packages for: {mfst.manifestId} ...");
+					AnsiConsole.MarkupLine($"Acquiring packages for: {mfst.ManifestId} ...");
 
-					var manifestReader = WorkloadManifestReader.ReadWorkloadManifest(mfst.manifestId, mfst.openManifestStream());
+					var manifestReader = WorkloadManifestReader.ReadWorkloadManifest(mfst.ManifestId, mfst.OpenManifestStream(), mfst.ManifestPath);
 
 					foreach (var wlPack in manifestReader.Packs)
 					{
@@ -310,8 +310,8 @@ namespace DotNetCheck
 		public IEnumerable<string> GetManifestDirectories()
 			=> manifestDirs.Select(m => m.dir);
 
-		public IEnumerable<(string manifestId, string informationalPath, Func<Stream> openManifestStream, Func<Stream> openLocalizationStream)> GetManifests()
-					=> manifestDirs.Select(m => (m.id, m.dir, new Func<Stream>(() => File.OpenRead(m.file)), new Func<Stream>(() => null)));
+		public IEnumerable<ReadableWorkloadManifest> GetManifests()
+					=> manifestDirs.Select(m => new ReadableWorkloadManifest(m.id, m.dir, new Func<Stream>(() => File.OpenRead(m.file)), new Func<Stream>(() => null)));
 
 		public string GetSdkFeatureBand()
 			=> $"{SdkVersion.Major}.{SdkVersion.Minor}.{SdkVersion.Patch}";

@@ -66,16 +66,19 @@ namespace DotNetCheck.Checkups
 				if (!NuGetVersion.TryParse(rp.Version, out var rpVersion))
 					rpVersion = new NuGetVersion(0, 0, 0);
 
-				// TODO: Eventually check actual workload resolver api for installed workloads and
-				// compare the manifest version once it has a string in it
-				if (!installedPackageWorkloads.Any(ip => ip.id.Equals(rp.Id, StringComparison.OrdinalIgnoreCase) && NuGetVersion.TryParse(ip.version, out var ipVersion) && ipVersion == rpVersion))
+				var installedVersions = installedPackageWorkloads
+					.Where(ip => ip.id.Equals(rp.Id, StringComparison.OrdinalIgnoreCase))
+					.Select(s => (s.id, NuGetVersion.Parse(s.version)));
+
+				// By default allow >= version, but --force will cause exact version matching
+				if (installedVersions.Any(iv => iv.Item2 == rpVersion || (!force && iv.Item2 >= rpVersion)))
 				{
-					ReportStatus($"{rp.Id} ({rp.PackageId} : {rp.Version}) not installed.", Status.Error);
-					missingWorkloads.Add(rp);
+					ReportStatus($"{rp.Id} ({rp.PackageId} : {rp.Version}) installed.", Status.Ok);
 				}
 				else
 				{
-					ReportStatus($"{rp.Id} ({rp.PackageId} : {rp.Version}) installed.", Status.Ok);
+					ReportStatus($"{rp.Id} ({rp.PackageId} : {rp.Version}) not installed.", Status.Error);
+					missingWorkloads.Add(rp);
 				}
 			}
 

@@ -68,10 +68,10 @@
       <HintPath>..\libs\Boots.Core.dll</HintPath>
     </Reference>
     <Reference Include="Mono.AndroidTools">
-      <HintPath>..\libs\Mono.AndroidTools.dll</HintPath>
+      <HintPath>..\libs\Mono.AndroidTools.Ide.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Android.Tools.AndroidSdk">
-      <HintPath>..\libs\Xamarin.Android.Tools.AndroidSdk.dll</HintPath>
+      <HintPath>..\libs\Xamarin.Android.Tools.AndroidSdk.Ide.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Installer.AndroidSDK">
       <HintPath>..\libs\Xamarin.Installer.AndroidSDK.dll</HintPath>
@@ -80,7 +80,7 @@
       <HintPath>..\libs\Xamarin.Installer.Common.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.AndroidTools">
-      <HintPath>..\libs\Xamarin.AndroidTools.dll</HintPath>
+      <HintPath>..\libs\Xamarin.AndroidTools.Ide.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\libs\ICSharpCode.SharpZipLib.dll</HintPath>

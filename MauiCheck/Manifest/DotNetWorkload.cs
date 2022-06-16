@@ -26,5 +26,8 @@ namespace DotNetCheck.Manifest
 
 		[JsonProperty("ignoredPackIds")]
 		public List<string> IgnoredPackIds { get; set; }
+
+		[JsonProperty("sdkBand")]
+		public string SdkBand { get; set; }
 	}
 }

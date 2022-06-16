@@ -46,6 +46,8 @@ namespace DotNetCheck.Manifest
 			{
 				foreach (var mapper in VariableMappers)
 				{
+					SubstituteVariables(mapper, Variables);
+
 					await mapper.Map();
 
 					foreach (var v in mapper.Variables)
@@ -79,6 +81,15 @@ namespace DotNetCheck.Manifest
 				else if (pval is Uri uriVal)
 				{
 					prop.SetValue(instance, new Uri(SubstituteVariableValue(uriVal.OriginalString, variables)));
+				}
+				else if (pval is string[] strarr)
+				{
+					var newArr = new List<string>();
+					foreach (var item in strarr)
+					{
+						newArr.Add(SubstituteVariableValue(item, variables));
+					}
+					prop.SetValue(instance, newArr.ToArray());
 				}
 				else if (pval is IList pinstList)
 				{

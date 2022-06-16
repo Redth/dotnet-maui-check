@@ -77,7 +77,7 @@ namespace DotNetCheck.DotNet
 			var json = new StringBuilder();
 			json.AppendLine("{");
 			json.AppendLine(string.Join("," + Environment.NewLine,
-				workloads.Select(wl => $"    \"{wl.WorkloadManifestId}\": \"{wl.Version}\"")));
+				workloads.Select(wl => $"    \"{wl.WorkloadManifestId}\": \"{wl.Version}/{wl.SdkBand}\"")));
 			json.AppendLine("}");
 
 			var rollbackFile = Path.Combine(DotNetCliWorkingDir, "workload.json");
@@ -96,10 +96,10 @@ namespace DotNetCheck.DotNet
 
 			foreach (var manifestInfo in manifestProvider.GetManifests())
 			{
-				using (var manifestStream = manifestInfo.openManifestStream())
+				using (var manifestStream = manifestInfo.OpenManifestStream())
 				{
-					var m = WorkloadManifestReader.ReadWorkloadManifest(manifestInfo.manifestId, manifestStream);
-					items[manifestInfo.manifestId] = m.Version;
+					var m = WorkloadManifestReader.ReadWorkloadManifest(manifestInfo.ManifestId, manifestStream, manifestInfo.ManifestPath);
+					items[manifestInfo.ManifestId] = m.Version;
 				}
 			}
 
@@ -112,9 +112,9 @@ namespace DotNetCheck.DotNet
 
 			foreach (var manifestInfo in manifestProvider.GetManifests())
 			{
-				using (var manifestStream = manifestInfo.openManifestStream())
+				using (var manifestStream = manifestInfo.OpenManifestStream())
 				{
-					var m = WorkloadManifestReader.ReadWorkloadManifest(manifestInfo.manifestId, manifestStream);
+					var m = WorkloadManifestReader.ReadWorkloadManifest(manifestInfo.ManifestId, manifestStream, manifestInfo.ManifestPath);
 
 					// Each workload manifest can have one or more workloads defined
 					foreach (var wl in m.Workloads)
