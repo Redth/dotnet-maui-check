@@ -63,10 +63,10 @@
       "exactVersionName": "14.0"
     },
     "vswin": {
-      "minimumVersion": "17.3.6"
+      "minimumVersion": "17.4.0-pre3"
     },
     "vsmac": {
-      "minimumVersion": "17.3.0.1028",
+      "minimumVersion": "17.4.0.2326",
       "optional": "true"
     },
     "android": {
@@ -85,7 +85,7 @@
         },
         {
           "path": "system-images;android-31;google_apis;x86_64",
-          "version": "8",
+          "version": "3",
           "alternatives": [
             {
               "path": "system-images;android-31;google_apis_playstore;x86_64",
