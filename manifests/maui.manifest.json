@@ -2,13 +2,13 @@
   "check": {
     "toolVersion": "1.0.0",
     "variables": {
-      "DOTNET_SDK_BAND": "6.0.300",
+      "DOTNET_SDK_BAND": "6.0.400",
       "MACIOS_SDK_BAND": "6.0.400",
-      "ANDROID_SDK_BAND": "6.0.300",
-      "MAUI_SDK_BAND": "6.0.300",
-      "EMSDK_SDK_BAND": "6.0.300",
-      "MONO_SDK_BAND": "6.0.300",
-      "DOTNET_SDK_VERSION": "6.0.301",
+      "ANDROID_SDK_BAND": "6.0.400",
+      "MAUI_SDK_BAND": "6.0.400",
+      "EMSDK_SDK_BAND": "6.0.400",
+      "MONO_SDK_BAND": "6.0.400",
+      "DOTNET_SDK_VERSION": "6.0.402",
       "WORKLOAD_PREVIEW": "",
       "OPENJDK_VERSION": "11.0.12",
       "PACKAGE_SOURCE_NUGET_ORG": "https://api.nuget.org/v3/index.json"
@@ -63,7 +63,7 @@
       "exactVersionName": "13.3"
     },
     "vswin": {
-      "minimumVersion": "17.3-pre.2.0"
+      "minimumVersion": "17.3.6"
     },
     "vsmac": {
       "minimumVersion": "17.3.0.1028",
