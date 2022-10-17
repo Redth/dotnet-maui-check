@@ -31,6 +31,8 @@ namespace DotNetCheck.Checkups
 		{
 			var dn = new DotNetSdk(history);
 
+			var installDotnet = history.GetEnvironmentVariableFlagSet("MAUI_CHECK_SETTINGS_INSTALL_DOTNET");
+
 			var missingDiagnosis = new DiagnosticResult(Status.Error, this, new Suggestion(".NET SDK not installed"));
 
 			if (!dn.Exists)
@@ -102,7 +104,7 @@ namespace DotNetCheck.Checkups
 					remedies.AddRange(missingSdks
 						.Select(ms => new DotNetSdkScriptInstallSolution(ms.Version)));
 				}
-				else
+				else if (installDotnet)
 				{
 					remedies.AddRange(missingSdks
 						.Where(ms => !ms.Url.AbsolutePath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
@@ -114,7 +116,7 @@ namespace DotNetCheck.Checkups
 				}
 
 				return new DiagnosticResult(Status.Error, this, $".NET SDK {str} not installed.",
-							new Suggestion($"Download .NET SDK {str}",
+					new Suggestion("Install the latest Visual Studio", "To install or update to the latest .NET SDK for .NET MAUI, install the latest Visual Studio: [underline]https://visualstudio.microsoft.com/vs[/] (Or Visual Studio Preview: [underline]https://visualstudio.microsoft.com/vs/preview[/] )",
 							remedies.ToArray()));
 			}
 

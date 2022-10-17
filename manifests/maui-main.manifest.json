@@ -12,7 +12,7 @@
           {
             "name": "MAUI_VERSION",
             "packageId": "Microsoft.NET.Sdk.Maui.Manifest-6.0.400",
-            "packageVersion": "6.0.500-main.*"
+            "packageVersion": "6.0.*"
           }
         ]
       },
@@ -55,14 +55,14 @@
       }
     },
     "xcode": {
-      "exactVersion": "20102",
-      "exactVersionName": "13.3"
+      "exactVersion": "21335",
+      "exactVersionName": "14.0"
     },
     "vswin": {
-      "minimumVersion": "17.3-pre.2.0"
+      "minimumVersion": "17.4.0-pre3"
     },
     "vsmac": {
-      "minimumVersion": "17.3.0.1028",
+      "minimumVersion": "17.4.0.2326",
       "optional": "true"
     },
     "android": {
@@ -81,36 +81,58 @@
         },
         {
           "path": "system-images;android-31;google_apis;x86_64",
-          "version": "8",
+          "version": "3",
           "alternatives": [
             {
               "path": "system-images;android-31;google_apis_playstore;x86_64",
-              "version": "6"
+              "version": "9"
             },
             {
               "path": "system-images;android-31;google_apis;arm64-v8a",
-              "version": "6"
+              "version": "9"
+            }
+          ]
+        },
+        {
+          "path": "build-tools;33.0.0",
+          "version": "33.0.0"
+        },
+        {
+          "path": "platforms;android-33",
+          "version": "1"
+        },
+        {
+          "path": "system-images;android-33;google_apis;x86_64",
+          "version": "5",
+          "alternatives": [
+            {
+              "path": "system-images;android-33;google_apis_playstore;x86_64",
+              "version": "5"
+            },
+            {
+              "path": "system-images;android-33;google_apis;arm64-v8a",
+              "version": "5"
             }
           ]
         },
         {
           "path": "platform-tools",
-          "version": "31.0.3"
+          "version": "33.0.2"
         },
         {
-          "path": "cmdline-tools;5.0",
-          "version": "5.0"
+          "path": "cmdline-tools;7.0",
+          "version": "7.0"
         }
       ],
       "emulators": [
         {
-          "sdkId": "system-images;android-31;google_apis;x86_64",
+          "sdkId": "system-images;android-33;google_apis;x86_64",
           "alternateSdkIds": [
-            "system-images;android-31;google_apis_playstore;x86_64",
-            "system-images;android-30;google_apis;arm64-v8a"
+            "system-images;android-33;google_apis_playstore;x86_64",
+            "system-images;android-33;google_apis;arm64-v8a"
           ],
-          "desc": "Android Emulator - x86_64 - API31 - Google API's",
-          "apiLevel": 31,
+          "desc": "Android Emulator - x86_64 - API33 - Google API's",
+          "apiLevel": 33,
           "tag": "google_apis",
           "device": "pixel"
         }

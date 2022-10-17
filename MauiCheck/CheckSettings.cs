@@ -28,6 +28,12 @@ namespace DotNetCheck
 		[CommandOption("--force-dotnet")]
 		public bool ForceDotNet { get; set; }
 
+		[CommandOption("--install-dotnet")]
+		public bool InstallDotNet { get; set; } = false;
+
+		[CommandOption("--install-workloads")]
+		public bool InstallWorkloads { get; set; } = false;
+
 		[CommandOption("-v|--verbose")]
 		public bool Verbose { get; set; }
 
