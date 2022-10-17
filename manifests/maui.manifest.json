@@ -125,7 +125,7 @@
           "version": "33.0.2"
         },
         {
-          "path": "cmdline-tools;5.0",
+          "path": "cmdline-tools;7.0",
           "version": "7.0"
         }
       ],
