@@ -59,14 +59,14 @@
       }
     },
     "xcode": {
-      "exactVersion": "20102",
-      "exactVersionName": "13.3"
+      "exactVersion": "21335",
+      "exactVersionName": "14.0"
     },
     "vswin": {
       "minimumVersion": "17.3.6"
     },
     "vsmac": {
-      "minimumVersion": "17.3.0.1028",
+      "minimumVersion": "17.3.8.5",
       "optional": "true"
     },
     "android": {
@@ -85,25 +85,25 @@
         },
         {
           "path": "system-images;android-31;google_apis;x86_64",
-          "version": "8",
+          "version": "3",
           "alternatives": [
             {
               "path": "system-images;android-31;google_apis_playstore;x86_64",
-              "version": "6"
+              "version": "9"
             },
             {
               "path": "system-images;android-31;google_apis;arm64-v8a",
-              "version": "6"
+              "version": "9"
             }
           ]
         },
         {
           "path": "platform-tools",
-          "version": "31.0.3"
+          "version": "33.0.2"
         },
         {
           "path": "cmdline-tools;5.0",
-          "version": "5.0"
+          "version": "7.0"
         }
       ],
       "emulators": [
@@ -111,7 +111,7 @@
           "sdkId": "system-images;android-31;google_apis;x86_64",
           "alternateSdkIds": [
             "system-images;android-31;google_apis_playstore;x86_64",
-            "system-images;android-30;google_apis;arm64-v8a"
+            "system-images;android-31;google_apis;arm64-v8a"
           ],
           "desc": "Android Emulator - x86_64 - API31 - Google API's",
           "apiLevel": 31,
