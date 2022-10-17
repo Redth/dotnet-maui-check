@@ -60,6 +60,8 @@ namespace DotNetCheck.Cli
 			sharedState.SetEnvironmentVariable("MAUI_CHECK_SETTINGS_FIX", settings.Fix.ToString());
 			sharedState.SetEnvironmentVariable("MAUI_CHECK_SETTINGS_CI", settings.CI.ToString());
 			sharedState.SetEnvironmentVariable("MAUI_CHECK_SETTINGS_NONINTERACTIVE", settings.NonInteractive.ToString());
+			sharedState.SetEnvironmentVariable("MAUI_CHECK_SETTINGS_INSTALL_DOTNET", settings.InstallDotNet.ToString());
+			sharedState.SetEnvironmentVariable("MAUI_CHECK_SETTINGS_INSTALL_WORKLOADS", settings.InstallWorkloads.ToString());
 
 			var results = new Dictionary<string, DiagnosticResult>();
 			var consoleStatus = AnsiConsole.Status();

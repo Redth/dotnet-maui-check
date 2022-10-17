@@ -47,6 +47,9 @@ namespace DotNetCheck.Checkups
 			if (!history.TryGetEnvironmentVariable("DOTNET_SDK_VERSION", out var sdkVersion))
 				sdkVersion = SdkVersion;
 
+			var installWorkloads = history.GetEnvironmentVariableFlagSet("MAUI_CHECK_SETTINGS_INSTALL_WORKLOADS")
+				|| Util.CI;
+
 			var force = history.TryGetEnvironmentVariable("DOTNET_FORCE", out var forceDotNet)
 				&& (forceDotNet?.Equals("true", StringComparison.OrdinalIgnoreCase) ?? false)
 				&& !wasForceRunAlready;
@@ -85,23 +88,21 @@ namespace DotNetCheck.Checkups
 			if (!missingWorkloads.Any() && !force)
 				return DiagnosticResult.Ok(this);
 
-			var canPerform = true;
-
-			if (Util.IsWindows)
+			if (installWorkloads)
 			{
 				var interactive = !history.GetEnvironmentVariableFlagSet("MAUI_CHECK_SETTINGS_NONINTERACTIVE");
 
-				Spectre.Console.AnsiConsole.MarkupLine($"[bold red]{Icon.Bell} Managing Workload installation from the CLI is [underline]NOT recommended[/].  Instead you should install the latest Visual Studio preview to automatically get the newest release of .NET MAUI workloads installed.[/]");
+				Spectre.Console.AnsiConsole.MarkupLine($"[bold red]{Icon.Bell} Managing Workload installation from the CLI is [underline]NOT recommended[/].  Instead you should install the latest Visual Studio to automatically get the newest release of .NET MAUI workloads installed.[/]");
 
 				// If this is not a CI / Fix flag install, ask if we want to confirm to continue the CLI install after seeing the warning
 				if (interactive)
-					canPerform = Spectre.Console.AnsiConsole.Confirm("Are you sure you would like to continue the CLI workload installation?", false);
+					installWorkloads = Spectre.Console.AnsiConsole.Confirm("Are you sure you would like to continue the CLI workload installation?", false);
 			}
 
 			return new DiagnosticResult(
 				Status.Error,
 				this,
-				canPerform ? 
+				installWorkloads ? 
 					new Suggestion("Install or Update SDK Workloads",
 						new ActionSolution(async (sln, cancel) =>
 						{
@@ -119,7 +120,7 @@ namespace DotNetCheck.Checkups
 
 							await workloadManager.Install(RequiredWorkloads);
 						}))
-				: new Suggestion("Install the latest Visual Studio Preview", "To install or update to the latest workloads for .NET MAUI, install the latest Visual Studio Preview and choose .NET MAUI in the list of features to install under the .NET Mobile Workload: [underline]https://visualstudio.microsoft.com/vs/preview/[/]"));
+				: new Suggestion("Install the latest Visual Studio", "To install or update to the latest workloads for .NET MAUI, install the latest Visual Studio and choose .NET MAUI in the list of features to install under the .NET Mobile Workload: [underline]https://visualstudio.microsoft.com/vs[/] (Or Visual Studio Preview: [underline]https://visualstudio.microsoft.com/vs/preview[/] )"));
 		}
 	}
 }
