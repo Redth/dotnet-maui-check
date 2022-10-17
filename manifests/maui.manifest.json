@@ -2,53 +2,76 @@
   "check": {
     "toolVersion": "1.0.0",
     "variables": {
-      "DOTNET_SDK_BAND": "6.0.400",
-      "MACIOS_SDK_BAND": "6.0.400",
-      "ANDROID_SDK_BAND": "6.0.400",
-      "MAUI_SDK_BAND": "6.0.400",
-      "EMSDK_SDK_BAND": "6.0.400",
-      "MONO_SDK_BAND": "6.0.400",
-      "DOTNET_SDK_VERSION": "6.0.402",
+      "WORKLOAD_SDK_BAND_PATTERN": "6.0.*",
       "WORKLOAD_PREVIEW": "",
       "OPENJDK_VERSION": "11.0.12",
       "PACKAGE_SOURCE_NUGET_ORG": "https://api.nuget.org/v3/index.json"
     },
     "variableMappers": [
       {
-        "$type": "DotNetCheck.Manifest.NuGetFeedVariableMapper, MauiCheck",
+        "$type": "DotNetCheck.Manifest.NuGetFeedWorkloadManifestSdkBandVariableMapper, MauiCheck",
         "packageSources": [ "$(PACKAGE_SOURCE_NUGET_ORG)" ],
         "mappings": [
           {
-            "name": "MAUI_VERSION",
-            "packageId": "Microsoft.NET.Sdk.Maui.Manifest-$(MAUI_SDK_BAND)",
-            "packageVersion": "6.0.*"
+            "packageId": "Microsoft.NET.Sdk.Maui.Manifest-",
+            "sdkBand": "$(WORKLOAD_SDK_BAND_PATTERN)",
+            "packageVersion": "*$(WORKLOAD_PREVIEW)",
+            "includePrerelease": false,
+            "sdkBandVariableName": "MAUI_WORKLOAD_SDK_BAND",
+            "packageIdVariableName": "MAUI_WORKLOAD_MANIFEST_PACKAGE_ID",
+            "packageVersionVariableName": "MAUI_WORKLOAD_MANIFEST_PACKAGE_VERSION"
           },
           {
-            "name": "ANDROID_SDK_VERSION",
-            "packageId": "Microsoft.NET.Sdk.Android.Manifest-$(ANDROID_SDK_BAND)",
-            "packageVersion": "*$(WORKLOAD_PREVIEW)"
+            "packageId": "Microsoft.NET.Sdk.Android.Manifest-",
+            "sdkBand": "$(WORKLOAD_SDK_BAND_PATTERN)",
+            "packageVersion": "*$(WORKLOAD_PREVIEW)",
+            "includePrerelease": false,
+            "sdkBandVariableName": "ANDROID_WORKLOAD_SDK_BAND",
+            "packageIdVariableName": "ANDROID_WORKLOAD_MANIFEST_PACKAGE_ID",
+            "packageVersionVariableName": "ANDROID_WORKLOAD_MANIFEST_PACKAGE_VERSION"
           },
           {
-            "name": "MACCATALYST_SDK_VERSION",
-            "packageId": "Microsoft.NET.Sdk.MacCatalyst.Manifest-$(MACIOS_SDK_BAND)",
-            "packageVersion": "*$(WORKLOAD_PREVIEW)"
+            "packageId": "Microsoft.NET.Sdk.MacCatalyst.Manifest-",
+            "sdkBand": "$(WORKLOAD_SDK_BAND_PATTERN)",
+            "packageVersion": "*$(WORKLOAD_PREVIEW)",
+            "includePrerelease": false,
+            "sdkBandVariableName": "MACCATALYST_WORKLOAD_SDK_BAND",
+            "packageIdVariableName": "MACCATALYST_WORKLOAD_MANIFEST_PACKAGE_ID",
+            "packageVersionVariableName": "MACCATALYST_WORKLOAD_MANIFEST_PACKAGE_VERSION"
           },
           {
-            "name": "TVOS_SDK_VERSION",
-            "packageId": "Microsoft.NET.Sdk.tvOS.Manifest-$(MACIOS_SDK_BAND)",
-            "packageVersion": "*$(WORKLOAD_PREVIEW)"
+            "packageId": "Microsoft.NET.Sdk.tvOS.Manifest-",
+            "sdkBand": "$(WORKLOAD_SDK_BAND_PATTERN)",
+            "packageVersion": "*$(WORKLOAD_PREVIEW)",
+            "includePrerelease": false,
+            "sdkBandVariableName": "TVOS_WORKLOAD_SDK_BAND",
+            "packageIdVariableName": "TVOS_WORKLOAD_MANIFEST_PACKAGE_ID",
+            "packageVersionVariableName": "TVOS_WORKLOAD_MANIFEST_PACKAGE_VERSION"
           },
           {
-            "name": "MACOS_SDK_VERSION",
-            "packageId": "Microsoft.NET.Sdk.macOS.Manifest-$(MACIOS_SDK_BAND)",
-            "packageVersion": "*$(WORKLOAD_PREVIEW)"
+            "packageId": "Microsoft.NET.Sdk.macOS.Manifest-",
+            "sdkBand": "$(WORKLOAD_SDK_BAND_PATTERN)",
+            "packageVersion": "*$(WORKLOAD_PREVIEW)",
+            "includePrerelease": false,
+            "sdkBandVariableName": "MACOS_WORKLOAD_SDK_BAND",
+            "packageIdVariableName": "MACOS_WORKLOAD_MANIFEST_PACKAGE_ID",
+            "packageVersionVariableName": "MACOS_WORKLOAD_MANIFEST_PACKAGE_VERSION"
           },
           {
-            "name": "IOS_SDK_VERSION",
-            "packageId": "Microsoft.NET.Sdk.iOS.Manifest-$(MACIOS_SDK_BAND)",
-            "packageVersion": "*$(WORKLOAD_PREVIEW)"
+            "packageId": "Microsoft.NET.Sdk.iOS.Manifest-",
+            "sdkBand": "$(WORKLOAD_SDK_BAND_PATTERN)",
+            "packageVersion": "*$(WORKLOAD_PREVIEW)",
+            "includePrerelease": false,
+            "sdkBandVariableName": "IOS_WORKLOAD_SDK_BAND",
+            "packageIdVariableName": "IOS_WORKLOAD_MANIFEST_PACKAGE_ID",
+            "packageVersionVariableName": "IOS_WORKLOAD_MANIFEST_PACKAGE_VERSION"
           }
         ]
+      },
+      {
+        "$type": "DotNetCheck.Manifest.DotNetSdkReleasesVariableMapper, MauiCheck",
+        "channelVersion": "net6.0",
+        "name":  "DOTNET_SDK_VERSION"
       }
     ],
     "openjdk": {
@@ -139,44 +162,44 @@
             {
               "workloadId": "android",
               "workloadManifestId": "microsoft.net.sdk.android",
-              "packageId": "Microsoft.NET.Sdk.Android.Manifest-$(ANDROID_SDK_BAND)",
-              "version": "$(ANDROID_SDK_VERSION)",
-              "sdkBand": "$(ANDROID_SDK_BAND)"
+              "packageId": "$(ANDROID_WORKLOAD_MANIFEST_PACKAGE_ID)",
+              "version": "$(ANDROID_WORKLOAD_MANIFEST_PACKAGE_VERSION)",
+              "sdkBand": "$(ANDROID_WORKLOAD_SDK_BAND)"
             },
             {
               "workloadId": "ios",
               "workloadManifestId": "microsoft.net.sdk.ios",
-              "packageId": "Microsoft.NET.Sdk.iOS.Manifest-$(DOTNET_SDK_BAND)",
-              "version": "$(IOS_SDK_VERSION)",
-              "sdkBand": "$(MACIOS_SDK_BAND)"
+              "packageId": "$(IOS_WORKLOAD_MANIFEST_PACKAGE_ID)",
+              "version": "$(IOS_WORKLOAD_MANIFEST_PACKAGE_VERSION)",
+              "sdkBand": "$(IOS_WORKLOAD_SDK_BAND)"
             },
             {
               "workloadId": "maccatalyst",
               "workloadManifestId": "microsoft.net.sdk.maccatalyst",
-              "packageId": "Microsoft.NET.Sdk.MacCatalyst.Manifest-$(MACIOS_SDK_BAND)",
-              "version": "$(MACCATALYST_SDK_VERSION)",
-              "sdkBand": "$(MACIOS_SDK_BAND)"
+              "packageId": "$(MACCATALYST_WORKLOAD_MANIFEST_PACKAGE_ID)",
+              "version": "$(MACCATALYST_WORKLOAD_MANIFEST_PACKAGE_VERSION)",
+              "sdkBand": "$(MACCATALYST_WORKLOAD_SDK_BAND)"
             },
             {
               "workloadId": "tvos",
               "workloadManifestId": "microsoft.net.sdk.tvos",
-              "packageId": "Microsoft.NET.Sdk.tvOS.Manifest-$(MACIOS_SDK_BAND)",
-              "version": "$(TVOS_SDK_VERSION)",
-              "sdkBand": "$(MACIOS_SDK_BAND)"
+              "packageId": "$(TVOS_WORKLOAD_MANIFEST_PACKAGE_ID)",
+              "version": "$(TVOS_WORKLOAD_MANIFEST_PACKAGE_VERSION)",
+              "sdkBand": "$(TVOS_WORKLOAD_SDK_BAND)"
             },
             {
               "workloadId": "macos",
               "workloadManifestId": "microsoft.net.sdk.macos",
-              "packageId": "Microsoft.NET.Sdk.macOS.Manifest-$(MACIOS_SDK_BAND)",
-              "version": "$(MACOS_SDK_VERSION)",
-              "sdkBand": "$(MACIOS_SDK_BAND)"
+              "packageId": "$(MACOS_WORKLOAD_MANIFEST_PACKAGE_ID)",
+              "version": "$(MACOS_WORKLOAD_MANIFEST_PACKAGE_VERSION)",
+              "sdkBand": "$(MACOS_WORKLOAD_SDK_BAND)"
             },
             {
               "workloadId": "maui",
               "workloadManifestId": "microsoft.net.sdk.maui",
-              "packageId": "Microsoft.NET.Sdk.Maui.Manifest-$(MAUI_SDK_BAND)",
-              "version": "$(MAUI_VERSION)",
-              "sdkBand": "$(MAUI_SDK_BAND)"
+              "packageId": "$(MAUI_WORKLOAD_MANIFEST_PACKAGE_ID)",
+              "version": "$(MAUI_WORKLOAD_MANIFEST_PACKAGE_VERSION)",
+              "sdkBand": "$(MAUI_WORKLOAD_SDK_BAND)"
             }
           ],
           "packs": []
