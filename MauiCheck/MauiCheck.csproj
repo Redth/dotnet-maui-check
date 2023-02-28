@@ -9,6 +9,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <PackAsToolShimRuntimeIdentifiers>win-x64;win-x86;osx-x64</PackAsToolShimRuntimeIdentifiers>
     <LangVersion>latest</LangVersion>
+    <RollForward>Major</RollForward>
   </PropertyGroup>
 
   <PropertyGroup>
