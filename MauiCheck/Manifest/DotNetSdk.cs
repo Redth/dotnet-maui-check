@@ -29,7 +29,7 @@ namespace DotNetCheck.Manifest
 		public List<DotNetWorkload> Workloads { get; set; }
 
 		[JsonProperty("packageSources")]
-		public List<string> PackageSources { get; set; }
+		public string[] PackageSources { get; set; }
 
 		[JsonProperty("enableWorkloadResolver")]
 		public bool EnableWorkloadResolver { get; set; }
