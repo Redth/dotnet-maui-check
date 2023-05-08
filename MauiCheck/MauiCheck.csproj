@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>maui-check</ToolCommandName>
     <PackageOutputPath>./artifacts</PackageOutputPath>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <PackAsToolShimRuntimeIdentifiers>win-x64;win-x86;osx-x64</PackAsToolShimRuntimeIdentifiers>
+    <PackAsToolShimRuntimeIdentifiers Condition="'$(GITHUB_ACTIONS)' == 'true' Or '$(TF_BUILD)' == 'true'">win-x64;win-x86;win-arm64;osx-x64;osx-arm64</PackAsToolShimRuntimeIdentifiers>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
@@ -26,7 +26,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/redth/dotnet-maui-check</RepositoryUrl>
     <AssemblyFileVersion>$(PackageVersion)</AssemblyFileVersion>
-    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <ContinuousIntegrationBuild>false</ContinuousIntegrationBuild>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <DebugType>portable</DebugType>
