@@ -28,17 +28,14 @@ namespace DotNetCheck.Manifest
 		[JsonProperty("vswin")]
 		public MinExactVersion VSWin { get; set; }
 
-		[JsonProperty("vsmac")]
-		public MinExactVersion VSMac { get; set; }
-
 		[JsonProperty("android")]
 		public Android Android { get; set; }
 
 		[JsonProperty("dotnet")]
 		public DotNet DotNet { get; set; }
 
-		[JsonProperty("filepermissions")]
-		public List<FilePermissions> FilePermissions { get; set; }
+		//[JsonProperty("filepermissions")]
+		//public List<FilePermissions> FilePermissions { get; set; }
 
 		public async Task MapVariables()
 		{
@@ -60,6 +57,9 @@ namespace DotNetCheck.Manifest
 
 		void SubstituteVariables(object instance, Dictionary<string, object> variables)
 		{
+			if (instance is null)
+				return;
+
 			var props = instance.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
 			if (!(props?.Any() ?? false))

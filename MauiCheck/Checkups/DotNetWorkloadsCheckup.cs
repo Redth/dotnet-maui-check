@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using DotNetCheck.DotNet;
 using DotNetCheck.Models;
@@ -18,20 +20,37 @@ namespace DotNetCheck.Checkups
 			throw new Exception("Do not IOC this type directly");
 		}
 
-		public DotNetWorkloadsCheckup(SharedState sharedState, string sdkVersion, Manifest.DotNetWorkload[] requiredWorkloads, params string[] nugetPackageSources) : base()
+		public DotNetWorkloadsCheckup(SharedState sharedState, string sdkVersion, Uri workloadRollback, string[] workloadIds, params string[] nugetPackageSources) : base()
 		{
 			var dotnet = new DotNetSdk(sharedState);
 
 			SdkRoot = dotnet.DotNetSdkLocation.FullName;
 			SdkVersion = sdkVersion;
-			RequiredWorkloads = requiredWorkloads;
+			WorkloadRollback = workloadRollback;
+			WorkloadIds = workloadIds;
 			NuGetPackageSources = nugetPackageSources;
 		}
 
 		public readonly string SdkRoot;
 		public readonly string SdkVersion;
 		public readonly string[] NuGetPackageSources;
-		public readonly Manifest.DotNetWorkload[] RequiredWorkloads;
+		public readonly Uri WorkloadRollback;
+
+		public readonly string[] WorkloadIds;
+
+
+		string rollbackJson = string.Empty;
+
+		public async Task<string> GetRollbackJson()
+		{
+			if (string.IsNullOrEmpty(rollbackJson))
+			{
+				var http = new HttpClient();
+				rollbackJson = await http.GetStringAsync(WorkloadRollback).ConfigureAwait(false);
+			}
+
+			return rollbackJson;
+		}
 
 		public override IEnumerable<CheckupDependency> DeclareDependencies(IEnumerable<string> checkupIds)
 			=> new[] { new CheckupDependency("dotnet") };
@@ -57,32 +76,38 @@ namespace DotNetCheck.Checkups
 
 			var workloadManager = new DotNetWorkloadManager(SdkRoot, sdkVersion, NuGetPackageSources);
 
-			var installedPackageWorkloads = workloadManager.GetInstalledWorkloads();
+			//var installedPackageWorkloads = workloadManager.GetInstalledWorkloads();
 
-			var missingWorkloads = new List<Manifest.DotNetWorkload>();
+			var installedWorkloads = workloadManager.GetInstalledWorkloadManifestIdsAndVersions();
 
-			foreach (var rp in RequiredWorkloads)
+			var requiredWorkloads = workloadManager.ParseRollback(await GetRollbackJson());
+
+			// Get rollback versions
+			// check for matches
+			var missingWorkloads = false;
+
+			foreach (var rp in requiredWorkloads)
 			{
-				if (!NuGetVersion.TryParse(rp.Version, out var rpVersion))
-					rpVersion = new NuGetVersion(0, 0, 0);
+				var workloadVersion = rp.Value.Version;
+				var sdkBand = rp.Value.SdkBand;
 
-				var installedVersions = installedPackageWorkloads
-					.Where(ip => ip.id.Equals(rp.Id, StringComparison.OrdinalIgnoreCase))
-					.Select(s => (s.id, NuGetVersion.Parse(s.version)));
+				var installedVersions = installedWorkloads
+					.Where(ip => ip.Key.Equals(rp.Key, StringComparison.OrdinalIgnoreCase))
+					.Select(s => (s.Key, s.Value));
 
 				// By default allow >= version, but --force will cause exact version matching
-				if (installedVersions.Any(iv => iv.Item2 == rpVersion || (!force && iv.Item2 >= rpVersion)))
+				if (installedVersions.Any(iv => iv.Item2 == workloadVersion || (!force && iv.Item2 >= workloadVersion)))
 				{
-					ReportStatus($"{rp.Id} ({rp.PackageId} : {rp.Version}) installed.", Status.Ok);
+					ReportStatus($"{rp.Key} ({workloadVersion}) installed.", Status.Ok);
 				}
 				else
 				{
-					ReportStatus($"{rp.Id} ({rp.PackageId} : {rp.Version}) not installed.", Status.Error);
-					missingWorkloads.Add(rp);
+					ReportStatus($"{rp.Key} ({workloadVersion}) not installed.", Status.Error);
+					missingWorkloads = true;
 				}
 			}
 
-			if (!missingWorkloads.Any() && !force)
+			if (!missingWorkloads && !force)
 				return DiagnosticResult.Ok(this);
 
 			var canPerform = true;
@@ -117,7 +142,7 @@ namespace DotNetCheck.Checkups
 								}
 							}
 
-							await workloadManager.Install(RequiredWorkloads);
+							await workloadManager.Install(await GetRollbackJson(), WorkloadIds);
 						}))
 				: new Suggestion("Install the latest Visual Studio Preview", "To install or update to the latest workloads for .NET MAUI, install the latest Visual Studio Preview and choose .NET MAUI in the list of features to install under the .NET Mobile Workload: [underline]https://visualstudio.microsoft.com/vs/preview/[/]"));
 		}

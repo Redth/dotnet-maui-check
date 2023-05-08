@@ -18,16 +18,17 @@ namespace DotNetCheck.Checkups
 			{
 				foreach (var sdk in sdks)
 				{
-					var workloads = sdk?.Workloads?.ToArray() ?? Array.Empty<DotNetWorkload>();
 					var pkgSrcs = sdk?.PackageSources?.ToArray() ?? Array.Empty<string>();
 
 					string sdkVersion;
 					if (!sharedState.TryGetEnvironmentVariable("DOTNET_SDK_VERSION", out sdkVersion))
 						sdkVersion = sdk.Version;
 
-					if (sdk.Workloads?.Any() ?? false)
+					if (sdk.WorkloadRollback is not null)
 					{
-						yield return new DotNetWorkloadsCheckup(sharedState, sdkVersion, workloads, pkgSrcs);
+						var workloadIds = sdk.WorkloadIds ?? new List<string> { "maui" };
+
+						yield return new DotNetWorkloadsCheckup(sharedState, sdkVersion, sdk.WorkloadRollback, workloadIds.ToArray(), pkgSrcs);
 					}
 				}
 			}

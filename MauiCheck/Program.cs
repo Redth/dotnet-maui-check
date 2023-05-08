@@ -23,18 +23,15 @@ namespace DotNetCheck
 			CheckupManager.RegisterCheckups(
 				new OpenJdkCheckup(),
 				new AndroidEmulatorCheckup(),
-				new VisualStudioMacCheckup(),
 				new VisualStudioWindowsCheckup(),
 				new AndroidSdkPackagesCheckup(),
 				new XCodeCheckup(),
 				new DotNetCheckup(),
-				new DotNetWorkloadDuplicatesCheckup(),
 				new EdgeWebView2Checkup());
 
 			CheckupManager.RegisterCheckupContributors(
 				new DotNetSdkCheckupContributor());
 
-			CheckupManager.RegisterCheckups(new DotNetSentinelCheckup());
 
 			var app = new CommandApp();
 
@@ -43,14 +40,13 @@ namespace DotNetCheck
 				config.AddCommand<CheckCommand>("check");
 				config.AddCommand<ListCheckupCommand>("list");
 				config.AddCommand<ConfigCommand>("config");
-				config.AddCommand<AcquirePackagesCommand>("acquirepackages");
 			});
 
 			var finalArgs = new List<string>();
 
 			var firstArg = args?.FirstOrDefault()?.Trim()?.ToLowerInvariant() ?? string.Empty;
 
-			if (firstArg != "list" && firstArg != "config" && firstArg != "acquirepackages")
+			if (firstArg != "list" && firstArg != "config")
 				finalArgs.Add("check");
 
 			if (args?.Any() ?? false)

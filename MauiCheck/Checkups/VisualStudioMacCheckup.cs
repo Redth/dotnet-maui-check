@@ -15,20 +15,20 @@ namespace DotNetCheck.Checkups
 			=> platform == Platform.OSX;
 
 		public NuGetVersion MinimumVersion
-			=> Extensions.ParseVersion(Manifest?.Check?.VSMac?.MinimumVersion, new NuGetVersion("8.9.0"));
+			=> Extensions.ParseVersion("17.5.0", new NuGetVersion("17.5.0"));
 
 		public NuGetVersion ExactVersion
-			=> Extensions.ParseVersion(Manifest?.Check?.VSMac?.ExactVersion);
+			=> Extensions.ParseVersion(null);
 
 		public bool Optional
-			=> Manifest?.Check?.VSMac?.Optional ?? false;
+			=> true;
 
 		public override string Id => "vsmac";
 
 		public override string Title => $"Visual Studio {MinimumVersion.ThisOrExact(ExactVersion)}";
 
 		public override bool ShouldExamine(SharedState history)
-			=> Manifest?.Check?.VSMac != null;
+			=> false;
 
 		public override async Task<DiagnosticResult> Examine(SharedState history)
 		{

@@ -64,12 +64,6 @@ namespace DotNetCheck.Checkups
 					if (bestSdk == null || sdk.Version > bestSdk.Version)
 						bestSdk = sdk;
 
-					if (requiredSdk.EnableWorkloadResolver)
-					{
-						var sentinelPath = Path.Combine(sdk.Directory.FullName, "EnableWorkloadResolver.sentinel");
-						sentinelFiles.Add(sentinelPath);
-					}
-
 					ReportStatus($"{sdk.Version} - {sdk.Directory}", Status.Ok);
 				}
 				else
@@ -86,10 +80,6 @@ namespace DotNetCheck.Checkups
 				history.SetEnvironmentVariable("DOTNET_SDK", bestSdk.Directory.FullName);
 				history.SetEnvironmentVariable("DOTNET_SDK_VERSION", bestSdk.Version.ToString());
 			}
-
-			// Add sentinel files that should be considered
-			if (sentinelFiles.Any())
-				history.ContributeState(this, "sentinel_files", sentinelFiles.ToArray());
 
 			if (missingSdks.Any())
 			{
