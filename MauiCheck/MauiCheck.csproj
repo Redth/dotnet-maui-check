@@ -64,15 +64,28 @@
     <Reference Include="Microsoft.DotNet.MSBuildSdkResolver">
       <HintPath>..\libs\Microsoft.DotNet.MSBuildSdkResolver.dll</HintPath>
     </Reference>
+	  <Reference Include="Microsoft.Deployment.DotNet.Releases">
+		  <HintPath>..\libs\Microsoft.Deployment.DotNet.Releases.dll</HintPath>
+	  </Reference>
     <Reference Include="Boots.Core">
       <HintPath>..\libs\Boots.Core.dll</HintPath>
     </Reference>
     <Reference Include="Mono.AndroidTools">
-      <HintPath>..\libs\Mono.AndroidTools.Ide.dll</HintPath>
+      <HintPath>..\libs\Mono.AndroidTools.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Android.Tools.AndroidSdk">
-      <HintPath>..\libs\Xamarin.Android.Tools.AndroidSdk.Ide.dll</HintPath>
+      <HintPath>..\libs\Xamarin.Android.Tools.AndroidSdk.dll</HintPath>
     </Reference>
+	  <!--<Reference Include="Xamarin.Android.Tools.AndroidSdk.Ide">
+		  <HintPath>..\libs\Xamarin.Android.Tools.AndroidSdk.Ide.dll</HintPath>
+	  </Reference>-->
+
+	  <Reference Include="Xamarin.AndroidTools">
+		  <HintPath>..\libs\Xamarin.AndroidTools.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Xamarin.AndroidTools.Ide">
+		  <HintPath>..\libs\Xamarin.AndroidTools.Ide.dll</HintPath>
+	  </Reference>
     <Reference Include="Xamarin.Installer.AndroidSDK">
       <HintPath>..\libs\Xamarin.Installer.AndroidSDK.dll</HintPath>
     </Reference>
