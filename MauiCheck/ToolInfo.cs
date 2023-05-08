@@ -66,17 +66,6 @@ namespace DotNetCheck
 				return false;
 			}
 
-			var minSupportedDotNetSdkVersion = Manifest.DotNetSdk.Version6Preview7;
-
-			// Check that we aren't on a manifest that wants too old of dotnet6
-			if (manifest?.Check?.DotNet?.Sdks?.Any(dnsdk =>
-				NuGetVersion.TryParse(dnsdk.Version, out var dnsdkVersion) && dnsdkVersion < minSupportedDotNetSdkVersion) ?? false)
-			{
-				Console.WriteLine();
-				AnsiConsole.MarkupLine($"[bold red]{Icon.Error} This version of the tool is incompatible with installing an older version of .NET 6[/]");
-				return false;
-			}
-
 			return true;
 		}
 
