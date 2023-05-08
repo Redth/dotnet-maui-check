@@ -9,6 +9,7 @@ using DotNetCheck.Solutions;
 using Xamarin.Installer.AndroidSDK;
 using Xamarin.Installer.AndroidSDK.Manager;
 using System.IO;
+using AndroidSdk;
 
 namespace DotNetCheck.Checkups
 {
@@ -36,25 +37,26 @@ namespace DotNetCheck.Checkups
 			if (!string.IsNullOrEmpty(javaHome) && Directory.Exists(javaHome))
 				java = Path.Combine(javaHome, "bin", "java" + (Util.IsWindows ? ".exe" : ""));
 
-			var avds = new List<AndroidSdk.AvdManager.Avd>();
+			var avdNames = new List<string>();
 
 			// Try invoking the java avdmanager library first
 			if (File.Exists(java))
 			{
-				avdManager = new AndroidSdk.AvdManager(java,
+				avdManager = new AndroidSdk.AvdManager(
 					history.GetEnvironmentVariable("ANDROID_SDK_ROOT") ?? history.GetEnvironmentVariable("ANDROID_HOME"));
-				avds.AddRange(avdManager.ListAvds());
+				avdNames.AddRange(avdManager.ListAvds().Select(a => a.Name));
 			}
 
 			// Fallback to manually reading the avd files
-			if (!avds.Any())
-				avds.AddRange(AndroidSdk.AvdManager.ListAvdsFromFiles());
+			if (!avdNames.Any())
+				avdNames.AddRange(new AvdLocator().ListAvds(history.GetEnvironmentVariable("ANDROID_SDK_ROOT") ?? history.GetEnvironmentVariable("ANDROID_HOME"))
+					.Select(a => a.DisplayName ?? a.DeviceName ?? a.Target));
 
-			if (avds.Any())
+			if (avdNames.Any())
 			{
-				var emu = avds.FirstOrDefault();
+				var emu = avdNames.FirstOrDefault();
 
-				ReportStatus($"Emulator: {emu.Name ?? emu.SdkId} found.", Status.Ok);
+				ReportStatus($"Emulator: {emu} found.", Status.Ok);
 
 				return Task.FromResult(DiagnosticResult.Ok(this));
 			}
@@ -110,7 +112,7 @@ namespace DotNetCheck.Checkups
 
 								var sdkId = sdkPackage?.Path ?? me.SdkId;
 
-								avdManager.Create($"Android_Emulator_{me.ApiLevel}", sdkId, device: preferredDevice?.Id, tag: "google_apis", force: true, interactive: true);
+								avdManager.Create($"Android_Emulator_{me.ApiLevel}", sdkId, device: preferredDevice?.Id, force: true);
 								return Task.CompletedTask;
 							}
 							catch (Exception ex)
