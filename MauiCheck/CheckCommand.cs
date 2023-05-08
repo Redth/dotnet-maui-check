@@ -25,17 +25,17 @@ namespace DotNetCheck.Cli
 
 			Console.Title = ToolInfo.ToolName;
 
-			AnsiConsole.Render(
-				new FigletText(".NET MAUI").LeftAligned().Color(Color.Green));
+			AnsiConsole.Write(
+				new FigletText(".NET MAUI").LeftJustified().Color(Color.Green));
 
 			AnsiConsole.MarkupLine($"[underline bold green]{Icon.Ambulance} {ToolInfo.ToolName} v{ToolInfo.CurrentVersion} {Icon.Recommend}[/]");
-			AnsiConsole.Render(new Rule());
+			AnsiConsole.Write(new Rule());
 
 			AnsiConsole.MarkupLine("This tool will attempt to evaluate your .NET MAUI development environment.");
 			AnsiConsole.MarkupLine("If problems are detected, this tool may offer the option to try and fix them for you, or suggest a way to fix them yourself.");
 			AnsiConsole.WriteLine();
 			AnsiConsole.MarkupLine("Thanks for choosing .NET MAUI!");
-			AnsiConsole.Render(new Rule());
+			AnsiConsole.Write(new Rule());
 
 			if (!Util.IsAdmin() && Util.IsWindows)
 			{
@@ -43,7 +43,7 @@ namespace DotNetCheck.Cli
 
 				AnsiConsole.MarkupLine($"[bold red]{Icon.Bell} {suTxt} is required to fix most issues.  Consider exiting and running the tool with {suTxt} permissions.[/]");
 
-				AnsiConsole.Render(new Rule());
+				AnsiConsole.Write(new Rule());
 
 				if (!settings.NonInteractive)
 				{
