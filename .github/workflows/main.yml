@@ -76,7 +76,11 @@ jobs:
           run: |
             dotnet tool install -g nupkgwrench
             nupkgwrench extract ./NuGet/*.nupkg --output ./tmp
-            codesign --sign "$env:APPLE_CERT_CN" "$pwd/tmp/**/maui-check" --keychain /Users/runner/Library/Keychains/signing_temp.keychain-db
+
+            security find-identity -p codesigning ~/Library/Keychains/signing_temp.keychain-db
+
+            codesign --sign "$env:APPLE_CERT_CN" "$pwd/tmp/**/maui-check" --keychain ~/Library/Keychains/signing_temp.keychain-db
+
             New-Item -ItemType Directory -Force -Path ./NuGetSigned
             nupkgwrench compress ./tmp --output ./NuGetSigned/
             $pfxPath = Join-Path -Path $pwd -ChildPath "codesigncert.pfx"
