@@ -10,7 +10,6 @@ namespace DotNetCheck.Manifest
 	{
 		public const string DefaultManifestUrl = "https://aka.ms/dotnet-maui-check-manifest";
 		public const string PreviewManifestUrl = "https://aka.ms/dotnet-maui-check-manifest-preview";
-		public const string MainManifestUrl = "https://aka.ms/dotnet-maui-check-manifest-main";
 
 		public static Task<Manifest> FromFileOrUrl(string fileOrUrl)
 		{

@@ -14,8 +14,3 @@
   This should align with the current MAUI preview version available:
   - maui-preview.manifest.json
   - https://aka.ms/dotnet-maui-check-manifest-preview
-  
-  ### Main
-  This should align with the current MAUI main branch version available and will change often:
-  - maui-main.manifest.json
-  - https://aka.ms/dotnet-maui-check-manifest-main

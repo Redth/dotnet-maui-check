@@ -72,7 +72,10 @@ namespace DotNetCheck.Cli
 			if (settings.Preview)
 				channel = ManifestChannel.Preview;
 			if (settings.Main)
-				channel = ManifestChannel.Main;
+			{
+				AnsiConsole.Markup($"[bold orange]{Icon.Warning} 'main' is deprecated, using 'preview' instead...[/]");
+				channel = ManifestChannel.Preview;
+			}
 
 			var manifest = await ToolInfo.LoadManifest(settings.Manifest, channel);
 
