@@ -15,6 +15,7 @@ jobs:
       env:
         NUPKG_MAJOR: 0.999
         CODESIGN_PFX: ${{ secrets.CODESIGN_PFX }}
+
       runs-on: windows-latest
       steps:
       - name: Checkout
@@ -44,7 +45,7 @@ jobs:
 
           dotnet build --configuration Release ./MauiCheck.sln
           dotnet pack --output ./artifacts -p:PackageVersion=$VERSION -p:SigningCertificatePfxFile=$pfxPath --configuration Release ./MauiCheck/MauiCheck.csproj
-          dotnet nuget sign .\artifacts\*.nupkg --certificate-path $pfxPath --timestamper http://timestamp.entrust.net/TSS/RFC3161sha2TS
+          dotnet nuget sign ./artifacts/*.nupkg --certificate-path $pfxPath --timestamper http://timestamp.entrust.net/TSS/RFC3161sha2TS
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v1
@@ -52,18 +53,54 @@ jobs:
           name: NuGet
           path: ./artifacts
 
-    publish:
-      name: Publish
+
+    maccodesign:
+      runs-on: macos-latest
+      name: Mac Signing
       needs:
         - build
-      runs-on: windows-latest
       steps:
         - name: Download Artifacts
           uses: actions/download-artifact@v1
           with:
             name: NuGet
 
+        - name: Import Apple Cert
+          uses: apple-actions/import-codesign-certs@v2
+          with: 
+            p12-file-base64: ${{ secrets.APPLE_CERT }}
+            p12-password: ${{ secrets.APPLE_CERT_PWD }}
+  
+        - name: Sign and Repackage
+          shell: pwsh
+          run: |
+            dotnet tool install -g nupkgwrench
+            nupkgwrench extract ./NuGet/*.nupkg --output ./tmp
+            codesign ./tmp/**/maui-check
+            nupkgwrench compress ./tmp --output ./NuGetSigned/
+
+            $pfxPath = Join-Path -Path $pwd -ChildPath "codesigncert.pfx"
+            [IO.File]::WriteAllBytes($pfxPath,[System.Convert]::FromBase64String($env:CODESIGN_PFX))
+            dotnet nuget sign ./NuGetSigned/*.nupkg --certificate-path $pfxPath --timestamper http://timestamp.entrust.net/TSS/RFC3161sha2TS
+
+        - name: Upload Artifacts
+          uses: actions/upload-artifact@v1
+          with:
+            name: NuGetSigned
+            path: ./NuGetSigned
+
+    publish:
+      name: Publish
+      needs:
+        - maccodesign
+      runs-on: windows-latest
+      steps:
+        - name: Download Artifacts
+          uses: actions/download-artifact@v1
+          with:
+            name: NuGetSigned
+
         - name: Push NuGet
           if: github.event_name == 'release'
           run: |
-            dotnet nuget push NuGet\*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_ORG_API_KEY }} --skip-duplicate
+            dotnet nuget push NuGetSigned\*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_ORG_API_KEY }} --skip-duplicate
