@@ -16,158 +16,54 @@ jobs:
         NUPKG_MAJOR: 0.999
         CODESIGN_PFX: ${{ secrets.CODESIGN_PFX }}
       runs-on: windows-latest
-      outputs:
-        dotnetver: ${{ steps.manifests.outputs.dotnetver }}
-        dotnetdevver: ${{ steps.manifests.outputs.dotnetdevver }}
-        pkgverrelease: ${{ steps.buildrelease.outputs.pkgverrelease }}
-        pkgverci: ${{ steps.buildci.outputs.pkgverci }}
       steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Setup .NET Core v3
+      - name: Setup .NET 8.0.x Preview
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '3.1.x'
-      
-      - name: Setup .NET Core v5
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: '5.0.x'
-      
-      - name: Setup .NET Core v6
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: '6.0.x'
+          dotnet-version: '8.0.x'
           include-prerelease: true
           
-      - name: Build and Pack - Release
-        id: buildrelease
-        if: github.event_name == 'release'
-        shell: pwsh
-        run: |
-          $VERSION = $env:GITHUB_REF.Split('/')[2]
-          echo "::set-output name=pkgverrelease::$VERSION"
-          mkdir ./output
-          mkdir ./artifacts
-          [IO.File]::WriteAllBytes("$pwd\codesigncert.pfx",[System.Convert]::FromBase64String($env:CODESIGN_PFX))
-          & dotnet build --configuration Release ./MauiCheck.sln
-          & dotnet pack --output ./artifacts -p:PackageVersion=$VERSION -p:SigningCertificatePfxFile="$pwd\codesigncert.pfx" --configuration Release ./MauiCheck/MauiCheck.csproj
-
-      - name: Build and Pack - CI
-        id: buildci
-        if: github.event_name != 'release'
+      - name: Build
         shell: pwsh
         run: |
           $VERSION="$env:NUPKG_MAJOR-ci$env:GITHUB_RUN_ID"
+          if ($env:GITHUB_EVENT_NAME -eq "release") {
+            $VERSION = $env:GITHUB_REF.Substring($env:GITHUB_REF.LastIndexOf('/') + 1)
+          }
           echo "::set-output name=pkgverci::$VERSION"
           echo "PACKAGE VERSION: $VERSION"
-          mkdir ./output
-          mkdir ./artifacts
-          [IO.File]::WriteAllBytes("$pwd\codesigncert.pfx",[System.Convert]::FromBase64String($env:CODESIGN_PFX))
+          
+          New-Item -ItemType Directory -Force -Path ./artifacts
+          New-Item -ItemType Directory -Force -Path ./output
+
+          $pfxPath = Join-Path -Path $pwd -ChildPath "codesigncert.pfx"
+          [IO.File]::WriteAllBytes($pfxPath,[System.Convert]::FromBase64String($env:CODESIGN_PFX))
+
           dotnet build --configuration Release ./MauiCheck.sln
-          dotnet pack --output ./artifacts -p:PackageVersion=$VERSION -p:SigningCertificatePfxFile="$pwd\codesigncert.pfx" --configuration Release ./MauiCheck/MauiCheck.csproj
+          dotnet pack --output ./artifacts -p:PackageVersion=$VERSION -p:SigningCertificatePfxFile=$pfxPath --configuration Release ./MauiCheck/MauiCheck.csproj
+          dotnet nuget sign .\artifacts\*.nupkg --certificate-path $pfxPath --timestamper http://timestamp.entrust.net/TSS/RFC3161sha2TS
+
       - name: Upload Artifacts
         uses: actions/upload-artifact@v1
         with:
           name: NuGet
           path: ./artifacts
 
-#     testwin:
-#       name: Use Tool - Windows
-#       needs: build
-#       runs-on: windows-latest
-#       steps:
-#         - name: Download Artifacts
-#           uses: actions/download-artifact@v1
-#           with:
-#             name: NuGet
-#         - name: Setup .NET Core
-#           uses: actions/setup-dotnet@v1
-#           with:
-#             dotnet-version: 3.1.100
-#         - name: Install and Run Tool
-#           shell: pwsh
-#           run: |
-#             $dotnetVersion="${{needs.build.outputs.dotnetver}}"
-#             $dotnetDevVersion="${{needs.build.outputs.dotnetdevver}}"
-#             $pkgVer="${{needs.build.outputs.pkgverrelease}}"
-#             if (!$pkgVer)
-#             {
-#               $pkgVer="${{needs.build.outputs.pkgverci}}"
-#             }
-#             Write-Output "PACKAGE VERSION: $pkgVer"
-#             $ProgressPreference = 'SilentlyContinue'
-#             # Invoke-WebRequest -Uri "https://dot.net/v1/dotnet-install.ps1" -OutFile dotnet-install.ps1
-#             # & .\dotnet-install.ps1 -Version "$dotnetVersion" -InstallDir "$env:ProgramFiles\dotnet\" -Verbose
-#             # & .\dotnet-install.ps1 -Version "$dotnetDevVersion" -InstallDir "$env:ProgramFiles\dotnet\" -Verbose
-#             & dotnet --list-sdks
-#             & dotnet tool install --global --version $pkgVer --add-source NuGet\ redth.net.maui.check
-#             & maui-check --ci --fix --non-interactive --verbose --skip openjdk --skip vswin --skip vsmac
-#             & maui-check --main --ci --fix --non-interactive --verbose
-#             & maui-check --ci --fix --non-interactive --verbose --skip openjdk --skip vswin --skip vsmac
-
-#     testmac:
-#       name: Use Tool - MacOS
-#       needs: build
-#       runs-on: macos-latest
-#       steps:
-#         - name: Download Artifacts
-#           uses: actions/download-artifact@v1
-#           with:
-#             name: NuGet
-#         - name: Setup .NET Core
-#           uses: actions/setup-dotnet@v1
-#           with:
-#             dotnet-version: 3.1.100
-#         - name: Install and Run Tool
-#           run: |
-#             dotnetVersion=${{needs.build.outputs.dotnetver}}
-#             dotnetDevVersion=${{needs.build.outputs.dotnetdevver}}
-#             pkgVer=${{needs.build.outputs.pkgverrelease}}
-#             if [ -z "$pkgVer" ]
-#             then
-#               pkgVer=${{needs.build.outputs.pkgverci}}
-#             fi
-#             echo "PACKAGE VERSION: $pkgVer"
-#             export PATH="/usr/local/share/dotnet/:~/.dotnet/tools:$PATH"
-#             # curl -L https://raw.githubusercontent.com/dotnet/install-scripts/7a9d5dcab92cf131fc2d8977052f8c2c2d540e22/src/dotnet-install.sh > dotnet-install.sh
-#             # sh dotnet-install.sh --version $dotnetVersion --install-dir $DOTNET_ROOT --verbose
-#             # sh dotnet-install.sh --version $dotnetDevVersion --install-dir $DOTNET_ROOT --verbose
-#             dotnet --list-sdks
-#             dotnet tool install --global --version $pkgVer --add-source ./NuGet/ redth.net.maui.check
-#             maui-check --ci --fix --non-interactive --verbose --skip openjdk --skip xcode --skip androidemulator --skip vswin --skip vsmac
-#             maui-check --main --ci --fix --non-interactive --verbose --skip xcode --skip androidemulator --skip vswin --skip vsmac
-#             maui-check --ci --fix --non-interactive --verbose --skip openjdk --skip xcode --skip androidemulator --skip vswin --skip vsmac
-
     publish:
       name: Publish
       needs:
         - build
-#         - testmac
-#         - testwin
       runs-on: windows-latest
       steps:
         - name: Download Artifacts
           uses: actions/download-artifact@v1
           with:
             name: NuGet
-        - name: Setup .NET Core
-          uses: actions/setup-dotnet@v1
-          with:
-            dotnet-version: 3.1.100
-        - name: Setup NuGet
-          uses: nuget/setup-nuget@v1
-          with:
-            nuget-api-key: ${{ secrets.NUGET_API_KEY }}
-            nuget-version: 'latest'
+
         - name: Push NuGet
           if: github.event_name == 'release'
           run: |
-            nuget push NuGet\*.nupkg -Source https://api.nuget.org/v3/index.json -ApiKey ${{ secrets.NUGET_ORG_API_KEY }} -SkipDuplicate
-        #- name: Push GPR
-        #  if: github.event_name != 'release'
-        #  run: |
-        #    nuget sources add -Name "GPR" -Source "https://nuget.pkg.github.com/Redth/index.json" -UserName Redth -Password ${{ secrets.GITHUB_TOKEN }}
-        #    nuget setApiKey ${{ secrets.NUGET_API_KEY }} -Source "GPR"
-        #    nuget push NuGet\*.nupkg -Source "GPR" -SkipDuplicate
+            dotnet nuget push NuGet\*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_ORG_API_KEY }} --skip-duplicate
