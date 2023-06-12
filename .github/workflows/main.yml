@@ -15,6 +15,7 @@ jobs:
       env:
         NUPKG_MAJOR: 0.999
         CODESIGN_PFX: ${{ secrets.CODESIGN_PFX }}
+        APPLE_CERT_CN: ${{ secrets.APPLE_CERT_CN }}
 
       runs-on: windows-latest
       steps:
@@ -45,7 +46,6 @@ jobs:
 
           dotnet build --configuration Release ./MauiCheck.sln
           dotnet pack --output ./artifacts -p:PackageVersion=$VERSION -p:SigningCertificatePfxFile=$pfxPath --configuration Release ./MauiCheck/MauiCheck.csproj
-          dotnet nuget sign .\artifacts\*.nupkg --certificate-path $pfxPath --timestamper http://timestamp.entrust.net/TSS/RFC3161sha2TS
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v1
@@ -76,7 +76,7 @@ jobs:
           run: |
             dotnet tool install -g nupkgwrench
             nupkgwrench extract ./NuGet/*.nupkg --output ./tmp
-            codesign ./tmp/**/maui-check
+            codesign -s "$env:APPLE_CERT_CN" ./tmp/**/maui-check
             nupkgwrench compress ./tmp --output ./NuGetSigned/
 
             $pfxPath = Join-Path -Path $pwd -ChildPath "codesigncert.pfx"
