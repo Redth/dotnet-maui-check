@@ -45,7 +45,7 @@ jobs:
 
           dotnet build --configuration Release ./MauiCheck.sln
           dotnet pack --output ./artifacts -p:PackageVersion=$VERSION -p:SigningCertificatePfxFile=$pfxPath --configuration Release ./MauiCheck/MauiCheck.csproj
-          dotnet nuget sign ./artifacts/*.nupkg --certificate-path $pfxPath --timestamper http://timestamp.entrust.net/TSS/RFC3161sha2TS
+          dotnet nuget sign .\artifacts\*.nupkg --certificate-path $pfxPath --timestamper http://timestamp.entrust.net/TSS/RFC3161sha2TS
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v1
