@@ -77,8 +77,8 @@ jobs:
             dotnet tool install -g nupkgwrench
             nupkgwrench extract ./NuGet/*.nupkg --output ./tmp
             codesign -s "$env:APPLE_CERT_CN" ./tmp/**/maui-check
+            New-Item -ItemType Directory -Force -Path ./NuGetSigned
             nupkgwrench compress ./tmp --output ./NuGetSigned/
-
             $pfxPath = Join-Path -Path $pwd -ChildPath "codesigncert.pfx"
             [IO.File]::WriteAllBytes($pfxPath,[System.Convert]::FromBase64String($env:CODESIGN_PFX))
             dotnet nuget sign ./NuGetSigned/*.nupkg --certificate-path $pfxPath --timestamper http://timestamp.entrust.net/TSS/RFC3161sha2TS
