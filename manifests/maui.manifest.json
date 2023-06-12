@@ -1,120 +1,80 @@
 {
   "check": {
-    "toolVersion": "1.0.0",
+    "toolVersion": "2.0.0",
     "variables": {
-      "DOTNET_SDK_BAND": "6.0.300",
-      "MACIOS_SDK_BAND": "6.0.400",
-      "ANDROID_SDK_BAND": "6.0.300",
-      "MAUI_SDK_BAND": "6.0.300",
-      "EMSDK_SDK_BAND": "6.0.300",
-      "MONO_SDK_BAND": "6.0.300",
-      "DOTNET_SDK_VERSION": "6.0.301",
-      "WORKLOAD_PREVIEW": "",
-      "OPENJDK_VERSION": "11.0.12",
+      "DOTNET_SDK_VERSION": "7.0.302",
+      "OPENJDK_VERSION": "11.0.19",
+      "WORKLOAD_ROLLBACK": "https://maui.blob.core.windows.net/metadata/rollbacks/7.0.86.json",
       "PACKAGE_SOURCE_NUGET_ORG": "https://api.nuget.org/v3/index.json"
     },
-    "variableMappers": [
-      {
-        "$type": "DotNetCheck.Manifest.NuGetFeedVariableMapper, MauiCheck",
-        "packageSources": [ "$(PACKAGE_SOURCE_NUGET_ORG)" ],
-        "mappings": [
-          {
-            "name": "MAUI_VERSION",
-            "packageId": "Microsoft.NET.Sdk.Maui.Manifest-$(MAUI_SDK_BAND)",
-            "packageVersion": "6.0.*"
-          },
-          {
-            "name": "ANDROID_SDK_VERSION",
-            "packageId": "Microsoft.NET.Sdk.Android.Manifest-$(ANDROID_SDK_BAND)",
-            "packageVersion": "*$(WORKLOAD_PREVIEW)"
-          },
-          {
-            "name": "MACCATALYST_SDK_VERSION",
-            "packageId": "Microsoft.NET.Sdk.MacCatalyst.Manifest-$(MACIOS_SDK_BAND)",
-            "packageVersion": "*$(WORKLOAD_PREVIEW)"
-          },
-          {
-            "name": "TVOS_SDK_VERSION",
-            "packageId": "Microsoft.NET.Sdk.tvOS.Manifest-$(MACIOS_SDK_BAND)",
-            "packageVersion": "*$(WORKLOAD_PREVIEW)"
-          },
-          {
-            "name": "MACOS_SDK_VERSION",
-            "packageId": "Microsoft.NET.Sdk.macOS.Manifest-$(MACIOS_SDK_BAND)",
-            "packageVersion": "*$(WORKLOAD_PREVIEW)"
-          },
-          {
-            "name": "IOS_SDK_VERSION",
-            "packageId": "Microsoft.NET.Sdk.iOS.Manifest-$(MACIOS_SDK_BAND)",
-            "packageVersion": "*$(WORKLOAD_PREVIEW)"
-          }
-        ]
-      }
-    ],
     "openjdk": {
       "version": "11.0",
       "urls": {
-        "win64": "https://aka.ms/download-jdk/microsoft-jdk-$(OPENJDK_VERSION)-windows-x64.msi",
-        "osx": "https://aka.ms/download-jdk/microsoft-jdk-$(OPENJDK_VERSION)-macos-x64.pkg"
+        "win": "https://aka.ms/download-jdk/microsoft-jdk-$(OPENJDK_VERSION)-windows-x64.msi",
+        "winArm64": "https://aka.ms/download-jdk/microsoft-jdk-$(OPENJDK_VERSION)-windows-aarch6464.msi",
+        "osx": "https://aka.ms/download-jdk/microsoft-jdk-$(OPENJDK_VERSION)-macos-x64.pkg",
+        "osxArm64": "https://aka.ms/download-jdk/microsoft-jdk-$(OPENJDK_VERSION)-macos-aarch64.pkg"
       }
     },
-    "xcode": {
-      "exactVersion": "20102",
-      "exactVersionName": "13.3"
-    },
     "vswin": {
-      "minimumVersion": "17.3-pre.2.0"
+      "minimumVersion": "17.6"
     },
-    "vsmac": {
-      "minimumVersion": "17.3.0.1028",
-      "optional": "true"
+    "xcode": {
+      "exactVersion": "21812",
+      "exactVersionName": "14.3"
     },
     "android": {
       "packages": [
         {
           "path": "emulator",
-          "version": "31.2.9"
+          "version": "31.3.12"
         },
         {
-          "path": "build-tools;31.0.0",
-          "version": "31.0.0"
+          "path": "build-tools;33.0.0",
+          "version": "33.0.0"
         },
         {
-          "path": "platforms;android-31",
-          "version": "1"
+          "path": "platforms;android-33",
+          "version": "2"
         },
         {
-          "path": "system-images;android-31;google_apis;x86_64",
-          "version": "8",
+          "path": "system-images;android-33;google_apis;x86_64",
+          "version": "10",
           "alternatives": [
             {
               "path": "system-images;android-31;google_apis_playstore;x86_64",
-              "version": "6"
+              "version": "9"
             },
             {
               "path": "system-images;android-31;google_apis;arm64-v8a",
-              "version": "6"
+              "version": "10"
+            },
+            {
+              "path": "system-images;android-33;google_apis;arm64-v8a",
+              "version": "9"
             }
           ]
         },
         {
           "path": "platform-tools",
-          "version": "31.0.3"
+          "version": "33.0.3"
         },
         {
-          "path": "cmdline-tools;5.0",
-          "version": "5.0"
+          "path": "cmdline-tools;8.0",
+          "version": "8.0"
         }
       ],
       "emulators": [
         {
-          "sdkId": "system-images;android-31;google_apis;x86_64",
+          "sdkId": "system-images;android-33;google_apis;x86_64",
           "alternateSdkIds": [
             "system-images;android-31;google_apis_playstore;x86_64",
-            "system-images;android-30;google_apis;arm64-v8a"
+            "system-images;android-33;google_apis_playstore;x86_64",
+            "system-images;android-31;google_apis;arm64-v8a",
+            "system-images;android-33;google_apis;arm64-v8a"
           ],
-          "desc": "Android Emulator - x86_64 - API31 - Google API's",
-          "apiLevel": 31,
+          "desc": "Android Emulator - x86_64 - API33 - Google API's",
+          "apiLevel": 33,
           "tag": "google_apis",
           "device": "pixel"
         }
@@ -125,9 +85,9 @@
         {
           "version": "$(DOTNET_SDK_VERSION)",
           "requireExact": false,
-          "enableWorkloadResolver": false,
           "urls": {
             "win64": "https://dotnetcli.azureedge.net/dotnet/Sdk/$(DOTNET_SDK_VERSION)/dotnet-sdk-$(DOTNET_SDK_VERSION)-win-x64.exe",
+            "winArm64": "https://dotnetcli.azureedge.net/dotnet/Sdk/$(DOTNET_SDK_VERSION)/dotnet-sdk-$(DOTNET_SDK_VERSION)-win-arm64.exe",
             "win": "https://dotnetcli.azureedge.net/dotnet/Sdk/$(DOTNET_SDK_VERSION)/dotnet-sdk-$(DOTNET_SDK_VERSION)-win-x86.exe",
             "osx": "https://dotnetcli.azureedge.net/dotnet/Sdk/$(DOTNET_SDK_VERSION)/dotnet-sdk-$(DOTNET_SDK_VERSION)-osx-x64.pkg",
             "osxArm64": "https://dotnetcli.azureedge.net/dotnet/Sdk/$(DOTNET_SDK_VERSION)/dotnet-sdk-$(DOTNET_SDK_VERSION)-osx-arm64.pkg"
@@ -135,51 +95,15 @@
           "packageSources": [
             "$(PACKAGE_SOURCE_NUGET_ORG)"
           ],
-          "workloads": [
-            {
-              "workloadId": "android",
-              "workloadManifestId": "microsoft.net.sdk.android",
-              "packageId": "Microsoft.NET.Sdk.Android.Manifest-$(ANDROID_SDK_BAND)",
-              "version": "$(ANDROID_SDK_VERSION)",
-              "sdkBand": "$(ANDROID_SDK_BAND)"
-            },
-            {
-              "workloadId": "ios",
-              "workloadManifestId": "microsoft.net.sdk.ios",
-              "packageId": "Microsoft.NET.Sdk.iOS.Manifest-$(DOTNET_SDK_BAND)",
-              "version": "$(IOS_SDK_VERSION)",
-              "sdkBand": "$(MACIOS_SDK_BAND)"
-            },
-            {
-              "workloadId": "maccatalyst",
-              "workloadManifestId": "microsoft.net.sdk.maccatalyst",
-              "packageId": "Microsoft.NET.Sdk.MacCatalyst.Manifest-$(MACIOS_SDK_BAND)",
-              "version": "$(MACCATALYST_SDK_VERSION)",
-              "sdkBand": "$(MACIOS_SDK_BAND)"
-            },
-            {
-              "workloadId": "tvos",
-              "workloadManifestId": "microsoft.net.sdk.tvos",
-              "packageId": "Microsoft.NET.Sdk.tvOS.Manifest-$(MACIOS_SDK_BAND)",
-              "version": "$(TVOS_SDK_VERSION)",
-              "sdkBand": "$(MACIOS_SDK_BAND)"
-            },
-            {
-              "workloadId": "macos",
-              "workloadManifestId": "microsoft.net.sdk.macos",
-              "packageId": "Microsoft.NET.Sdk.macOS.Manifest-$(MACIOS_SDK_BAND)",
-              "version": "$(MACOS_SDK_VERSION)",
-              "sdkBand": "$(MACIOS_SDK_BAND)"
-            },
-            {
-              "workloadId": "maui",
-              "workloadManifestId": "microsoft.net.sdk.maui",
-              "packageId": "Microsoft.NET.Sdk.Maui.Manifest-$(MAUI_SDK_BAND)",
-              "version": "$(MAUI_VERSION)",
-              "sdkBand": "$(MAUI_SDK_BAND)"
-            }
-          ],
-          "packs": []
+          "workloadRollback": "$(WORKLOAD_ROLLBACK)",
+          "workloadIds": [
+            "maui",
+            "android",
+            "maccatalyst",
+            "ios",
+            "tvos",
+            "macos"
+          ]
         }
       ]
     }
