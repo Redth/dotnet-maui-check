@@ -20,7 +20,7 @@ namespace DotNetCheck.Manifest
 		public bool RequireExact { get; set; }
 
 		[JsonProperty("packageSources")]
-		public List<string> PackageSources { get; set; }
+		public string[] PackageSources { get; set; }
 
 		[JsonProperty("workloadRollback", NullValueHandling = NullValueHandling.Ignore)]
 		public System.Uri WorkloadRollback { get; set; }
