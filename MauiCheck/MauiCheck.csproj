@@ -9,6 +9,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <PackAsToolShimRuntimeIdentifiers Condition="'$(GITHUB_ACTIONS)' == 'true' Or '$(TF_BUILD)' == 'true'">win-x64;win-x86;win-arm64;osx-x64;osx-arm64</PackAsToolShimRuntimeIdentifiers>
     <LangVersion>latest</LangVersion>
+    <RollForward>Major</RollForward>
   </PropertyGroup>
 
   <PropertyGroup>
