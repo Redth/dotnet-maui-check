@@ -41,7 +41,8 @@ namespace DotNetCheck.Checkups
 
 		string[] winSdkLocations = new string[]
 		{
-			Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Android", "android-sdk")
+			Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Android", "android-sdk"),
+			Environment.GetEnvironmentVariable("ANDROID_SDK_ROOT")
 		};
 
 		public string FindBestSdkLocation()
